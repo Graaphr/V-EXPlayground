@@ -1,4 +1,4 @@
-import {SlideItem} from "@/app/components/model/Carousel";
+import {SlideItem} from "@/components/model/Carousel";
 
 export const DataFoto : SlideItem []= [
     { 

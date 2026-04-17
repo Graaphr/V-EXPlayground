@@ -11,7 +11,7 @@
 }
 @theme{
   --color-main-blue: #2E05E0;
-    --color-secondary-color: #F6F7F8;
+  --color-secondary-color: #F6F7F8;
   --color-secondary-gray: #F5F5F5;
   --font-poppins:var(--font-poppins);
   --font-tilt-wrap:var(--font-tilt-wrap);

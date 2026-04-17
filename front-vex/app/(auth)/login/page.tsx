@@ -3,9 +3,9 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-// Komponen & Assets
-import { Logo, Button, ButtonPutih } from "@/app/components/Componen";
-import { VectorBox } from "@/app/components/model/BoxModel";
+// Komponen 
+import { Logo, Button, ButtonPutih } from "@/components/Componen";
+import { VectorBox } from "@/components/model/BoxModel";
 
 export default function LoginPage() {
   const slideUp = {
@@ -31,7 +31,6 @@ export default function LoginPage() {
   return (
     <div className="bg-secondary-color overflow-hidden min-h-screen flex items-center justify-center p-4 relative text-black">
       
-      {/* 1. Background Biru - Load dari bawah */}
       <motion.div 
         initial={{ y: "100vh" }}
         animate={{ y: 0 }}
@@ -39,7 +38,6 @@ export default function LoginPage() {
         className="absolute h-[95%] bottom-0 w-[95%] bg-main-blue rounded-t-full"
       >
         
-        {/* --- 3 VECTOR KIRI --- */}
         <motion.div
           variants={slideUp}
           initial="initial"
@@ -71,7 +69,6 @@ export default function LoginPage() {
         </motion.div>
 
 
-        {/* --- 1 VECTOR TENGAH --- */}
         <motion.div
           variants={slideUp}
           initial="initial"
@@ -83,7 +80,6 @@ export default function LoginPage() {
         </motion.div>
 
 
-        {/* --- 3 VECTOR KANAN --- */}
         <motion.div
           variants={slideUp}
           initial="initial"
@@ -116,7 +112,6 @@ export default function LoginPage() {
 
       </motion.div>
 
-      {/* --- FORM LOGIN --- */}
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -128,7 +123,7 @@ export default function LoginPage() {
         </div>
 
         <div className="w-full space-y-5">
-          <input type="email" placeholder="Email" className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
+          <input type="email" placeholder="Email" className="font-poppins w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
           <input type="password" placeholder="Kata Sandi" className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
           <div className="flex justify-end">
             <Link href="#" className="text-sm hover:text-main-blue">Lupa Kata Sandi?</Link>

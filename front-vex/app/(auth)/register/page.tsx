@@ -2,8 +2,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Logo, Button, ButtonPutih } from "@/app/components/Componen";
-import { VectorBox, VectorBlueBox } from "@/app/components/model/BoxModel";
+import { Logo, Button, ButtonPutih } from "@/components/Componen";
+import { VectorBox, VectorBlueBox } from "@/components/model/BoxModel";
 
 export default function RegisterPage() {
     const slideUp = {

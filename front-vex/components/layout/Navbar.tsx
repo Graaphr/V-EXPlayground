@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/icon/logo-vex-ok.svg";
-import { Card, Logo, TextNav, Button } from "@/app/components/Componen";
+import { Card, Logo, TextNav, Button } from "@/components/Componen";
 import "@/app/globals.css";
 
 export default function Navbar() {

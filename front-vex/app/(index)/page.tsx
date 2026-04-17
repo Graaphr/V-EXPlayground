@@ -1,11 +1,11 @@
 // main komponen
-import Navbar from "@/app/components/model/Navbar";
-import Footer from "@/app/components/model/Footer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 // komponen
-import { Card, Logo, Button, BestTag, FavTag } from "@/app/components/Componen";
-import Carousel from "@/app/components/model/Carousel";
+import { Card, Logo, Button, BestTag, FavTag } from "@/components/Componen";
+import Carousel from "@/components/model/Carousel";
 // data
-import { DataFoto } from "@/app/components/model/CarouselData"; //foto terbaik
+import { DataFoto } from "@/components/model/CarouselData"; //foto terbaik
 // icon
 import { BiCube, BiGlobe } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
@@ -13,7 +13,7 @@ import { FaStar } from "react-icons/fa";
 export default function Home() {
   return (
     <div className="flex flex-col w-full  bg-secondary-color">
-      <Navbar />
+     
       <div>
         {/* section1 */}
        <div className="bg-[url(/image/BG1.jpg)] max-h-[100vh] bg-cover  w-full">
@@ -249,7 +249,7 @@ export default function Home() {
         </div>
 
         <div className="bg-main-blue w-full">
-          <Footer />
+         
 
         </div>
       </div>

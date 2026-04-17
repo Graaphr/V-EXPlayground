@@ -35,11 +35,11 @@ const tiltWarp = Tilt_Warp({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${poppins.variable} ${tiltWarp.variable}`}>
-      <body className="font-poppins">
+      <body className="font-poppins"> <Navbar />
         <AnimatePresence mode="wait">
           {children}
         </AnimatePresence>
-         
+         <Footer />
         </body>
 
     </html>
