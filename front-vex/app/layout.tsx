@@ -31,18 +31,18 @@ const tiltWarp = Tilt_Warp({
 });
 
 
+// app/layout.tsx
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" className={`${poppins.variable} ${tiltWarp.variable}`}>
-      <body className="font-poppins">
-        <AnimatePresence mode="wait">
-          {children}
-        </AnimatePresence>
-         
-        </body>
-
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.variable} ${tiltWarp.variable} font-poppins`}>
+        {children}
+      </body>
     </html>
-  
-  );
+  )
 }
