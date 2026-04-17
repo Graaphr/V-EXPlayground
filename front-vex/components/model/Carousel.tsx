@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
-import { BiSolidRightArrow,BiSolidLeftArrow } from "react-icons/bi";
+import { BiSolidRightArrow, BiSolidLeftArrow } from "react-icons/bi";
 
 
 export interface SlideItem {
@@ -12,7 +12,7 @@ export interface SlideItem {
 }
 
 interface CarouselProps {
-  data: SlideItem[]; 
+  data: SlideItem[];
 }
 
 export default function Carousel({ data = [] }: CarouselProps) {
@@ -34,7 +34,7 @@ export default function Carousel({ data = [] }: CarouselProps) {
 
   return (
     <div className="relative group max-w-5xl mx-auto">
-      
+
       <div className="overflow-hidden rounded-2xl shadow-lg border border-gray-100" ref={emblaRef}>
         <div className="flex">
           {data.map((item, index) => (
@@ -59,14 +59,14 @@ export default function Carousel({ data = [] }: CarouselProps) {
         onClick={scrollPrev}
         className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-500/30 hover:bg-black-500/50 backdrop-blur-md text-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
         aria-label="Previous slide"
-      ><BiSolidLeftArrow className="text-xl"/>
+      ><BiSolidLeftArrow className="text-xl" />
       </button>
 
       <button
         onClick={scrollNext}
         className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-500/30 hover:bg-gray-500/50 backdrop-blur-md text-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
         aria-label="Next slide"
-      ><BiSolidRightArrow className="text-xl"/>
+      ><BiSolidRightArrow className="text-xl" />
       </button>
 
     </div>

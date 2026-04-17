@@ -22,9 +22,9 @@ export function Logo({ ...props }) {
             <Image
                 src={logo}
                 alt="Logo"
-                width={200}
-                height={100}
-                className="size-full " {...props}
+                width={490}
+                height={120}
+                {...props}
             />
         </div>
     );
@@ -35,8 +35,8 @@ export function LogoWhite({ ...props }) {
             <Image
                 src={logoWhite}
                 alt="Logo"
-                width={200}
-                height={100}
+                width={240}
+                height={120}
                 className="size-full " {...props}
             />
         </div>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root{
+:root {
   --main-color: #2E05E0;
   --secondary-color: #F6F7F8;
   --accent-color: #FF5722;
@@ -9,33 +9,32 @@
 
 
 }
-@theme{
+
+@theme {
   --color-main-blue: #2E05E0;
   --color-secondary-color: #F6F7F8;
   --color-secondary-gray: #F5F5F5;
-  --font-poppins:var(--font-poppins);
-  --font-tilt-wrap:var(--font-tilt-wrap);
+  --font-poppins: var(--font-poppins);
+  --font-tilt-wrap: var(--font-tilt-wrap);
 }
-@layer components{
-  .primary-hover:hover{
-   transition: all 0.3s ease-in-out;
-   
+
+@layer components {
+  .primary-hover:hover {
+    transition: all 0.3s ease-in-out;
+
   }
-  .primary-hover{
-    @apply hover:bg-gradient-to-b 
-     hover:from-white
-     hover:to-main-blue/20
-     ;
+
+  .primary-hover {
+    @apply hover:bg-gradient-to-b hover:from-white hover:to-main-blue/20;
   }
-  .garis{
-    @apply absolute bottom-3  left-1/2 h-[2px] w-0 bg-main-blue 
-    transition-all
-    duration-320 group-hover:left-0 group-hover:w-full;
+
+  .garis {
+    @apply absolute bottom-3 left-1/2 h-[2px] w-0 bg-main-blue transition-all duration-320 group-hover:left-0 group-hover:w-full;
   }
-  .autoMid{
-    @apply max-w-[80rem] mx-auto px-[60px] 
-     ;
+
+  .autoMid {
+    @apply max-w-[80rem] mx-auto;
   }
-  
+
 
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Tilt_Warp, Poppins} from "next/font/google";
+import { Geist, Geist_Mono, Tilt_Warp, Poppins } from "next/font/google";
 import "@/app/globals.css";
 import { AnimatePresence } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 const poppins = Poppins({
   subsets: ['latin'],
   variable: '--font-poppins',
-  weight: ['100','200','300', '400', '500', '600', '700'],
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
 });
 
 const geistSans = Geist({
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 };
 const tiltWarp = Tilt_Warp({
   subsets: ["latin"],
-  variable: "--font-tilt-warp", 
+  variable: "--font-tilt-warp",
 });
 
 

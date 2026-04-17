@@ -48,7 +48,7 @@ export default function Home() {
 
         {/* section2 */}
         <div className="relative bg-secondary-color  w-full">
-          <div className="autoMid py-[180px] max-h-[740px]  grid grid-cols-5 gap-10">
+          <div className="autoMid px-[20px] py-[180px] max-h-[740px]  grid grid-cols-5 gap-10">
             {/* kiri */}
             <div className="relative  col-span-2 grid grid-rows-5 gap-6">
               <div className="text-main-blue leading-none row-span-1">

@@ -9,7 +9,7 @@ import "@/app/globals.css";
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 py-1 rounded-b-2xl  h-16  w-full  bg-white  font-poppins">
-      <div className="max-w-[80rem] mx-auto px-[60px]  h-full w-full  flex items-center justify-between ">
+      <div className="max-w-[80rem] mx-auto px-[20px]  h-full w-full  flex items-center justify-between ">
 
         <div >
           <Link href="/" className="items-center gap-2 hover:opacity-80 transition-opacity">
