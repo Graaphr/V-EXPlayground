@@ -2,6 +2,7 @@ import React from 'react';
 import { FaLinkedin, FaInstagram, FaYoutube, FaFacebook } from 'react-icons/fa';
 import { Card, LogoWhite, LinkAkses, LinkAksesEks, TextNav, Button } from "@/components/Componen";
 import { VectorBox } from "@/components/model/BoxModel";
+import "@/app/globals.css";
 
 export default function Footer() {
     return (

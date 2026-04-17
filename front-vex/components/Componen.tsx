@@ -115,7 +115,7 @@ export function LinkAkses({ link, title,  className, ...props }: LinkAkses) {
     return (
         <Link
             href={link || "/icon/logo-vex.svg"}
-            className="hover:text-purple-600 transition-colors cursor-pointer"  {...props}
+            className="hover-text"  {...props}
         >
             {title}
 
@@ -128,7 +128,7 @@ export function LinkAksesEks({ link, title, children,  className, ...props }: Li
     return (
         <a
             href={link || "/icon/logo-vex.svg"}
-            className="hover:text-purple-600 transition-colors cursor-pointer"  {...props}
+            className="hover-text"  {...props}
         >
             {title}{children}
         </a>

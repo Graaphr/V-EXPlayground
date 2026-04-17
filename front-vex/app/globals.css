@@ -19,21 +19,16 @@
 }
 
 @layer components {
-  .primary-hover:hover {
-    transition: all 0.3s ease-in-out;
 
+  .hover-text{
+    @apply hover:text-main-blue transition-all cursor-pointer;
   }
-
-  .primary-hover {
-    @apply hover:bg-gradient-to-b hover:from-white hover:to-main-blue/20;
-  }
-
   .garis {
     @apply absolute bottom-3 left-1/2 h-[2px] w-0 bg-main-blue transition-all duration-320 group-hover:left-0 group-hover:w-full;
   }
 
   .autoMid {
-    @apply max-w-[80rem] mx-auto;
+    @apply max-w-[80rem] mx-auto px-[20px];
   }
 
 
