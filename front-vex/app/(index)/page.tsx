@@ -1,6 +1,4 @@
-// main komponen
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+
 // komponen
 import { Card, Logo, Button, BestTag, FavTag } from "@/components/Componen";
 import Carousel from "@/components/model/Carousel";
@@ -228,10 +226,11 @@ export default function Home() {
 
               </div>
             </div>
+            {/* kanan */}
             <div className="col-span-6 grid grid-rows-4 rounded-lg ">
               <div className="row-span-3 grid grid-cols-2 gap-5">
                 <div className="">
-                  <Card link={"/image/img-best1.svg"} className="shadow-xl " title={"Best 1"} />
+                  <Card link={"/image/img-best1.svg"} className=" shadow-xl " title={"Best 1"} />
                 </div>
                 <div className="">
                   <Card link={"/image/img-best1.svg"} className="shadow-xl " title={"Best 1"} />
@@ -246,11 +245,6 @@ export default function Home() {
 
             </div>
           </div>
-        </div>
-
-        <div className="bg-main-blue w-full">
-         
-
         </div>
       </div>
     </div>
