@@ -50,12 +50,12 @@ export default function Home() {
         <div className="relative bg-secondary-color  w-full">
           <div className="autoMid px-[20px] py-[180px] max-h-[740px]  grid grid-cols-5 gap-10">
             {/* kiri */}
-            <div className="relative  col-span-2 grid grid-rows-5 gap-6">
-              <div className="text-main-blue leading-none row-span-1">
+            <div className="relative  col-span-2 grid grid-rows-3 gap-6">
+              <div className="text-main-blue leading-none">
                 <p className="font-poppins font-thin text-7xl leading-none ">TAMPILKAN</p>
                 <p className="font-tilt-wrap font-bold text-7xl leading-none ">KARYAMU</p>
               </div>
-              <div className="flex flex-col justify-center row-span-1 gap-4">
+              <div className="flex flex-col justify-cente gap-4">
                 <div className="gap-2 flex items-center">
                   <BiCube className="text-[36px] font-bold shrink-0" />
                   <p className="text-24 font-poppins">Jelajahi karya dari berbagai sudut dalam ruang virtual.</p>
@@ -65,7 +65,7 @@ export default function Home() {
                   <p className="text-24 font-poppins">Rasakan suasana pameran seperti di dunia nyata.</p>
                 </div>
               </div>
-              <div className="flex items-start row-span-1">
+              <div className="flex items-start">
                 <Button link={"/"} className="items-center font-poppins font-bold bg-secondary-color border-3 border-transparent text-normal px-12 py-4 rounded-md hover:scale-110 ease-in-out transition-all duration-300">
                   TUTORIAL
                 </Button>
