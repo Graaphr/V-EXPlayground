@@ -8,9 +8,9 @@ export default function Footer() {
     return (
         <footer className="w-full bg-main-blue text-white overflow-hidden">
 
-            <div className="relative pt-[80px] max-h-[360px] flex flex-col  md:flex-row">
+            <div className="relative pt-[40px] max-h-[300px] flex flex-col  md:flex-row">
                 {/* kiri */}
-                <div className="w-full md:w-[45%] flex flex-col justify-between p-16 relative z-10">
+                <div className="w-full md:w-[45%] flex flex-col justify-between p-10 relative z-10">
                     <div className="">
 
                         <div className="flex items-start gap-4">
@@ -24,7 +24,7 @@ export default function Footer() {
                         </p>
                     </div>
 
-                    <div className="relative left-0 bottom-20">
+                    <div className="relative left-0 bottom-10">
                         <VectorBox className='w-[500px] relative h-[500px] ' />
 
                     </div>

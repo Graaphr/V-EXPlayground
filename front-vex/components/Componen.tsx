@@ -35,7 +35,7 @@ export function LogoWhite({ ...props }) {
             <Image
                 src={logoWhite}
                 alt="Logo"
-                width={240}
+                width={490}
                 height={120}
                 className="size-full " {...props}
             />
