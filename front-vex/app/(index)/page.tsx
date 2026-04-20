@@ -11,69 +11,73 @@ import { FaStar } from "react-icons/fa";
 export default function Home() {
   return (
     <div className="flex flex-col w-full  bg-secondary-color">
-     
+
       <div>
         {/* section1 */}
-       <div className="bg-[url(/image/BG1.jpg)] max-h-[100vh] bg-cover  w-full">
+        <div className="bg-[url(/image/BG1.jpg)] max-h-[100vh] bg-cover  w-full">
           <div className="autoMid grid grid-cols-2 gap-3 min-h-screen ">
-            
+
             {/* kanan */}
             <div className="col-start-2 flex justify-end">
-  <div className=" relative h-screen w-[80%] grid grid-rows-8 gap-4">
-              {/* Logo */}
-              <div className="items-end flex  relative w-full h-full row-span-2">
-                <Logo />
-              </div>
-              {/* Link/Video */}
-              <div className="h-full  w-full row-span-4">
-                <div className="aspect-video shadow-[0px_9px_12px_rgba(0,0,0,0.9)] shadow-black">
-                  <iframe
-                    src="https://www.youtube.com/embed/IDIDIDIDIDID?controls=0&modestbranding=1&rel=0&showinfo=0"
-                    className="w-full h-full rounded-sm"
-                    title="Demo V-Ex"
-                  ></iframe>
+              <div className=" relative h-screen w-[80%] grid grid-rows-[180px_280px_auto] gap-4">
+                {/* Logo */}
+                <div className="items-end flex  relative w-full h-full">
+                  <Logo />
+                </div>
+                {/* Link/Video */}
+                <div className="items-center h-full  w-full rounded-sm">
+                  <div className="aspect-video shadow-[0px_0px_8px_2px_rgba(0,0,0,0.25)] rounded-sm ">
+                    <iframe
+                      src="https://www.youtube.com/embed/LPUY6cT-VnY?si=WFohWqXD5NbUwYIK?controls=0&modestbranding=1&rel=0&showinfo=0"
+                      className="w-full h-full rounded-sm  "
+                      title="Demo V-Ex"
+                    ></iframe>
+                  </div>
+                </div>
+                {/* Button More */}
+                <div className="relative w-full flex justify-end items-start ">
+                  <Button link={"/"} className="font-medium border-3 border-transparent text-normal px-16 py-3 rounded-md ease-in-out transition-all duration-300 hover:scale-105">
+                    More
+                  </Button>
                 </div>
               </div>
-              {/* Button More */}
-              <div className="relative w-full row-span-2 flex justify-end items-start ">
-                <Button link={"/"} className="font-medium bg-secondary-color border-3 border-transparent text-normal px-12 py-1 rounded-md ease-in-out transition-all duration-300 hover:scale-105">
-                  More
-                </Button>
-              </div>
             </div>
-            </div>
-          
+
           </div>
         </div>
 
         {/* section2 */}
         <div className="relative bg-secondary-color  w-full">
-          <div className="autoMid px-[20px] py-[180px] max-h-[740px]  grid grid-cols-5 gap-10">
+          <div className="autoMid px-[20px] py-[180px] max-h-[740px]  grid grid-cols-2 gap-10">
             {/* kiri */}
-            <div className="relative  col-span-2 grid grid-rows-3 gap-6">
-              <div className="text-main-blue leading-none">
-                <p className="font-poppins font-thin text-7xl leading-none ">TAMPILKAN</p>
-                <p className="font-tilt-wrap font-bold text-7xl leading-none ">KARYAMU</p>
-              </div>
-              <div className="flex flex-col justify-cente gap-4">
-                <div className="gap-2 flex items-center">
-                  <BiCube className="text-[36px] font-bold shrink-0" />
-                  <p className="text-24 font-poppins">Jelajahi karya dari berbagai sudut dalam ruang virtual.</p>
+            <div className="relative grid grid-rows-2 gap-6">
+              <div className="text-main-blue leading-none grid grid-rows-2 gap-4">
+                <div>
+                  <p className="font-poppins font-thin text-8xl leading-none ">TAMPILKAN</p>
+                  <p className="font-tilt-wrap font-bold text-8xl leading-none ">KARYAMU</p>
                 </div>
-                <div className="gap-2 flex items-center">
-                  <BiGlobe className="text-[36px] font-bold shrink-0" />
-                  <p className="text-24 font-poppins">Rasakan suasana pameran seperti di dunia nyata.</p>
+                <div className="gap-4 flex flex-col text-black w-[500px]">
+                  <div className="gap-2 flex items-start">
+                    <BiCube className="text-[26px] font-bold shrink-0" />
+                    <p className="text-[22px] font-poppins">Jelajahi karya dari berbagai sudut dalam ruang virtual.</p>
+                  </div>
+                  <div className="gap-2 flex items-start">
+                    <BiGlobe className="text-[26px] font-bold shrink-0" />
+                    <p className="text-[22px] font-poppins">Rasakan suasana pameran seperti di dunia nyata.</p>
+                  </div>
                 </div>
+                <div className="flex items-start">
+                  <Button link={"/"} className="items-center font-poppins font-medium text-normal px-18 py-4 rounded-md hover:scale-110 ease-in-out transition-all duration-300">
+                    Tutorial
+                  </Button>
+                </div>
+
               </div>
-              <div className="flex items-start">
-                <Button link={"/"} className="items-center font-poppins font-bold bg-secondary-color border-3 border-transparent text-normal px-12 py-4 rounded-md hover:scale-110 ease-in-out transition-all duration-300">
-                  TUTORIAL
-                </Button>
-              </div>
+
             </div>
             {/* kanan */}
-            <div className="col-span-3 h-full">
-              <Card link={"/image/img-lobby.jpg"} title={"lobby"} className="w-full h-full object-cover rounded-xl" />
+            <div className="h-full">
+              <Card link={"/image/BG1.svg"} title={"lobby"} className="w-full h-full object-cover rounded-xl" />
             </div>
           </div>
         </div>
@@ -152,9 +156,9 @@ export default function Home() {
               {/* <div className="rounded-xl shadow-xl">
                 <Card link={"/image/img-best1.svg"} className="shadow-xl " title={"Best 1"} />
               </div> */}
-               <BestTag className="absolute right-0 top-0 z-10"/>
+              <BestTag className="absolute right-0 top-0 z-10" />
               <div className="max-w-4xl mx-auto">
-                           
+
 
                 <Carousel data={DataFoto} />
               </div>
@@ -169,7 +173,7 @@ export default function Home() {
             <div className="col-span-5  rounded-lg">
               <div className="rounded-xl relative shadow-xl">
                 {/* <Card link={"/image/img-best1.svg"} className="shadow-xl " title={"Best 1"} /> */}
-                 <FavTag className="absolute left-0 top-0 z-10"/>
+                <FavTag className="absolute left-0 top-0 z-10" />
                 <div className="max-w-4xl mx-auto">
                   <Carousel data={DataFoto} />
                 </div>

@@ -8,7 +8,7 @@ import "@/app/globals.css";
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 py-1 rounded-b-2xl  h-16  w-full  bg-white  font-poppins">
+    <nav className="sticky top-0 z-50 py-1 rounded-b-2xl  h-18  w-full  bg-white  font-poppins">
       <div className="max-w-[80rem] mx-auto px-[20px]  h-full w-full  flex items-center justify-between ">
 
         <div >
@@ -22,7 +22,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-[40px]">
           <>
             <TextNav
               link={"/"}

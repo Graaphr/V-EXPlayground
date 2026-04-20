@@ -33,3 +33,16 @@
 
 
 }
+
+/* Hilangkan scrollbar untuk semua browser */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
