@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Tilt_Warp, Poppins } from "next/font/google";
 import "@/app/globals.css";
-import { AnimatePresence } from "framer-motion";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-// import { Html, Head, Main, NextScript } from 'next/document';
+
 const poppins = Poppins({
   subsets: ['latin'],
   variable: '--font-poppins',
@@ -30,8 +27,6 @@ const tiltWarp = Tilt_Warp({
   variable: "--font-tilt-warp",
 });
 
-
-// app/layout.tsx
 
 export default function RootLayout({
   children,
