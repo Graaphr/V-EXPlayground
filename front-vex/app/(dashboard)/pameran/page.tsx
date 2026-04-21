@@ -55,20 +55,30 @@ export default function PameranPage() {
         <div className="autoMid">
           <div className="flex w-full gap-4 pt-[30px] pb-[20px] justify-between items-center">
 
+            {/* search section */}
+            <div className='w-[50%] relative flex items-center justify-start text-black'>
+              <input
+                type="text"
+                placeholder="Cari..."
+                className="w-full p-2 pl-[50px] bg-white rounded-full text-sm flex-1 border-2 border-transparent shadow-xl/20 focus:outline-none focus:border-main-blue" />
+
+              <FaSearch className='absolute left-4 opacity-80 text-[22px]' />
+            </div>
+
             {/* filter list */}
             <div className='w-[35%] flex justify-between'>
-{/* Filter Prodi */}
+              {/* Filter Prodi */}
               <div>
                 <SelectProdi selected={selectedProdi}
                   onChange={setSelectedProdi} />
               </div>
-{/* Filter Tahun */}
+              {/* Filter Tahun */}
               <div>
                 <SelectTahun selected={selectedTahun}
                   onChange={setSelectedTahun} />
               </div>
 
-{/* Filter Semester */}
+              {/* Filter Semester */}
               <div>
                 <SelectSemester selected={selectedSemester}
                   onChange={setSelectedSemester} />
@@ -76,15 +86,7 @@ export default function PameranPage() {
 
             </div>
 
-            {/* search section */}
-            <div className='w-[50%] relative flex items-center justify-start text-black'>
-              <input 
-              type="text" 
-              placeholder="Cari..." 
-              className="w-full p-2 pl-[50px] bg-white rounded-full text-sm flex-1 border-2 border-transparent shadow-xl/20 focus:outline-none focus:border-main-blue" />
 
-              <FaSearch className='absolute left-4 opacity-80 text-[22px]' />
-            </div>
           </div>
 
           {/* main */}

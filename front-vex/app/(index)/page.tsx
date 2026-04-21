@@ -46,7 +46,7 @@ export default function Home() {
                 {/* Button */}
                 <div className="flex justify-end lg:justify-end">
                   <Button
-                    link={"/"}
+                    link={"/pameran"}
                     className="font-medium px-8 sm:px-12 py-3 rounded-md transition-all duration-300 hover:scale-105"
                   >
                     More
