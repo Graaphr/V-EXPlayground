@@ -186,13 +186,13 @@ export default function Home() {
             <div className="order-1 grid grid-cols-1 sm:grid-cols-2 gap-6 items-start self-start">
 
               <Card
-                link={"/image/bestbadge.svg"}
+                link={"/image/BestBadge.svg"}
                 title={"best badge"}
                 className="w-full aspect-[4/3] object-cover rounded-xl self-start"
               />
 
               <Card
-                link={"/image/favoritebadge.svg"}
+                link={"/image/FavoriteBadge.svg"}
                 title={"favorite badge"}
                 className="w-full aspect-[4/3] object-cover rounded-xl self-start"
               />
