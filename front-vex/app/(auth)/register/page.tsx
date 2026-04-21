@@ -79,7 +79,7 @@ export default function RegisterPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="z-10 bg-secondary-color border-2 border-white/20 backdrop-blur-sm rounded-xl shadow-2xl w-full max-w-md p-8 flex flex-col items-center scale-90"
+                className="z-10 bg-white border-2 border-white/20 backdrop-blur-sm rounded-xl shadow-2xl w-full max-w-md p-8 flex flex-col items-center scale-90"
             >
                 <div className="flex flex-col items-center mb-8">
                     <Logo />
@@ -98,7 +98,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="mt-6 flex flex-col items-center w-full">
-                    <span className="text-white/70 text-sm mb-4">Sudah punya akun?</span>
+                    <span className="text-black text-sm mb-4">Sudah punya akun?</span>
                     <div className="w-full border-gray-300 ">
                         <Button link="/login" className="w-full  py-3 border-2 rounded-lg text-lg font-bold">Masuk</Button>
                     </div>
