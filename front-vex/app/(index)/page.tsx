@@ -400,7 +400,7 @@ export default function Home() {
 
             {/* button paling bawah saat mobile */}
             <div className="order-3 lg:order-3 lg:col-span-10 flex justify-center lg:justify-end w-full">
-              <Button link={"/login"} className="px-10 sm:px-14 lg:px-18 py-2 lg:py-3 rounded-md hover:scale-110 transition">
+              <Button link={"/register"} className="px-10 sm:px-14 lg:px-18 py-2 lg:py-3 rounded-md hover:scale-110 transition">
                 Daftar
               </Button>
             </div>
