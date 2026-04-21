@@ -93,7 +93,7 @@ export default function RegisterPage() {
 
                 <div className="w-full mt-8 border-b-2 border-gray-400 pb-8">
                     <ButtonPutih link="/" className="w-full py-3 border-2 rounded-lg text-lg font-bold">
-                        Daftar Sekarang
+                        Daftar
                     </ButtonPutih>
                 </div>
 
