@@ -36,7 +36,7 @@ export default function Navbar() {
           />
 
           <TextNav
-            link={"/"}
+            link={"/pameran"}
             title={"PAMERAN"}
             subtitle={"3D BOOTH"}
           />

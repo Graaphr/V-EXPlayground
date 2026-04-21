@@ -68,10 +68,10 @@ export default function ProjectCard({ project, className }: ProjectData) {
         {/* likes dan View */}
         <div className='mt-2 flex items-center gap-4 text-xs'>
           <span className="flex items-center gap-1">
-            <FaHeart /> {project.likes} likes
+            <FaHeart /> {project.likes} Likes
           </span>
           <span className="flex items-center gap-1">
-            <BsStars /> {project.karya} karya
+            <BsStars /> {project.karya} Karya
           </span>
         </div>
       </div>

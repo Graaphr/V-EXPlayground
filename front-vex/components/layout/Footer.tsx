@@ -57,7 +57,7 @@ export default function Footer() {
                                 Solusi
                             </h3>
 
-                            <ul className="text-gray-500 font-semibold space-y-2">
+                            <ul className="text-gray-500 font-normal space-y-2">
                                 <li><LinkAkses link={"/"} title={"Pameran"} /></li>
                                 <li><LinkAkses link={"/"} title={"Stan Pameran"} /></li>
                                 <li><LinkAkses link={"/"} title={"Karya"} /></li>
@@ -71,7 +71,7 @@ export default function Footer() {
                                 Sumber
                             </h3>
 
-                            <ul className="text-gray-500 font-semibold space-y-2">
+                            <ul className="text-gray-500 font-normal space-y-2">
                                 <li><LinkAkses link={"/"} title={"FAQs"} /></li>
                                 <li><LinkAkses link={"/"} title={"Petunjuk"} /></li>
                                 <li><LinkAkses link={"/"} title={"Pelayanan"} /></li>
@@ -85,7 +85,7 @@ export default function Footer() {
                                 Hukum
                             </h3>
 
-                            <ul className="text-gray-500 font-semibold space-y-2">
+                            <ul className="text-gray-500 font-normal space-y-2">
                                 <li><LinkAksesEks link={"/"} title={"Syarat & Ketentuan"} /></li>
                                 <li><LinkAksesEks link={"/"} title={"Kebijakan Privasi"} /></li>
                                 <li><LinkAksesEks link={"/"} title={"Hubungi Kami"} /></li>
@@ -101,7 +101,7 @@ export default function Footer() {
                             <FaLinkedin className="w-7 h-7 sm:w-8 sm:h-8 hover:scale-125 transition-all cursor-pointer" />
                         </LinkAksesEks>
 
-                        <LinkAksesEks link={"/"}>
+                        <LinkAksesEks link={"https://www.instagram.com/virtualexhibition204/"}>
                             <FaInstagram className="w-7 h-7 sm:w-8 sm:h-8 hover:scale-125 transition-all cursor-pointer" />
                         </LinkAksesEks>
 
