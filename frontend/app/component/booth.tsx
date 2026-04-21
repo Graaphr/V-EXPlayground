@@ -18,16 +18,17 @@ export default function Booth({
   video,
 }: BoothProps) {
   const [openVideo, setOpenVideo] = useState(false);
+  const [openPoster, setOpenPoster] = useState(false);
 
   /**
-   * RANDOM STAND 1-3
+   * RANDOM MODEL
    */
   const randomNumber = useMemo(() => {
     return Math.floor(Math.random() * 3) + 1;
   }, []);
 
   /**
-   * LOAD MODEL STAND
+   * LOAD MODEL
    */
   const gltf = useGLTF(`/models/stand${randomNumber}.glb`);
   const scene = useMemo(() => gltf.scene.clone(), [gltf]);
@@ -36,26 +37,52 @@ export default function Booth({
   const videoMesh = useRef<THREE.Mesh | null>(null);
 
   /**
-   * AMBIL PANEL DALAM MODEL
+   * SETUP OBJECT
    */
   useEffect(() => {
-    posterMesh.current = scene.getObjectByName("PanelPoster") as THREE.Mesh;
-    videoMesh.current = scene.getObjectByName("PanelVideo") as THREE.Mesh;
+    scene.traverse((obj: any) => {
+      if (!obj.isMesh) return;
+
+      /**
+       * collider dari blender
+       */
+      if (
+        obj.name.toLowerCase().includes("collider")
+      ) {
+        obj.userData.collider = true;
+        obj.visible = false;
+      } else {
+        obj.userData.collider = false;
+      }
+    });
+
+    posterMesh.current =
+      scene.getObjectByName(
+        "PanelPoster"
+      ) as THREE.Mesh;
+
+    videoMesh.current =
+      scene.getObjectByName(
+        "PanelVideo"
+      ) as THREE.Mesh;
   }, [scene]);
 
   /**
-   * LOAD POSTER IMAGE
+   * LOAD POSTER
    */
   useEffect(() => {
-    if (!poster || !posterMesh.current) return;
+    if (!poster || !posterMesh.current)
+      return;
 
-    const loader = new THREE.TextureLoader();
+    const loader =
+      new THREE.TextureLoader();
 
     loader.load(poster, (texture) => {
       texture.flipY = false;
 
       const material =
-        posterMesh.current!.material as THREE.MeshStandardMaterial;
+        posterMesh.current!
+          .material as THREE.MeshStandardMaterial;
 
       material.map = texture;
       material.needsUpdate = true;
@@ -63,31 +90,37 @@ export default function Booth({
   }, [poster]);
 
   /**
-   * LOAD VIDEO TEXTURE (MP4 / WEBM)
+   * VIDEO TEXTURE
    */
   useEffect(() => {
-    if (!video || !videoMesh.current) return;
+    if (!video || !videoMesh.current)
+      return;
 
-    const isMp4 =
+    const isVideo =
       video.endsWith(".mp4") ||
       video.endsWith(".webm");
 
-    if (!isMp4) return;
+    if (!isVideo) return;
 
-    const htmlVideo = document.createElement("video");
+    const htmlVideo =
+      document.createElement("video");
 
     htmlVideo.src = video;
     htmlVideo.loop = true;
     htmlVideo.muted = true;
-    htmlVideo.playsInline = true;
     htmlVideo.autoplay = true;
+    htmlVideo.playsInline = true;
 
     htmlVideo.play().catch(() => {});
 
-    const texture = new THREE.VideoTexture(htmlVideo);
+    const texture =
+      new THREE.VideoTexture(
+        htmlVideo
+      );
 
     const material =
-      videoMesh.current.material as THREE.MeshStandardMaterial;
+      videoMesh.current!
+        .material as THREE.MeshStandardMaterial;
 
     material.map = texture;
     material.needsUpdate = true;
@@ -99,29 +132,40 @@ export default function Booth({
   }, [video]);
 
   /**
-   * CLICK OPEN EMBED VIDEO
+   * CLICK OBJECT
    */
   const handleClick = (e: any) => {
-    if (!video) return;
+    const clicked =
+      e.object.name;
 
     if (
-      e.object.name === "PanelVideo" &&
-      !video.endsWith(".mp4") &&
-      !video.endsWith(".webm")
+      clicked === "PanelVideo" &&
+      video
     ) {
       setOpenVideo(true);
+    }
+
+    if (
+      clicked === "PanelPoster" &&
+      poster
+    ) {
+      setOpenPoster(true);
     }
   };
 
   return (
     <>
-      {/* MARKER POSITION + ROTATION DARI HALL */}
       <group
         position={position}
-        quaternion={new THREE.Quaternion(...quaternion)}
+        quaternion={
+          new THREE.Quaternion(
+            ...quaternion
+          )
+        }
       >
         <primitive
           object={scene}
+          position={[0, 0, -1.2]}
           scale={1}
           onClick={handleClick}
         />
@@ -134,7 +178,9 @@ export default function Booth({
             <div className="w-[900px] h-[500px] bg-white rounded-xl overflow-hidden relative">
               <button
                 className="absolute top-2 right-3 z-50 text-black text-xl"
-                onClick={() => setOpenVideo(false)}
+                onClick={() =>
+                  setOpenVideo(false)
+                }
               >
                 ✕
               </button>
@@ -143,7 +189,31 @@ export default function Booth({
                 src={video}
                 width="100%"
                 height="100%"
+                allow="autoplay; fullscreen"
                 allowFullScreen
+              />
+            </div>
+          </div>
+        </Html>
+      )}
+
+      {/* POPUP POSTER */}
+      {openPoster && (
+        <Html fullscreen>
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+            <div className="max-w-[90vw] max-h-[90vh] relative">
+              <button
+                className="absolute -top-10 right-0 text-white text-2xl"
+                onClick={() =>
+                  setOpenPoster(false)
+                }
+              >
+                ✕
+              </button>
+
+              <img
+                src={poster}
+                className="max-w-full max-h-[90vh] rounded-xl"
               />
             </div>
           </div>

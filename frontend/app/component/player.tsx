@@ -1,124 +1,361 @@
 "use client";
 
-import { PointerLockControls } from "@react-three/drei";
+import {
+  PointerLockControls,
+  OrbitControls,
+} from "@react-three/drei";
+
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 type Props = {
-    mode: "first" | "third";
-    scene: THREE.Scene;
+  mode: "first" | "third";
 };
 
-export default function Player({ mode, scene }: Props) {
-    const { camera } = useThree();
+export default function Player({
+  mode,
+}: Props) {
+  const { camera, scene: world } =
+    useThree();
 
-    const position = useRef(new THREE.Vector3(0, 8, 5));
-    const velocityY = useRef(0);
+  const orbitRef = useRef<any>(null);
 
-    const raycaster = new THREE.Raycaster();
+  const position = useRef(
+    new THREE.Vector3(0, 8, 5)
+  );
 
-    const keys = useRef({
+  const velocityY = useRef(0);
+
+  const raycaster = useRef(
+    new THREE.Raycaster()
+  );
+
+  const keys = useRef({
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+  });
+
+  const playerMesh = useRef<THREE.Mesh>(
+    null!
+  );
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      /**
+       * BLOKIR TOMBOL C
+       */
+      if (e.code === "KeyC") {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.code === "KeyW")
+        keys.current.w = true;
+
+      if (e.code === "KeyA")
+        keys.current.a = true;
+
+      if (e.code === "KeyS")
+        keys.current.s = true;
+
+      if (e.code === "KeyD")
+        keys.current.d = true;
+    };
+
+    const up = (e: KeyboardEvent) => {
+      if (e.code === "KeyW")
+        keys.current.w = false;
+
+      if (e.code === "KeyA")
+        keys.current.a = false;
+
+      if (e.code === "KeyS")
+        keys.current.s = false;
+
+      if (e.code === "KeyD")
+        keys.current.d = false;
+    };
+
+    const resetKeys = () => {
+      keys.current = {
         w: false,
         a: false,
         s: false,
         d: false,
+      };
+
+      velocityY.current = 0;
+    };
+
+    window.addEventListener(
+      "keydown",
+      down
+    );
+
+    window.addEventListener(
+      "keyup",
+      up
+    );
+
+    window.addEventListener(
+      "blur",
+      resetKeys
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      resetKeys
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        down
+      );
+
+      window.removeEventListener(
+        "keyup",
+        up
+      );
+
+      window.removeEventListener(
+        "blur",
+        resetKeys
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        resetKeys
+      );
+    };
+  }, []);
+
+  useFrame(() => {
+    const speed = 0.15;
+    const playerHeight = 3;
+
+    const colliders: THREE.Object3D[] =
+      [];
+
+    world.traverse((obj: any) => {
+      if (
+        obj.name
+          ?.toLowerCase()
+          .includes("collider")
+      ) {
+        colliders.push(obj);
+        obj.visible = false;
+      }
     });
 
-    useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.code === "KeyW") keys.current.w = true;
-            if (e.code === "KeyA") keys.current.a = true;
-            if (e.code === "KeyS") keys.current.s = true;
-            if (e.code === "KeyD") keys.current.d = true;
-        };
+    /**
+     * ARAH
+     */
+    const dir =
+      new THREE.Vector3();
 
-        const up = (e: KeyboardEvent) => {
-            if (e.code === "KeyW") keys.current.w = false;
-            if (e.code === "KeyA") keys.current.a = false;
-            if (e.code === "KeyS") keys.current.s = false;
-            if (e.code === "KeyD") keys.current.d = false;
-        };
+    camera.getWorldDirection(dir);
+    dir.y = 0;
+    dir.normalize();
 
-        window.addEventListener("keydown", down);
-        window.addEventListener("keyup", up);
+    const right =
+      new THREE.Vector3();
 
-        return () => {
-            window.removeEventListener("keydown", down);
-            window.removeEventListener("keyup", up);
-        };
-    }, []);
+    right
+      .crossVectors(
+        dir,
+        camera.up
+      )
+      .normalize();
 
-    useFrame(() => {
-        const speed = 0.15;
+    /**
+     * MOVE
+     */
+    const next =
+      position.current.clone();
 
-        const dir = new THREE.Vector3();
-        camera.getWorldDirection(dir);
-        dir.y = 0;
-        dir.normalize();
+    if (keys.current.w)
+      next.add(
+        dir
+          .clone()
+          .multiplyScalar(speed)
+      );
 
-        const right = new THREE.Vector3();
-        right.crossVectors(dir, camera.up).normalize();
+    if (keys.current.s)
+      next.add(
+        dir
+          .clone()
+          .multiplyScalar(-speed)
+      );
 
-        const next = position.current.clone();
+    if (keys.current.a)
+      next.add(
+        right
+          .clone()
+          .multiplyScalar(-speed)
+      );
 
-        if (keys.current.w) next.add(dir.clone().multiplyScalar(speed));
-        if (keys.current.s) next.add(dir.clone().multiplyScalar(-speed));
-        if (keys.current.a) next.add(right.clone().multiplyScalar(-speed));
-        if (keys.current.d) next.add(right.clone().multiplyScalar(speed));
+    if (keys.current.d)
+      next.add(
+        right
+          .clone()
+          .multiplyScalar(speed)
+      );
 
-        /**
-         * WALL COLLISION
-         */
-        raycaster.set(position.current, next.clone().sub(position.current).normalize());
+    /**
+     * COLLISION
+     */
+    const moveDir = next
+      .clone()
+      .sub(position.current);
 
-        const hits = raycaster.intersectObjects(scene.children, true);
+    if (moveDir.length() > 0) {
+      moveDir.normalize();
 
-        if (!hits.length || hits[0].distance > 0.5) {
-            position.current.copy(next);
-        }
+      raycaster.current.set(
+        position.current,
+        moveDir
+      );
 
-        const playerHeight = 3;
-        let grounded = false;
+      const hits =
+        raycaster.current.intersectObjects(
+          colliders,
+          true
+        );
 
-        // cek lantai
-        raycaster.set(position.current, new THREE.Vector3(0, -1, 0));
-        const floorHits = raycaster.intersectObjects(scene.children, true);
+      if (
+        !hits.length ||
+        hits[0].distance > 0.6
+      ) {
+        position.current.copy(
+          next
+        );
+      }
+    }
 
-        if (floorHits.length) {
-            const dist = floorHits[0].distance;
-            const floorY = floorHits[0].point.y + playerHeight;
+    /**
+     * FLOOR
+     */
+    let grounded = false;
 
-            if (dist <= playerHeight + 0.15) {
-                grounded = true;
-                position.current.y = floorY;
-                velocityY.current = 0;
+    raycaster.current.set(
+      position.current,
+      new THREE.Vector3(
+        0,
+        -1,
+        0
+      )
+    );
+
+    const floorHits =
+      raycaster.current
+        .intersectObjects(
+          world.children,
+          true
+        )
+        .filter(
+          (hit) =>
+            !hit.object.name
+              ?.toLowerCase()
+              .includes(
+                "collider"
+              )
+        );
+
+    if (floorHits.length) {
+      const dist =
+        floorHits[0].distance;
+
+      const floorY =
+        floorHits[0].point.y +
+        playerHeight;
+
+      if (
+        dist <=
+        playerHeight + 0.15
+      ) {
+        grounded = true;
+
+        position.current.y =
+          floorY;
+
+        velocityY.current = 0;
+      }
+    }
+
+    if (!grounded) {
+      velocityY.current -=
+        0.01;
+
+      position.current.y +=
+        velocityY.current;
+    }
+
+    /**
+     * PLAYER BODY
+     */
+    if (
+      playerMesh.current &&
+      mode === "third"
+    ) {
+      playerMesh.current.position.copy(
+        position.current
+      );
+
+      playerMesh.current.position.y -=
+        1.5;
+    }
+
+    /**
+     * CAMERA
+     */
+    if (mode === "first") {
+      camera.position.copy(
+        position.current
+      );
+    }
+
+    if (
+      mode === "third" &&
+      orbitRef.current
+    ) {
+      orbitRef.current.target.copy(
+        position.current
+      );
+
+      orbitRef.current.update();
+    }
+  });
+
+  return (
+    <>
+      {mode === "first" && (
+        <PointerLockControls />
+      )}
+
+      {mode === "third" && (
+        <>
+          <OrbitControls
+            ref={orbitRef}
+            enablePan={false}
+            minDistance={4}
+            maxDistance={8}
+            maxPolarAngle={
+              Math.PI / 2.1
             }
-        }
+          />
 
-        // gravity hanya kalau tidak grounded
-        if (!grounded) {
-            velocityY.current -= 0.01;
-            position.current.y += velocityY.current;
-        }
-        /**
-         * CAMERA
-         */
-        if (mode === "first") {
-            camera.position.copy(position.current);
-        } else {
-            camera.position.lerp(
-                new THREE.Vector3(
-                    position.current.x,
-                    position.current.y + 3,
-                    position.current.z + 6
-                ),
-                0.1
-            );
-
-            camera.lookAt(position.current);
-        }
-    });
-
-    return mode === "first" ? <PointerLockControls /> : null;
+          <mesh ref={playerMesh}>
+            <capsuleGeometry
+              args={[0.5, 1.2, 4, 8]}
+            />
+            <meshStandardMaterial />
+          </mesh>
+        </>
+      )}
+    </>
+  );
 }

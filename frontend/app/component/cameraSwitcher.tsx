@@ -3,22 +3,41 @@
 import { useEffect } from "react";
 
 type Props = {
-    setMode: React.Dispatch<React.SetStateAction<"first" | "third">>;
+    setMode: React.Dispatch<
+        React.SetStateAction<
+            "first" | "third"
+        >
+    >;
 };
 
-export default function CameraSwitcher({ setMode }: Props) {
+export default function CameraSwitcher({
+    setMode,
+}: Props) {
     useEffect(() => {
-        const handleKey = (e: KeyboardEvent) => {
-            if (e.code === "Tab") {
+        const handleKey = (
+            e: KeyboardEvent
+        ) => {
+            if (e.code === "KeyC") {
                 e.preventDefault();
 
-                setMode((prev) => (prev === "first" ? "third" : "first"));
+                setMode((prev) =>
+                    prev === "first"
+                        ? "third"
+                        : "first"
+                );
             }
         };
 
-        window.addEventListener("keydown", handleKey);
+        window.addEventListener(
+            "keyup",
+            handleKey
+        );
 
-        return () => window.removeEventListener("keydown", handleKey);
+        return () =>
+            window.removeEventListener(
+                "keyup",
+                handleKey
+            );
     }, [setMode]);
 
     return null;
