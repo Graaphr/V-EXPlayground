@@ -5,6 +5,8 @@ import logo from "@/public/icon/logo-vex-ok.svg";
 import logoWhite from "@/public/icon/logo-vex-white.svg";
 import bestTag from "@/public/icon/Medalion.svg";
 import favTag from "@/public/icon/Favorite.svg";
+import bestBadge from "@/public/image/BestBadge.svg";
+import favoriteBadge from "@/public/image/FavoriteBadge.svg";
 import "@/app/globals.css";
 
 
@@ -22,7 +24,7 @@ export function Logo({ ...props }) {
             <Image
                 src={logo}
                 alt="Logo"
-                width={490}
+                width={520}
                 height={120}
                 {...props}
             />
@@ -65,53 +67,69 @@ export function Card({ link, title, className, ...props }: dataCard) {
 }
 
 
-export function TextNav({ link, title, subtitle, className, ...props }: LinkAkses) {
+export function TextNav({
+    link,
+    title,
+    subtitle,
+    className,
+    ...props
+}: LinkAkses) {
     return (
         <Link
             href={link || "/icon/logo-vex.svg"}
-            className="group relative text-18 hover:text-main-blue py-4 items-center flex-wrap font-bold font-sans text-black transition-all ease-in-out duration-200"  {...props}
+            className={`
+        group relative text-18 hover:text-main-blue py-4
+        flex flex-col items-start lg:items-center
+        font-semibold font-poppins
+        transition-all ease-in-out duration-200
+        ${className || ""}
+      `}
+            {...props}
         >
             {title}
-            <p className="flex items-center group-hover:text-main-blue  font-sans justify-center text-xs text-black opacity-65 ">
-                {subtitle ||""}
+
+            <p
+                className="
+          flex items-center justify-start lg:justify-center
+          group-hover:text-main-blue
+          font-light font-poppins text-xs opacity-65
+        "
+            >
+                {subtitle || ""}
                 <span className="garis"></span>
             </p>
-
-
         </Link>
-
+    );
+}
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children: React.ReactNode;
+    link?: string;
+    className?: string;
+}
+export function Button({ children, link, className, ...props }: ButtonProps) {
+    return (
+        <Link href={link || "/"}>
+            <button
+                className={`
+        text-white font-bold font-tilt-wrap cursor-pointer bg-[#2E05E0] transition-all ease-in-out duration-300 border-none
+        hover:shadow-[inset_0px_0px_24px_-2px_rgba(255,255,255,0.25)] ${className}`} {...props}
+            > {children} </button>
+        </Link>
+    );
+}
+export function ButtonPutih({ children, link, className, ...props }: ButtonProps) {
+    return (
+        <Link href={link || "/"}>
+            <button
+                className={`
+        text-main-blue font-bold font-tilt-wrap cursor-pointer bg-white border-main-blue transition-all ease-in-out duration-300
+        hover:bg-none hover:bg-main-blue hover:text-white hover:border-white border  ${className}`} {...props}
+            > {children} </button>
+        </Link>
     );
 }
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
-  link?:string;
-  className?: string;
-}
-export function Button({ children,link, className, ...props }: ButtonProps) {
-  return (
-    <Link href={link || "/"}>
-    <button
-      className={`
-         text-white font-bold font-tilt-wrap cursor-pointer bg-gradient-to-br from-[#4A00E0] to-[#8E2DE2] shadow-lg shadow-[#4A00E0]/40 transition-all ease-in-out duration-300
-        hover:bg-none hover:bg-white hover:text-[#4A00E0] hover:border-[#4A00E0] border border-transparent ${className}`} {...props}
-    > {children} </button>
-    </Link>
-  );
-}
-export function ButtonPutih({ children,link, className, ...props }: ButtonProps) {
-  return (
-    <Link href={link || "/"}>
-    <button
-      className={`
-         text-main-blue font-bold font-tilt-wrap cursor-pointer bg-white shadow-lg border-main-blue shadow-[#4A00E0]/40 transition-all ease-in-out duration-300
-        hover:bg-none hover:bg-main-blue hover:text-white hover:border-white border  ${className}`} {...props}
-    > {children} </button>
-    </Link>
-  );
-}
-
-export function LinkAkses({ link, title,  className, ...props }: LinkAkses) {
+export function LinkAkses({ link, title, className, ...props }: LinkAkses) {
     return (
         <Link
             href={link || "/icon/logo-vex.svg"}
@@ -124,7 +142,7 @@ export function LinkAkses({ link, title,  className, ...props }: LinkAkses) {
     );
 }
 
-export function LinkAksesEks({ link, title, children,  className, ...props }: LinkAkses) {
+export function LinkAksesEks({ link, title, children, className, ...props }: LinkAkses) {
     return (
         <a
             href={link || "/icon/logo-vex.svg"}
@@ -136,21 +154,21 @@ export function LinkAksesEks({ link, title, children,  className, ...props }: Li
     );
 }
 
-export function BestTag ({...props}){
-    return(
+export function BestTag({ ...props }) {
+    return (
         <Image src={bestTag}
-        width={100}
-        height={100}
-        alt="Medalion" 
-        {...props}/>
+            width={100}
+            height={100}
+            alt="Medalion"
+            {...props} />
     );
 }
-export function FavTag ({...props}){
-    return(
+export function FavTag({ ...props }) {
+    return (
         <Image src={favTag}
-        width={100}
-        height={100}
-        alt="fav-icon"
-        {...props}/>
+            width={100}
+            height={100}
+            alt="fav-icon"
+            {...props} />
     );
 }

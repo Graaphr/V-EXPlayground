@@ -9,5 +9,17 @@ export const DataFoto: SlideItem[] = [
     src: "/image/img-lobby.svg",
     title: "Pameran PBL-909 - Booth Utama"
   },
+  {
+    src: "/image/img-lobby.svg",
+    title: "Pameran PBL-909 - Booth Utama"
+  },
+  {
+    src: "/image/img-lobby.svg",
+    title: "Pameran PBL-909 - Booth Utama"
+  },
+  {
+    src: "/image/img-lobby.svg",
+    title: "Pameran PBL-909 - Booth Utama"
+  },
 
 ];
