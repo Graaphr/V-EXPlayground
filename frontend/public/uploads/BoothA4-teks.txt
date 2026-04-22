@@ -1,0 +1,5 @@
+Judul: AjuinAja - Project Aplikasi Berbasis Web 
+
+Tim: PBL-TRPL101-A4
+
+Deskripsi: AjuinAja merupakan aplikasi berbasis web yang dirancang untuk memudahkan warga dalam melakukan pengajuan berbagai dokumen administrasi secara cepat, praktis, dan terorganisir. Melalui aplikasi ini, warga dapat mengajukan kebutuhan seperti surat pengantar, surat domisili, surat keterangan usaha, dan berbagai dokumen lainnya tanpa harus datang langsung ke kantor pelayanan. Setiap pengajuan dapat dipantau status prosesnya secara online, sehingga warga mengetahui tahapan verifikasi hingga dokumen selesai diterbitkan. Dengan AjuinAja, proses pelayanan administrasi menjadi lebih efisien, mengurangi antrean, mempercepat waktu pengurusan, serta meningkatkan kualitas layanan bagi masyarakat.

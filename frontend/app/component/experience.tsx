@@ -8,20 +8,33 @@ import Booth from "./booth";
 import Player from "./player";
 import CameraSwitcher from "./cameraSwitcher";
 
-export default function Experience() {
+type Props = {
+  openPoster: (
+    src: string,
+    booth: string
+  ) => void;
+
+  controlsLocked: boolean;
+};
+
+export default function Experience({
+  openPoster,
+  controlsLocked,
+}: Props) {
   const [mode, setMode] =
-    useState<"first" | "third">("first");
+    useState<"first" | "third">(
+      "first"
+    );
 
   /**
    * LOAD HALL
    */
   const { scene } = useGLTF(
-    "/models/hall1.glb"
+    "/models/hall2.glb"
   );
 
   /**
-   * AMBIL MARKER BOOTH
-   * BoothA1 BoothA2 dst
+   * AMBIL POSISI BOOTH
    */
   const boothPoints = useMemo(() => {
     const result: any[] = [];
@@ -30,23 +43,35 @@ export default function Experience() {
 
     scene.traverse((obj: any) => {
       const name =
-        obj.name?.toLowerCase() || "";
+        obj.name || "";
+
+      const lower =
+        name.toLowerCase();
 
       /**
        * MARKER BOOTH
        */
-      if (name.startsWith("booth")) {
+      if (
+        lower.startsWith(
+          "booth"
+        )
+      ) {
         const worldPos =
           new THREE.Vector3();
 
         const worldQuat =
           new THREE.Quaternion();
 
-        obj.getWorldPosition(worldPos);
-        obj.getWorldQuaternion(worldQuat);
+        obj.getWorldPosition(
+          worldPos
+        );
+
+        obj.getWorldQuaternion(
+          worldQuat
+        );
 
         result.push({
-          name: obj.name,
+          name: name,
           position: [
             worldPos.x,
             worldPos.y,
@@ -60,22 +85,33 @@ export default function Experience() {
           ],
         });
 
-        /**
-         * MARKER ASLI:
-         * disembunyikan
-         * tapi collision dimatikan
-         */
         obj.visible = false;
-        obj.raycast = () => null;
-        obj.userData.collider = false;
+        obj.raycast =
+          () => null;
+
+        obj.userData.collider =
+          false;
       }
 
       /**
-       * SEMUA OBJECT SELAIN MARKER BOOTH
-       * BISA COLLISION
+       * COLLIDER
        */
-      if (!name.startsWith("booth")) {
-        obj.userData.collider = true;
+      if (
+        lower.includes(
+          "collider"
+        )
+      ) {
+        obj.userData.collider =
+          true;
+
+        obj.visible = false;
+      } else if (
+        !lower.startsWith(
+          "booth"
+        )
+      ) {
+        obj.userData.collider =
+          false;
       }
     });
 
@@ -99,28 +135,47 @@ export default function Experience() {
       />
 
       {/* HALL */}
-      <primitive object={scene} />
-
-      {/* BOOTH BARU */}
-      {boothPoints.map((item, i) => (
-        <Booth
-          key={i}
-          position={item.position}
-          quaternion={item.quaternion}
-          poster={`/uploads/${item.name}-poster.png`}
-          video="https://www.youtube.com/embed/pNm1aeDNHDU?si=E--HIracxC0ZxCU-"
-        />
-      ))}
-
-      {/* PLAYER */}
-      <Player
-        mode={mode}
-        scene={scene}
+      <primitive
+        object={scene}
       />
 
-      {/* CAMERA */}
+      {/* BOOTH */}
+      {boothPoints.map(
+        (item, i) => (
+          <Booth
+            key={i}
+            boothName={
+              item.name
+            }
+            position={
+              item.position
+            }
+            quaternion={
+              item.quaternion
+            }
+            poster={`/uploads/${item.name}-poster.png`}
+            video={`/uploads/${item.name}-video.mp4`}
+            openPoster={
+              openPoster
+            }
+          />
+        )
+      )}
+
+      {/* PLAYER JANGAN DIUNMOUNT */}
+      <Player
+        mode={mode}
+        controlsLocked={
+          controlsLocked
+        }
+      />
+
+      {/* CAMERA SWITCH */}
       <CameraSwitcher
         setMode={setMode}
+        disabled={
+          !controlsLocked
+        }
       />
     </>
   );

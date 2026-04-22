@@ -1,0 +1,5 @@
+Judul: SiTawar - Project Aplikasi Berbasis Web 
+
+Tim: PBL-TRPL101-A1
+
+Deskripsi: SiTawar merupakan aplikasi administrasi warga berbasis web yang dirancang untuk membantu menyelesaikan berbagai kebutuhan pelayanan masyarakat secara lebih mudah, cepat, dan terorganisir. Aplikasi ini memudahkan warga dalam mengurus keperluan administrasi sehari-hari seperti pengajuan surat pengantar, pendataan warga, pelaporan keluhan, penyampaian informasi lingkungan, hingga pemantauan status permohonan secara online tanpa harus datang langsung ke kantor pelayanan. Dengan sistem yang terintegrasi, SiTawar membantu meningkatkan efisiensi kerja pengurus lingkungan, mempercepat proses pelayanan, mengurangi penggunaan kertas, serta menciptakan komunikasi yang lebih transparan antara warga dan pihak administrasi. Melalui SiTawar, pelayanan masyarakat menjadi lebih modern, praktis, dan responsif terhadap kebutuhan warga.
