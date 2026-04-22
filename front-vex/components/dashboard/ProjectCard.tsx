@@ -6,7 +6,7 @@ import { BsStars } from 'react-icons/bs';
 // Interface Data Yang Wajib Masukkan 
 export interface ProjectCard {
   id: number;
-  image: string;
+  bannerImage: string;
   title: string;
   category: string;
   likes: number;
@@ -27,7 +27,7 @@ export default function ProjectCard({ project, className }: ProjectData) {
       {/* Wrapper Gambar */}
       <div className="relative aspect-video w-full overflow-hidden rounded-sm shadow-[0px_1px_3px_rgba(0,0,0,1)]">
         <Image
-          src={project.image}
+          src={project.bannerImage}
           alt={project.title}
           fill
           className="object-cover transition-transform group-hover:scale-105"
