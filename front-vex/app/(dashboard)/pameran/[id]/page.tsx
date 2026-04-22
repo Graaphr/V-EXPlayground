@@ -78,7 +78,7 @@ export default function PameranDetail() {
 
                                 {/* Play Button */}
                                 <div className="flex flex-col sm:flex-row gap-6 mt-4 md:mt-0">
-                                    <Button className="flex-1 md:flex-none py-4 px-[100px] items-center text-md flex rounded-md shadow-md/30 hover:bg-green-500/20">
+                                    <Button link={"/exhibition"} className="flex-1 md:flex-none py-4 px-[100px] items-center text-md flex rounded-md shadow-md/30 hover:bg-green-500/20">
                                         <FaPlay />
                                     </Button>
 
@@ -121,28 +121,28 @@ export default function PameranDetail() {
                         </div>
 
                         {/* Histori Pameran */}
-                        <div className="mt-8 py-6 border-y-2">
+                        <div className="mt-8 py-4 border-y-1">
 
                             <div className="hidden md:flex justify-between items-center text-center divide-x divide-gray-400">
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Total Suka</p>
-                                    <p className="font-bold text-gray-800">{stats.likes}</p>
+                                    <p className="text-xs text-gray-400 font-light uppercase tracking-wider mb-1">Total Suka</p>
+                                    <p className="font-semibold text-gray-800">{stats.likes}</p>
                                 </div>
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Total Karya</p>
-                                    <p className="font-bold text-gray-800">{stats.karya}</p>
+                                    <p className="text-xs text-gray-400 font-light uppercase tracking-wider mb-1">Total Karya</p>
+                                    <p className="font-semibold text-gray-800">{stats.karya}</p>
                                 </div>
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Tanggal Pameran</p>
-                                    <p className="font-bold text-gray-800">{stats.startDate}</p>
+                                    <p className="text-xs text-gray-400 font-light uppercase tracking-wider mb-1">Tanggal Buka</p>
+                                    <p className="font-semibold text-gray-800">{stats.startDate}</p>
                                 </div>
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Tanggal Tutup</p>
-                                    <p className="font-bold text-gray-800">{stats.endDate}</p>
+                                    <p className="text-xs text-gray-400 font-light uppercase tracking-wider mb-1">Tanggal Tutup</p>
+                                    <p className="font-semibold text-gray-800">{stats.endDate}</p>
                                 </div>
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Tingkat Studi</p>
-                                    <p className="font-bold text-gray-800">{stats.studyLevel}</p>
+                                    <p className="text-xs text-gray-400 font-light uppercase tracking-wider mb-1">Program Studi</p>
+                                    <p className="font-semibold text-gray-800">{stats.studyLevel}</p>
                                 </div>
                             </div>
 
@@ -157,7 +157,7 @@ export default function PameranDetail() {
                                     <span className="font-bold">{stats.karya}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Tanggal Pameran</span>
+                                    <span className="text-gray-500">Tanggal Buka</span>
                                     <span className="font-bold">{stats.startDate}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
@@ -165,7 +165,7 @@ export default function PameranDetail() {
                                     <span className="font-bold">{stats.endDate}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Tingkat Studi</span>
+                                    <span className="text-gray-500">Program Studi</span>
                                     <span className="font-bold">{stats.studyLevel}</span>
                                 </div>
                             </div>
