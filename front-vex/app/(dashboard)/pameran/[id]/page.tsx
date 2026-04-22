@@ -15,8 +15,8 @@ import { ALL_EXHIBITIONS } from '@/app/data/Pameran';
 
 export default function PameranDetail() {
     // Ambil id dari Parameter 
-    const searchParams = useSearchParams();
-    const id = searchParams.get('ids');
+    const Params = useParams();
+    const id = Params.id;
     const exhibitionData = ALL_EXHIBITIONS.find(p => p.id === id) || ALL_EXHIBITIONS[0];
 
     const { title, subtitle, date, bannerImage, posterImage, description, stats, institution } = exhibitionData;

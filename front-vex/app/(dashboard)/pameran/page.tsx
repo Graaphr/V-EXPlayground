@@ -9,6 +9,7 @@ import ProjectCard from '@/components/dashboard/ProjectCard';
 import SelectProdi, { ProdiType } from "@/components/dashboard/SelectProdi";
 import SelectTahun, { TahunType } from "@/components/dashboard/SelectTahun";
 import SelectSemester, { SemesterType } from "@/components/dashboard/SelectSemester";
+import SearchBar from "@/components/dashboard/SearchBar";
 // Dummy data
 import { ALL_EXHIBITIONS } from '@/app/data/Pameran';
 
@@ -25,6 +26,15 @@ export default function PameranPage() {
       ));
   };
 
+  //   const handleSearch = (query: string) => {
+  //   const filtered = ALL_EXHIBITIONS.filter((item) =>
+  //     item.title.toLowerCase().includes(query.toLowerCase()) ||
+  //     item.category.toLowerCase().includes(query.toLowerCase())
+  //   );
+  //   setFilteredData(filtered);
+  // };
+  //Search
+  const [filteredData, setFilteredData] = useState(ALL_EXHIBITIONS);
   // Filtering
   const [selectedProdi, setSelectedProdi] = useState<ProdiType | null>(null);
   const [selectedTahun, setSelectedTahun] = useState<TahunType | null>(null);
@@ -36,9 +46,8 @@ export default function PameranPage() {
         <div className="autoMid">
           <div className="flex w-full gap-4 pt-[30px] pb-[20px] justify-between items-center">
             {/* search section */}
-            <div className='w-[50%] relative flex items-center justify-start text-black'>
-              <input type="text" placeholder="Cari..." className="w-full p-2 pl-[50px] bg-white rounded-full text-sm focus:outline-none focus:border-main-blue" />
-              <FaSearch className='absolute left-4 opacity-80 text-[22px]' />
+            <div className='w-[50%] relative flex items-center'>
+              <SearchBar />
             </div>
 
             {/* filter list */}
