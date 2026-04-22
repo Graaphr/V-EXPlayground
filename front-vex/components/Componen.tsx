@@ -5,8 +5,6 @@ import logo from "@/public/icon/logo-vex-ok.svg";
 import logoWhite from "@/public/icon/logo-vex-white.svg";
 import bestTag from "@/public/icon/Medalion.svg";
 import favTag from "@/public/icon/Favorite.svg";
-import bestBadge from "@/public/image/BestBadge.svg";
-import favoriteBadge from "@/public/image/FavoriteBadge.svg";
 import "@/app/globals.css";
 
 
@@ -37,8 +35,8 @@ export function LogoWhite({ ...props }) {
             <Image
                 src={logoWhite}
                 alt="Logo"
-                width={490}
-                height={120}
+                width={400}
+                height={100}
                 className="size-full " {...props}
             />
         </div>
@@ -111,7 +109,7 @@ export function Button({ children, link, className, ...props }: ButtonProps) {
         <Link href={link || "/"}>
             <button
                 className={`
-        text-white font-bold font-tilt-wrap cursor-pointer bg-[#2E05E0] transition-all ease-in-out duration-300 border-none
+        text-white font-bold font-tilt-wrap cursor-pointer bg-main-blue transition-all ease-in-out duration-300 border-none
         hover:shadow-[inset_0px_0px_24px_-2px_rgba(255,255,255,0.25)] ${className}`} {...props}
             > {children} </button>
         </Link>
