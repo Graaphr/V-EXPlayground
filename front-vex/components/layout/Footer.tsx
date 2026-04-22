@@ -19,10 +19,10 @@ export default function Footer() {
     return (
         <footer className="w-full bg-main-blue text-white overflow-hidden">
 
-            <div className="relative flex flex-col lg:flex-row">
+            <div className="relative pt-[40px] max-h-[380px] flex flex-col lg:flex-row">
 
                 {/* kiri */}
-                <div className="w-full lg:w-[45%] px-6 sm:px-8 lg:px-10 pt-10 pb-8 flex flex-col justify-between relative z-10 overflow-hidden">
+                <div className="w-full lg:w-[45%] p-10 relative z-10 px-6 sm:px-8 lg:px-10 pt-10 pb-8 flex flex-col justify-between relative z-10 overflow-hidden">
 
                     {/* logo */}
                     <div className="relative z-20">
@@ -31,7 +31,7 @@ export default function Footer() {
 
                     {/* copyright */}
                     <div className="mt-8 lg:mt-auto relative z-20">
-                        <p className="text-xs sm:text-sm text-black font-normal tracking-wide">
+                        <p className="text-md sm:text-sm text-gray-700 font-semibold tracking-wide">
                             All rights reserved. V-EX (Virtual Exhibition)
                         </p>
                     </div>
@@ -46,7 +46,7 @@ export default function Footer() {
                 </div>
 
                 {/* kanan */}
-                <div className="w-full lg:w-[55%] bg-white text-gray-800 rounded-t-[40px] lg:rounded-t-none lg:rounded-tl-[60px] px-6 sm:px-8 lg:px-16 py-10 flex flex-col gap-10 relative shadow-2xl mt-6 lg:mt-10">
+                <div className="w-full lg:w-[55%] bg-white text-gray-800 rounded-t-[40px] lg:rounded-t-none lg:rounded-tl-[60px] px-6 sm:px-8 lg:px-16 py-[40px] flex flex-col gap-2 relative shadow-2xl mt-6 lg:mt-2">
 
                     {/* links */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
