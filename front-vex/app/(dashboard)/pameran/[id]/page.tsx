@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
     FaPlay,
@@ -7,69 +8,27 @@ import {
     FaRegCalendarAlt
 } from "react-icons/fa";
 import { Button } from "@/components/Componen";
-
-// ==========================================
-//  Dummy Data Pameran
-// ==========================================
-const exhibitionData = {
-    id: "animotion-fest-2026",
-    title: "ANIMOTION FEST 2026",
-    subtitle: "PBL - EXPO",
-    date: "5 Oktober 2026",
-
-    bannerImage: "/image/Contoh-poster.svg",
-    posterImage: "/image/Contoh-poster.svg",
-    description: [
-        {
-            title: "✨ Selamat Datang di Animotion Fest!",
-            content: "Ini adalah platform pameran digital yang menghadirkan dunia animasi penuh warna, kreativitas, dan imajinasi tanpa batas. Jelajahi karya-karya terbaik, temukan cerita inspiratif, dan rasakan pengalaman interaktif galeri animasi kami semua dalam satu ruang virtual."
-        },
-        {
-            title: "🌟 [Event Showcase]",
-            content: "Pameran ini menampilkan hasil karya terbaik dari para kreator, mahasiswa, dan seniman muda berbakat. Setiap karya merupakan perpaduan antara seni visual, teknologi, storytelling, serta inovasi yang dihidupkan melalui gerakan dan ekspresi."
-        },
-        {
-            title: "❗ [Apa yang Bisa Dilakukan?]",
-            list: [
-                "Menjelajahi pameran animasi 3D secara interaktif.",
-                "Melihat karakter, film pendek, dan karya visual terkait.",
-                "Mengetahui proses di balik setiap animasi.",
-                "Menemukan ide dan inspirasi dari para kreator muda.",
-                "Merasakan pengalaman pameran modern berbasis online."
-            ]
-        },
-        {
-            title: "💻 [Panduan Pengunjung]",
-            list: [
-                "Gunakan Mouse untuk memutar tampilan.",
-                "Scroll untuk zoom in/out/fokus.",
-                "Klik objek untuk melihat informasi karya.",
-                "Geser tampilan untuk menjelajahi area pameran.",
-                "Nikmati pengalaman seru di dunia animasi."
-            ]
-        }
-    ],
-    stats: {
-        likes: 196,
-        visitors: 72,
-        startDate: "18/10/2026",
-        endDate: "20/10/2026",
-        studyLevel: "Animasi"
-    },
-    institution: "Politeknik Negeri Batam"
-};
-
+import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+// Dummy Data
+import { ALL_EXHIBITIONS } from '@/app/data/Pameran';
 
 export default function PameranDetail() {
+    // Ambil id dari Parameter 
+    const searchParams = useSearchParams();
+    const id = searchParams.get('ids');
+    const exhibitionData = ALL_EXHIBITIONS.find(p => p.id === id) || ALL_EXHIBITIONS[0];
+
     const { title, subtitle, date, bannerImage, posterImage, description, stats, institution } = exhibitionData;
 
     return (
+
         <div className=" min-h-screen  bg-gray-50 font-sans text-gray-800">
 
             {/* MAIN CONTENT */}
             <main className="relative pb-16 bg-white">
 
-                <div className="absolute hidden md:block relative w-full h-[50vh] overflow-hidden">
+                <div className="absolute hidden md:block relative w-full h-[60vh] overflow-hidden">
                     {/* Banner */}
                     <img
                         src={bannerImage}
@@ -77,7 +36,7 @@ export default function PameranDetail() {
                         className="w-full h-full  object-cover object-[50%_20%] opacity-80"
                     />
                     {/* Gradasi Putih */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
                 </div>
 
                 {/* Main Content */}
@@ -170,8 +129,8 @@ export default function PameranDetail() {
                                     <p className="font-bold text-gray-800">{stats.likes}</p>
                                 </div>
                                 <div className="flex-1 px-4">
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Total Kunjungan</p>
-                                    <p className="font-bold text-gray-800">{stats.visitors}</p>
+                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Total Karya</p>
+                                    <p className="font-bold text-gray-800">{stats.karya}</p>
                                 </div>
                                 <div className="flex-1 px-4">
                                     <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Tanggal Pameran</p>
@@ -194,8 +153,8 @@ export default function PameranDetail() {
                                     <span className="font-bold">{stats.likes}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Total Kunjungan</span>
-                                    <span className="font-bold">{stats.visitors}</span>
+                                    <span className="text-gray-500">Total Karya</span>
+                                    <span className="font-bold">{stats.karya}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
                                     <span className="text-gray-500">Tanggal Pameran</span>
@@ -210,13 +169,10 @@ export default function PameranDetail() {
                                     <span className="font-bold">{stats.studyLevel}</span>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </main>
-
-
         </div>
     );
 }
