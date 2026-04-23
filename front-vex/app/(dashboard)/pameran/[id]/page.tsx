@@ -114,9 +114,9 @@ export default function PameranDetail() {
                         <div className="mt-12 flex justify-end items-center gap-[50px] pt-6 text-[30px]">
                             <p className="font-bold text-main-blue">{institution}</p>
                             <div className="flex gap-4 text-2xl text-main-blue">
-                                <a href="#" className="hover:opacity-80 transition"><FaInstagram className="text-[30px]" /></a>
-                                <a href="#" className="hover:opacity-80 transition"><FaYoutube className="text-[30px]" /></a>
-                                <a href="#" className="hover:opacity-80 transition"><FaFacebookSquare className="text-[30px]" /></a>
+                                <a href="https://www.instagram.com/polibatamofficial/" className="hover:opacity-80 transition"><FaInstagram className="text-[30px]" /></a>
+                                <a href="https://www.youtube.com/@PolibatamTV" className="hover:opacity-80 transition"><FaYoutube className="text-[30px]" /></a>
+                                <a href="https://www.facebook.com/polibatamofficial/" className="hover:opacity-80 transition"><FaFacebookSquare className="text-[30px]" /></a>
                             </div>
                         </div>
 
