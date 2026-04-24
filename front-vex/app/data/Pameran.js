@@ -2,7 +2,7 @@ export const ALL_EXHIBITIONS = [
     {
         id: "1",
         title: "ANIMOTION FEST 2026",
-        subtitle: "PBL - EXPO",
+        subtitle: "ANIMASI",
         category: "Animasi",
         date: "5 Oktober 2026",
         image: "/image/Contoh-poster.svg", // Digunakan ProjectCard
@@ -11,8 +11,10 @@ export const ALL_EXHIBITIONS = [
         likes: 196,
         karya: 72, // Dianggap sebagai total karya/views
         description: [
-            { title: "✨ Selamat Datang di Animotion Fest!", content: "Platform pameran digital dunia animasi penuh warna." },
-            { title: "❗ [Apa yang Bisa Dilakukan?]", list: ["Menjelajahi pameran animasi 3D.", "Melihat karakter film pendek."] }
+            { title: "✨ Selamat Datang di Animotion Fest!", content: "Ini adalah platform pameran digital yang menghadirkan dunia animasi penuh warna, kreativitas, dan imajinasi tanpa batas. Jelajahi karya-karya terbaik, temukan cerita inspiratif, dan rasakan pengalaman memasuki galeri animasi masa kini dalam satu ruang virtual." },
+            { title: "⚠️ [Event Showcase]", content: "Pameran ini menampilkan hasil karya terbaik dari para kreator, mahasiswa, dan seniman muda berbakat. Setiap karya merupakan perpaduan antara seni visual, teknologi, storytelling, serta inovasi yang dihidupkan melalui gerakan dan ekspresi." },
+            { title: "❗ [Apa yang Bisa Dilakukan?]", list: ["Menjelajahi pameran animasi 3D.", "Melihat karakter, film pendek, dan karya visual kreatif.", "Mengetahui proses di balik setiap animasi.", "Menemukan ide dan inspirasi dari para kreator muda.", "Merasakan pengalaman pameran modern berbasis online."] },
+            { title: "🖥️ [Panduan Pengunjung]", list: ["Gunakan Mouse untuk memutar tampilan.", "Scroll untuk zoom masuk/keluar.", "Klik objek untuk melihat informasi karya.", "Geser tampilan untuk menjelajahi area pameran.", "Nikmati pengalaman seru di dunia animasi."] }
         ],
         stats: { likes: 196, karya: 72, startDate: "18/10/2026", endDate: "20/10/2026", studyLevel: "Animasi" },
         institution: "Politeknik Negeri Batam"
