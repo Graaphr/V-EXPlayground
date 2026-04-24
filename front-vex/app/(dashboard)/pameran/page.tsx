@@ -25,7 +25,7 @@ export default function PameranPage() {
         </Link>
       ));
   };
-
+  // untuk fitering
   //   const handleSearch = (query: string) => {
   //   const filtered = ALL_EXHIBITIONS.filter((item) =>
   //     item.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -47,7 +47,7 @@ export default function PameranPage() {
           <div className="flex w-full gap-4 pt-[30px] pb-[20px] justify-between items-center">
             {/* search section */}
             <div className='w-[50%] relative flex items-center'>
-              <SearchBar />
+              <SearchBar text={"Cari Pameran..."}/>
             </div>
 
             {/* filter list */}

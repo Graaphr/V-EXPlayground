@@ -30,9 +30,13 @@ const tiltWarp = Tilt_Warp({
 });
 
 export default function IndexLayout({ children }: { children: React.ReactNode }) {
+    const userMenu = [
+        { title: "BERANDA", subtitle: "UTAMA", link: "/" },
+        { title: "PAMERAN", subtitle: "3D BOOTH", link: "/pameran" },
+    ];
     return (
         <div>
-            <Navbar />
+            <Navbar menuItems={userMenu} />
             {children}
             <Footer />
         </div>

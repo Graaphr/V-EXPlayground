@@ -21,6 +21,7 @@ export function Logo({ ...props }) {
         <div >
             <Image
                 src={logo}
+                loading="eager"
                 alt="Logo"
                 width={520}
                 height={120}
@@ -34,6 +35,7 @@ export function LogoWhite({ ...props }) {
         <div >
             <Image
                 src={logoWhite}
+                loading="eager"
                 alt="Logo"
                 width={400}
                 height={100}
@@ -53,6 +55,7 @@ export function Card({ link, title, className, ...props }: dataCard) {
     return (
         <div className="">
             <Image
+                loading="eager"
                 src={link}
                 alt={title}
                 width={100}
@@ -155,6 +158,7 @@ export function LinkAksesEks({ link, title, children, className, ...props }: Lin
 export function BestTag({ ...props }) {
     return (
         <Image src={bestTag}
+            loading="eager"
             width={100}
             height={100}
             alt="Medalion"
@@ -164,6 +168,7 @@ export function BestTag({ ...props }) {
 export function FavTag({ ...props }) {
     return (
         <Image src={favTag}
+            loading="eager"
             width={100}
             height={100}
             alt="fav-icon"
