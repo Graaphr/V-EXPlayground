@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -8,140 +14,476 @@ import Booth from "./booth";
 import Player from "./player";
 import CameraSwitcher from "./cameraSwitcher";
 
+import { ALL_EXHIBITIONS } from "@/app/data/Pameran";
+
 type Props = {
+  exhibitionId: string;
+
   openPoster: (
     src: string,
     booth: string
   ) => void;
 
   controlsLocked: boolean;
+  soundOn: boolean;
 };
 
 export default function Experience({
+  exhibitionId,
   openPoster,
   controlsLocked,
+  soundOn,
 }: Props) {
   const [mode, setMode] =
-    useState<"first" | "third">(
-      "first"
+    useState<
+      "first" | "third"
+    >("first");
+
+  const [walking, setWalking] =
+    useState(false);
+
+  const isViewingMedia =
+    !controlsLocked;
+
+  const bgmRef =
+    useRef<HTMLAudioElement | null>(
+      null
     );
 
-  /**
-   * LOAD HALL
-   */
-  const { scene } = useGLTF(
-    "/models/hall2.glb"
-  );
+  const footRef =
+    useRef<HTMLAudioElement | null>(
+      null
+    );
 
-  /**
-   * AMBIL POSISI BOOTH
-   */
-  const boothPoints = useMemo(() => {
-    const result: any[] = [];
+  const loader =
+    useRef(
+      new THREE.TextureLoader()
+    );
 
-    scene.updateMatrixWorld(true);
+  const { scene } =
+    useGLTF(
+      "/models/hall2.glb"
+    );
 
-    scene.traverse((obj: any) => {
-      const name =
-        obj.name || "";
+  /* ===================== */
+  /* DATA PAMERAN */
+  /* ===================== */
 
-      const lower =
-        name.toLowerCase();
+  const currentExpo =
+    ALL_EXHIBITIONS.find(
+      (item) =>
+        item.id ===
+        exhibitionId
+    );
 
-      /**
-       * MARKER BOOTH
-       */
-      if (
-        lower.startsWith(
-          "booth"
-        )
-      ) {
-        const worldPos =
-          new THREE.Vector3();
+  const category =
+    currentExpo?.category ||
+    "default";
 
-        const worldQuat =
-          new THREE.Quaternion();
+  const folder =
+    category
+      .toLowerCase()
+      .replaceAll(" ", "-");
 
-        obj.getWorldPosition(
-          worldPos
-        );
+  /* ===================== */
+  /* AUDIO */
+  /* ===================== */
 
-        obj.getWorldQuaternion(
-          worldQuat
-        );
+  useEffect(() => {
+    bgmRef.current =
+      new Audio(
+        "/music/bgm.mp3"
+      );
 
-        result.push({
-          name: name,
-          position: [
-            worldPos.x,
-            worldPos.y,
-            worldPos.z,
-          ],
-          quaternion: [
-            worldQuat.x,
-            worldQuat.y,
-            worldQuat.z,
-            worldQuat.w,
-          ],
-        });
+    bgmRef.current.loop =
+      true;
 
-        obj.visible = false;
-        obj.raycast =
-          () => null;
+    bgmRef.current.volume =
+      0.35;
 
-        obj.userData.collider =
-          false;
+    footRef.current =
+      new Audio(
+        "/music/footstep.mp3"
+      );
+
+    footRef.current.loop =
+      true;
+
+    footRef.current.volume =
+      0.55;
+
+    return () => {
+      bgmRef.current?.pause();
+      footRef.current?.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!bgmRef.current)
+      return;
+
+    if (soundOn) {
+      bgmRef.current.volume =
+        isViewingMedia
+          ? 0.08
+          : 0.35;
+
+      bgmRef.current
+        .play()
+        .catch(() => {});
+    } else {
+      bgmRef.current.pause();
+      footRef.current?.pause();
+    }
+  }, [
+    soundOn,
+    isViewingMedia,
+  ]);
+
+  useEffect(() => {
+    if (!footRef.current)
+      return;
+
+    if (
+      soundOn &&
+      walking &&
+      controlsLocked
+    ) {
+      footRef.current
+        .play()
+        .catch(() => {});
+    } else {
+      footRef.current.pause();
+      footRef.current.currentTime =
+        0;
+    }
+  }, [
+    soundOn,
+    walking,
+    controlsLocked,
+  ]);
+
+  /* ===================== */
+  /* PANEL DISPLAY */
+  /* paneldisplaya1-a4
+     paneldisplayb1-b4
+     paneldisplayc1-c4
+     paneldisplayd1-d4
+  */
+  /* ===================== */
+
+  useEffect(() => {
+    scene.traverse(
+      (obj: any) => {
+        if (!obj.isMesh)
+          return;
+
+        const name =
+          obj.name?.toLowerCase() ||
+          "";
+
+        /* PANELDISPLAY */
+        if (
+          name.startsWith(
+            "paneldisplay"
+          )
+        ) {
+          const code =
+            name.replace(
+              "paneldisplay",
+              ""
+            );
+
+          const zone =
+            code[0]; // a,b,c,d
+
+          const num =
+            parseInt(
+              code[1]
+            ); //1-4
+
+          if (
+            !zone ||
+            isNaN(num)
+          )
+            return;
+
+          const path =
+            `/prodi/${folder}/${num}.png`;
+
+          loader.current.load(
+            path,
+            (tex) => {
+              tex.flipY =
+                false;
+
+              tex.colorSpace =
+                THREE.SRGBColorSpace;
+
+              obj.material =
+                new THREE.MeshBasicMaterial(
+                  {
+                    map: tex,
+                    toneMapped:
+                      false,
+                  }
+                );
+
+              obj.material.needsUpdate =
+                true;
+            }
+          );
+        }
+
+        /* PANEL */
+        if (
+          name ===
+          "panel"
+        ) {
+          const path =
+            `/prodi/${folder}/${folder}.png`;
+
+          loader.current.load(
+            path,
+            (tex) => {
+              tex.flipY =
+                false;
+
+              tex.colorSpace =
+                THREE.SRGBColorSpace;
+
+              obj.material =
+                new THREE.MeshBasicMaterial(
+                  {
+                    map: tex,
+                    toneMapped:
+                      false,
+                  }
+                );
+
+              obj.material.needsUpdate =
+                true;
+            }
+          );
+        }
       }
+    );
+  }, [
+    scene,
+    folder,
+  ]);
 
-      /**
-       * COLLIDER
-       */
-      if (
-        lower.includes(
-          "collider"
-        )
-      ) {
-        obj.userData.collider =
-          true;
+  /* ===================== */
+  /* POSTER BOOTH */
+  /* ===================== */
 
-        obj.visible = false;
-      } else if (
-        !lower.startsWith(
-          "booth"
+  useEffect(() => {
+    scene.traverse(
+      (obj: any) => {
+        if (!obj.isMesh)
+          return;
+
+        const lower =
+          obj.name?.toLowerCase() ||
+          "";
+
+        if (
+          !lower.startsWith(
+            "panelposter"
+          )
         )
-      ) {
-        obj.userData.collider =
-          false;
+          return;
+
+        const code =
+          lower.replace(
+            "panelposter",
+            ""
+          );
+
+        const zone =
+          code[0];
+
+        const num =
+          parseInt(
+            code.slice(1)
+          );
+
+        if (
+          !zone ||
+          isNaN(num)
+        )
+          return;
+
+        const posterNum =
+          ((num - 1) % 6) + 1;
+
+        const path =
+          `/uploads/${exhibitionId}/booth${zone}${posterNum}-poster.png`;
+
+        loader.current.load(
+          path,
+          (tex) => {
+            tex.flipY =
+              false;
+
+            tex.colorSpace =
+              THREE.SRGBColorSpace;
+
+            obj.material =
+              new THREE.MeshBasicMaterial(
+                {
+                  map: tex,
+                  toneMapped:
+                    false,
+                }
+              );
+
+            obj.material.needsUpdate =
+              true;
+          }
+        );
       }
-    });
+    );
+  }, [
+    scene,
+    exhibitionId,
+  ]);
 
-    return result;
-  }, [scene]);
+  /* ===================== */
+  /* BOOTH */
+  /* ===================== */
+
+  const boothPoints =
+    useMemo(() => {
+      const result: any[] =
+        [];
+
+      scene.updateMatrixWorld(
+        true
+      );
+
+      scene.traverse(
+        (obj: any) => {
+          const name =
+            obj.name || "";
+
+          const lower =
+            name.toLowerCase();
+
+          if (
+            lower.startsWith(
+              "booth"
+            )
+          ) {
+            const pos =
+              new THREE.Vector3();
+
+            const quat =
+              new THREE.Quaternion();
+
+            obj.getWorldPosition(
+              pos
+            );
+
+            obj.getWorldQuaternion(
+              quat
+            );
+
+            result.push({
+              name,
+              position: [
+                pos.x,
+                pos.y,
+                pos.z,
+              ],
+              quaternion:
+                [
+                  quat.x,
+                  quat.y,
+                  quat.z,
+                  quat.w,
+                ],
+            });
+
+            obj.visible =
+              false;
+
+            obj.raycast =
+              () => null;
+          }
+
+          if (
+            lower.includes(
+              "collider"
+            )
+          ) {
+            obj.visible =
+              false;
+
+            obj.traverse(
+              (
+                child: any
+              ) => {
+                child.visible =
+                  false;
+
+                if (
+                  child.isMesh
+                ) {
+                  child.userData.collider =
+                    true;
+                }
+              }
+            );
+          }
+
+          if (
+            obj.isMesh &&
+            !obj.userData
+              ?.collider
+          ) {
+            obj.castShadow =
+              true;
+
+            obj.receiveShadow =
+              true;
+          }
+        }
+      );
+
+      return result;
+    }, [scene]);
 
   return (
     <>
-      {/* LIGHT */}
-      <ambientLight intensity={2.5} />
+      <ambientLight
+        intensity={2.2}
+      />
 
       <directionalLight
-        position={[10, 15, 10]}
-        intensity={4}
+        position={[
+          10, 15, 10,
+        ]}
+        intensity={3}
         castShadow
       />
 
       <pointLight
-        position={[0, 8, 0]}
-        intensity={3}
+        position={[
+          0, 8, 0,
+        ]}
+        intensity={2}
       />
 
-      {/* HALL */}
       <primitive
         object={scene}
       />
 
-      {/* BOOTH */}
       {boothPoints.map(
-        (item, i) => (
+        (
+          item,
+          i
+        ) => (
           <Booth
             key={i}
             boothName={
@@ -153,8 +495,8 @@ export default function Experience({
             quaternion={
               item.quaternion
             }
-            poster={`/uploads/${item.name}-poster.png`}
-            video={`/uploads/${item.name}-video.mp4`}
+            poster={`/uploads/${exhibitionId}/${item.name}-poster.png`}
+            video={`/uploads/${exhibitionId}/${item.name}-video.mp4`}
             openPoster={
               openPoster
             }
@@ -162,17 +504,20 @@ export default function Experience({
         )
       )}
 
-      {/* PLAYER JANGAN DIUNMOUNT */}
       <Player
         mode={mode}
         controlsLocked={
           controlsLocked
         }
+        setWalking={
+          setWalking
+        }
       />
 
-      {/* CAMERA SWITCH */}
       <CameraSwitcher
-        setMode={setMode}
+        setMode={
+          setMode
+        }
         disabled={
           !controlsLocked
         }
