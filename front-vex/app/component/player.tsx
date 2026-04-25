@@ -56,7 +56,7 @@ export default function Player({
       new THREE.Vector3(
         0,
         20,
-        -s8
+        -8
       )
     );
 

@@ -14,7 +14,11 @@ import Booth from "./booth";
 import Player from "./player";
 import CameraSwitcher from "./cameraSwitcher";
 
+import { ALL_EXHIBITIONS } from "@/app/data/Pameran";
+
 type Props = {
+  exhibitionId: string;
+
   openPoster: (
     src: string,
     booth: string
@@ -25,6 +29,7 @@ type Props = {
 };
 
 export default function Experience({
+  exhibitionId,
   openPoster,
   controlsLocked,
   soundOn,
@@ -61,6 +66,26 @@ export default function Experience({
     );
 
   /* ===================== */
+  /* DATA PAMERAN */
+  /* ===================== */
+
+  const currentExpo =
+    ALL_EXHIBITIONS.find(
+      (item) =>
+        item.id ===
+        exhibitionId
+    );
+
+  const category =
+    currentExpo?.category ||
+    "default";
+
+  const folder =
+    category
+      .toLowerCase()
+      .replaceAll(" ", "-");
+
+  /* ===================== */
   /* AUDIO */
   /* ===================== */
 
@@ -72,6 +97,7 @@ export default function Experience({
 
     bgmRef.current.loop =
       true;
+
     bgmRef.current.volume =
       0.35;
 
@@ -82,6 +108,7 @@ export default function Experience({
 
     footRef.current.loop =
       true;
+
     footRef.current.volume =
       0.55;
 
@@ -101,9 +128,9 @@ export default function Experience({
           ? 0.08
           : 0.35;
 
-      bgmRef.current.play().catch(
-        () => {}
-      );
+      bgmRef.current
+        .play()
+        .catch(() => {});
     } else {
       bgmRef.current.pause();
       footRef.current?.pause();
@@ -122,9 +149,9 @@ export default function Experience({
       walking &&
       controlsLocked
     ) {
-      footRef.current.play().catch(
-        () => {}
-      );
+      footRef.current
+        .play()
+        .catch(() => {});
     } else {
       footRef.current.pause();
       footRef.current.currentTime =
@@ -137,7 +164,117 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* PANEL POSTER */
+  /* PANEL DISPLAY */
+  /* paneldisplaya1-a4
+     paneldisplayb1-b4
+     paneldisplayc1-c4
+     paneldisplayd1-d4
+  */
+  /* ===================== */
+
+  useEffect(() => {
+    scene.traverse(
+      (obj: any) => {
+        if (!obj.isMesh)
+          return;
+
+        const name =
+          obj.name?.toLowerCase() ||
+          "";
+
+        /* PANELDISPLAY */
+        if (
+          name.startsWith(
+            "paneldisplay"
+          )
+        ) {
+          const code =
+            name.replace(
+              "paneldisplay",
+              ""
+            );
+
+          const zone =
+            code[0]; // a,b,c,d
+
+          const num =
+            parseInt(
+              code[1]
+            ); //1-4
+
+          if (
+            !zone ||
+            isNaN(num)
+          )
+            return;
+
+          const path =
+            `/prodi/${folder}/${num}.png`;
+
+          loader.current.load(
+            path,
+            (tex) => {
+              tex.flipY =
+                false;
+
+              tex.colorSpace =
+                THREE.SRGBColorSpace;
+
+              obj.material =
+                new THREE.MeshBasicMaterial(
+                  {
+                    map: tex,
+                    toneMapped:
+                      false,
+                  }
+                );
+
+              obj.material.needsUpdate =
+                true;
+            }
+          );
+        }
+
+        /* PANEL */
+        if (
+          name ===
+          "panel"
+        ) {
+          const path =
+            `/prodi/${folder}/${folder}.png`;
+
+          loader.current.load(
+            path,
+            (tex) => {
+              tex.flipY =
+                false;
+
+              tex.colorSpace =
+                THREE.SRGBColorSpace;
+
+              obj.material =
+                new THREE.MeshBasicMaterial(
+                  {
+                    map: tex,
+                    toneMapped:
+                      false,
+                  }
+                );
+
+              obj.material.needsUpdate =
+                true;
+            }
+          );
+        }
+      }
+    );
+  }, [
+    scene,
+    folder,
+  ]);
+
+  /* ===================== */
+  /* POSTER BOOTH */
   /* ===================== */
 
   useEffect(() => {
@@ -181,7 +318,7 @@ export default function Experience({
           ((num - 1) % 6) + 1;
 
         const path =
-          `/uploads/booth${zone}${posterNum}-poster.png`;
+          `/uploads/${exhibitionId}/booth${zone}${posterNum}-poster.png`;
 
         loader.current.load(
           path,
@@ -207,10 +344,13 @@ export default function Experience({
         );
       }
     );
-  }, [scene]);
+  }, [
+    scene,
+    exhibitionId,
+  ]);
 
   /* ===================== */
-  /* BOOTH + COLLIDER */
+  /* BOOTH */
   /* ===================== */
 
   const boothPoints =
@@ -229,10 +369,6 @@ export default function Experience({
 
           const lower =
             name.toLowerCase();
-
-          /* ===================== */
-          /* BOOTH MARKER */
-          /* ===================== */
 
           if (
             lower.startsWith(
@@ -254,7 +390,7 @@ export default function Experience({
             );
 
             result.push({
-              name: name,
+              name,
               position: [
                 pos.x,
                 pos.y,
@@ -276,14 +412,6 @@ export default function Experience({
               () => null;
           }
 
-          /* ===================== */
-          /* ALL COLLIDER OBJECTS */
-          /* ===================== */
-          /* hall collider */
-          /* booth collider */
-          /* any child named collider */
-          /* ===================== */
-
           if (
             lower.includes(
               "collider"
@@ -304,20 +432,10 @@ export default function Experience({
                 ) {
                   child.userData.collider =
                     true;
-
-                  child.castShadow =
-                    false;
-
-                  child.receiveShadow =
-                    false;
                 }
               }
             );
           }
-
-          /* ===================== */
-          /* NORMAL MESH */
-          /* ===================== */
 
           if (
             obj.isMesh &&
@@ -377,8 +495,8 @@ export default function Experience({
             quaternion={
               item.quaternion
             }
-            poster={`/uploads/${item.name}-poster.png`}
-            video={`/uploads/${item.name}-video.mp4`}
+            poster={`/uploads/${exhibitionId}/${item.name}-poster.png`}
+            video={`/uploads/${exhibitionId}/${item.name}-video.mp4`}
             openPoster={
               openPoster
             }

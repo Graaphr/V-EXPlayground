@@ -5,6 +5,11 @@ import {
   useState,
 } from "react";
 
+import {
+  useParams,
+  useRouter,
+} from "next/navigation";
+
 import { Canvas } from "@react-three/fiber";
 import Experience from "@/app/component/experience";
 import Crosshair from "@/app/component/crosshair";
@@ -21,6 +26,15 @@ type InfoData = {
 };
 
 export default function Page() {
+  const router =
+    useRouter();
+
+  const params =
+    useParams();
+
+  const id =
+    params.id as string;
+
   /**
    * poster
    */
@@ -45,19 +59,6 @@ export default function Page() {
     setSoundOn,
   ] = useState(true);
 
-  /**
-   * username popup
-   */
-  const [
-    askName,
-    setAskName,
-  ] = useState(true);
-
-  const [
-    username,
-    setUsername,
-  ] = useState("");
-
   const [
     posterData,
     setPosterData,
@@ -65,23 +66,6 @@ export default function Page() {
     src: "",
     booth: "",
   });
-
-  /**
-   * cek nama tersimpan
-   */
-  useEffect(() => {
-    const saved =
-      localStorage.getItem(
-        "username"
-      );
-
-    if (saved) {
-      setUsername(saved);
-      setAskName(
-        false
-      );
-    }
-  }, []);
 
   /**
    * ESC buka menu
@@ -93,10 +77,10 @@ export default function Page() {
       if (
         e.key ===
           "Escape" &&
-        !posterOpen &&
-        !askName
+        !posterOpen
       ) {
         setMenuOpen(true);
+
         document.exitPointerLock?.();
       }
     };
@@ -111,10 +95,7 @@ export default function Page() {
         "keydown",
         down
       );
-  }, [
-    posterOpen,
-    askName,
-  ]);
+  }, [posterOpen]);
 
   /**
    * buka poster
@@ -132,34 +113,11 @@ export default function Page() {
   };
 
   /**
-   * submit nama
-   */
-  const submitName = () => {
-    const finalName =
-      username.trim() ||
-      "Guest";
-
-    localStorage.setItem(
-      "username",
-      finalName
-    );
-
-    setUsername(
-      finalName
-    );
-
-    setAskName(
-      false
-    );
-  };
-
-  /**
    * lock game
    */
   const controlsLocked =
     !posterOpen &&
-    !menuOpen &&
-    !askName;
+    !menuOpen;
 
   return (
     <div className="w-screen h-screen relative overflow-hidden bg-black">
@@ -174,6 +132,9 @@ export default function Page() {
         }}
       >
         <Experience
+          exhibitionId={
+            id
+          }
           openPoster={
             openPoster
           }
@@ -189,52 +150,6 @@ export default function Page() {
       {/* CROSSHAIR */}
       {controlsLocked && (
         <Crosshair />
-      )}
-
-      {/* USERNAME */}
-      {askName && (
-        <div className="fixed inset-0 z-[99999] bg-black/80 flex items-center justify-center">
-          <div className="w-[420px] rounded-2xl bg-zinc-900 border border-white/10 p-6 text-white">
-            <h1 className="text-2xl font-bold mb-2">
-              Selamat Datang
-            </h1>
-
-            <p className="text-white/60 mb-4">
-              Masukkan nama pemain
-            </p>
-
-            <input
-              autoFocus
-              value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value
-                )
-              }
-              onKeyDown={(
-                e
-              ) => {
-                if (
-                  e.key ===
-                  "Enter"
-                ) {
-                  submitName();
-                }
-              }}
-              placeholder="Nama..."
-              className="w-full h-12 px-4 rounded-xl bg-white/10 outline-none"
-            />
-
-            <button
-              onClick={
-                submitName
-              }
-              className="w-full h-12 rounded-xl bg-green-500 mt-4 font-bold"
-            >
-              Masuk
-            </button>
-          </div>
-        </div>
       )}
 
       {/* MENU ESC */}
@@ -272,7 +187,9 @@ export default function Page() {
 
             <button
               onClick={() =>
-                location.reload()
+                router.push(
+                  `/pameran/${id}`
+                )
               }
               className="w-full h-12 rounded-xl bg-red-500 font-bold"
             >
@@ -285,6 +202,7 @@ export default function Page() {
       {/* POSTER */}
       {posterOpen && (
         <PosterViewer
+          id={id}
           src={
             posterData.src
           }
@@ -307,10 +225,12 @@ export default function Page() {
 /* ========================= */
 
 function PosterViewer({
+  id,
   src,
   booth,
   onClose,
 }: {
+  id: string;
   src: string;
   booth: string;
   onClose: () => void;
@@ -336,7 +256,7 @@ function PosterViewer({
         try {
           const res =
             await fetch(
-              `/uploads/${booth}-teks.txt?time=${Date.now()}`
+              `/uploads/${id}/${booth}-teks.txt?time=${Date.now()}`
             );
 
           const txt =
@@ -373,7 +293,7 @@ function PosterViewer({
       };
 
     load();
-  }, [booth]);
+  }, [id, booth]);
 
   /**
    * esc close

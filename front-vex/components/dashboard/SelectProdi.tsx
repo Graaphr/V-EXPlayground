@@ -11,7 +11,8 @@ const prodiList: ProdiType[] = [
   { id: 3, name: "Teknik Geomatika" },
   { id: 4, name: "Animasi" },
   { id: 5, name: "Rekayasa Keamanan Siber" },
-  { id: 6, name: "Teknologi Rekayasa Perangkat Lunak" },
+  { id: 6, name: "Teknologi Permainan" },
+  { id: 7, name: "Teknologi Rekayasa Perangkat Lunak" },
 ];
 
 
