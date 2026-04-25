@@ -1,13 +1,29 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 // Komponen 
 import { Logo, Button, ButtonPutih } from "@/components/Componen";
 import { VectorBox } from "@/components/model/BoxModel";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+      // DATA
+      const [form, setForm] = React.useState({
+          nama: "",
+          email: "",
+          password: "",
+          confirm: "",
+      });
+      // AMBIL DATA DARI INPUT
+      const handleChange = (e: any) => {
+          const { name, value } = e.target;
+          setForm(prev => ({
+              ...prev,
+              [name]: value,
+          }));
+      };
   const slideUp = {
     initial: { y: "100vh", opacity: 0 },
     animate: { 
@@ -53,7 +69,7 @@ export default function LoginPage() {
           initial="initial"
           animate="animate"
           transition={floatingTransition(0.4)}
-          className="absolute z-2 top-20 left-20"
+          className="absolute top-20 left-20"
         >
           <VectorBox className="h-[200px] w-[200px] opacity-90 -rotate-12 " />
         </motion.div>
@@ -63,7 +79,7 @@ export default function LoginPage() {
           initial="initial"
           animate="animate"
           transition={floatingTransition(0.6)}
-          className="absolute z-2 bottom-50 left-60"
+          className="absolute z-2 left-60"
         >
           <VectorBox className="h-[100px] w-[100px] opacity-80 rotate-45 " />
         </motion.div>
@@ -123,8 +139,55 @@ export default function LoginPage() {
         </div>
 
         <div className="w-full space-y-5">
-          <input type="email" placeholder="Email" className="font-poppins w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
-          <input type="password" placeholder="Kata Sandi" className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
+           <input
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        type="email"
+                        placeholder="Email"
+                        className="input-form"
+                    />
+          <div className='relative'>
+                        <input
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            className="input-form"
+                        />
+
+                        <motion.span
+                            onClick={() => setShowPassword(prev => !prev)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 flex items-center justify-center"
+                            whileTap={{ scale: 0.8 }} // efek klik
+                            whileHover={{ scale: 1.1 }} // efek hover
+                        >
+                            <AnimatePresence mode="wait">
+                                {showPassword ? (
+                                    <motion.div
+                                        key="hide"
+                                        initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEyeSlash size={20} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="show"
+                                        initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEye size={20} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.span>
+                    </div>
           <div className="flex justify-end">
             <Link href="#" className="text-sm hover:text-main-blue">Lupa Kata Sandi?</Link>
           </div>
