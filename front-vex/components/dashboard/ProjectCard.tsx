@@ -40,20 +40,15 @@ export default function ProjectCard({
   project,
   className,
 }: ProjectData) {
-  const today =
-    new Date();
+  const today = new Date();
 
-  const startDate =
-    convertDate(
-      project.stats
-        .startDate
-    );
+  const startDate = convertDate(
+    project.stats.startDate
+  );
 
-  const endDate =
-    convertDate(
-      project.stats
-        .endDate
-    );
+  const endDate = convertDate(
+    project.stats.endDate
+  );
 
   const isOpen =
     today >= startDate &&
@@ -66,36 +61,34 @@ export default function ProjectCard({
       {/* IMAGE */}
       <div className="relative aspect-video w-full overflow-hidden rounded-sm shadow-[0px_1px_3px_rgba(0,0,0,1)]">
         <Image
-          src={
-            project.bannerImage
-          }
-          alt={
-            project.title
-          }
+          src={project.bannerImage}
+          alt={project.title}
           fill
           className="object-cover transition-transform group-hover:scale-105"
         />
 
         {/* OVERLAY */}
-        <div className="text-white absolute inset-0 bg-gradient-to-t from-main-blue/90 via-white/40 to-transparent opacity-0 group-hover:opacity-90 transition-opacity ease-in-out duration-300 flex flex-col justify-end pb-[10px] p-[20px]">
-          <div className="gap-1 flex items-center justify-between">
+        <div className="absolute inset-0 bg-gradient-to-t from-main-blue/90 via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end pb-[10px] p-[20px]">
+          
+          {/* CONTENT NON TRANSPARENT */}
+          <div className="flex items-center justify-between text-white opacity-100">
+            
             {/* DATE */}
-            <div className="flex items-center gap-2">
-              <FaCalendar />
-
-              <p className="text-sm">
+            <div className="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+              <FaCalendar className="text-sm" />
+              <p className="text-sm font-medium">
                 {project.date}
               </p>
             </div>
 
             {/* STATUS */}
-            <div className="flex items-center gap-2">
+            <div>
               {isOpen ? (
-                <span className="flex items-center justify-center bg-green-500 w-7 h-7 rounded-full shadow-md">
+                <span className="flex items-center justify-center bg-green-500 w-8 h-8 rounded-full shadow-md">
                   <FaUnlock className="text-white text-xs" />
                 </span>
               ) : (
-                <span className="flex items-center justify-center bg-red-500 w-7 h-7 rounded-full shadow-md">
+                <span className="flex items-center justify-center bg-red-500 w-8 h-8 rounded-full shadow-md">
                   <FaLock className="text-white text-xs" />
                 </span>
               )}
@@ -112,12 +105,12 @@ export default function ProjectCard({
 
         <div className="mt-2 flex items-center gap-4 text-xs">
           <span className="flex items-center gap-1">
-            <FaHeart />{" "}
+            <FaHeart />
             {project.likes} Likes
           </span>
 
           <span className="flex items-center gap-1">
-            <BsStars />{" "}
+            <BsStars />
             {project.karya} Karya
           </span>
         </div>
