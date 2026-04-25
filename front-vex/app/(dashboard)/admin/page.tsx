@@ -18,7 +18,7 @@ import {
     FaUser
 } from "react-icons/fa";
 import { HiPencilAlt } from "react-icons/hi";
-import {FaCircleCheck} from "react-icons/fa6";
+import { FaCircleCheck } from "react-icons/fa6";
 
 // ================= DUMMY DATA =================
 
@@ -106,7 +106,7 @@ export default function Admin() {
 
     const nextPage = () => setPageMhs(p => Math.min(p + 1, totalPages));
     const prevPage = () => setPageMhs(p => Math.max(p - 1, 1));
-   
+
 
     // Return Main Page
     return (
@@ -223,10 +223,10 @@ export default function Admin() {
                                                     ) : (
                                                         <div
                                                             className={`w-[40%] p-2 rounded-lg text-center
-                                                            ${formData?.status === "active" ? "bg-green-400 text-white"
+                                                            ${selectedUser?.status === "active" ? "bg-green-400 text-white"
                                                                     : "bg-red-100 text-red-600"}`}
                                                         >
-                                                            {formData?.status === "active" ? "Aktif" : "Tidak Aktif"}
+                                                            {selectedUser?.status === "active" ? "Aktif" : "Tidak Aktif"}
                                                         </div>
                                                     )}
 
@@ -326,47 +326,47 @@ function SectionHeader({ title, currentPage, totalPages, onNext, onPrev }: any) 
 }
 
 function UserCard({ user, onClick, isActive }: any) {
-  const [on, setOn] = useState(user.status);
+    const [on, setOn] = useState(user.status);
 
-  const isInactive = on === "inactive";
+    const isInactive = on === "inactive";
 
-  const toggleStatus = (e: any) => {
-    e.stopPropagation();
-    setOn(prev => (prev === "active" ? "inactive" : "active"));
-  };
+    const toggleStatus = (e: any) => {
+        e.stopPropagation();
+        setOn(prev => (prev === "active" ? "inactive" : "active"));
+    };
 
-  return (
-    <div
-      onClick={onClick}
-      className={`flex justify-between items-center p-3 rounded-lg cursor-pointer
+    return (
+        <div
+            onClick={onClick}
+            className={`flex justify-between items-center p-3 rounded-lg cursor-pointer
       ${isActive ? "border-main-blue shadow-md" : "bg-white"}
       ${isInactive ? "bg-gray-300/60" : ""}`}
-    >
-      <div className="flex gap-3 items-center">
-        <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center
-          ${isInactive ? "bg-gray-400" : "bg-main-blue"}`}
         >
-          <FaUser className="text-white" />
-        </div>
+            <div className="flex gap-3 items-center">
+                <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center
+          ${isInactive ? "bg-gray-400" : "bg-main-blue"}`}
+                >
+                    <FaUser className="text-white" />
+                </div>
 
-        <div>
-          <h4 className={`text-sm font-bold ${isInactive ? "text-gray-400" : ""}`}>
-            {user.nama}
-          </h4>
-          <p className="text-xs text-gray-400">{user.role}</p>
-        </div>
-      </div>
+                <div>
+                    <h4 className={`text-sm font-bold ${isInactive ? "text-gray-400" : ""}`}>
+                        {user.nama}
+                    </h4>
+                    <p className="text-xs text-gray-400">{user.role}</p>
+                </div>
+            </div>
 
-      <div onClick={toggleStatus} className="w-10 h-10 flex items-center justify-center">
-        {on === "active" ? (
-          <FaCircleCheck size={20} className="text-green-500" />
-        ) : (
-          <FiXCircle size={20} className="text-red-500" />
-        )}
-      </div>
-    </div>
-  );
+            <div onClick={toggleStatus} className="w-10 h-10 flex items-center justify-center">
+                {on === "active" ? (
+                    <FaCircleCheck size={20} className="text-green-500" />
+                ) : (
+                    <FiXCircle size={20} className="text-red-500" />
+                )}
+            </div>
+        </div>
+    );
 }
 
 function FormTambahUser({ onClose }: { onClose: () => void }) {

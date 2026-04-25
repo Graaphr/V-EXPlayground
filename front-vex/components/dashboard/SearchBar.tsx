@@ -11,9 +11,6 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch,text }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
-//   useEffect(() => {
-//     onSearch(query);
-//   }, [query, onSearch]);
 
   return (
     <div className="w-full relative flex items-center justify-start text-black">
