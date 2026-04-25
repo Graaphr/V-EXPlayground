@@ -21,15 +21,104 @@ type InfoData = {
 };
 
 export default function Page() {
-  const [posterOpen, setPosterOpen] =
-    useState(false);
+  /**
+   * poster
+   */
+  const [
+    posterOpen,
+    setPosterOpen,
+  ] = useState(false);
 
-  const [posterData, setPosterData] =
-    useState<PosterData>({
-      src: "",
-      booth: "",
-    });
+  /**
+   * esc menu
+   */
+  const [
+    menuOpen,
+    setMenuOpen,
+  ] = useState(false);
 
+  /**
+   * sound
+   */
+  const [
+    soundOn,
+    setSoundOn,
+  ] = useState(true);
+
+  /**
+   * username popup
+   */
+  const [
+    askName,
+    setAskName,
+  ] = useState(true);
+
+  const [
+    username,
+    setUsername,
+  ] = useState("");
+
+  const [
+    posterData,
+    setPosterData,
+  ] = useState<PosterData>({
+    src: "",
+    booth: "",
+  });
+
+  /**
+   * cek nama tersimpan
+   */
+  useEffect(() => {
+    const saved =
+      localStorage.getItem(
+        "username"
+      );
+
+    if (saved) {
+      setUsername(saved);
+      setAskName(
+        false
+      );
+    }
+  }, []);
+
+  /**
+   * ESC buka menu
+   */
+  useEffect(() => {
+    const down = (
+      e: KeyboardEvent
+    ) => {
+      if (
+        e.key ===
+          "Escape" &&
+        !posterOpen &&
+        !askName
+      ) {
+        setMenuOpen(true);
+        document.exitPointerLock?.();
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      down
+    );
+
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        down
+      );
+  }, [
+    posterOpen,
+    askName,
+  ]);
+
+  /**
+   * buka poster
+   */
   const openPoster = (
     src: string,
     booth: string
@@ -42,12 +131,45 @@ export default function Page() {
     setPosterOpen(true);
   };
 
+  /**
+   * submit nama
+   */
+  const submitName = () => {
+    const finalName =
+      username.trim() ||
+      "Guest";
+
+    localStorage.setItem(
+      "username",
+      finalName
+    );
+
+    setUsername(
+      finalName
+    );
+
+    setAskName(
+      false
+    );
+  };
+
+  /**
+   * lock game
+   */
+  const controlsLocked =
+    !posterOpen &&
+    !menuOpen &&
+    !askName;
+
   return (
-    <div className="w-screen h-screen relative overflow-hidden">
+    <div className="w-screen h-screen relative overflow-hidden bg-black">
+      {/* GAME */}
       <Canvas
         shadows
         camera={{
-          position: [0, 2, 5],
+          position: [
+            0, 2, 5,
+          ],
           fov: 75,
         }}
       >
@@ -56,15 +178,111 @@ export default function Page() {
             openPoster
           }
           controlsLocked={
-            !posterOpen
+            controlsLocked
+          }
+          soundOn={
+            soundOn
           }
         />
       </Canvas>
 
-      {!posterOpen && (
+      {/* CROSSHAIR */}
+      {controlsLocked && (
         <Crosshair />
       )}
 
+      {/* USERNAME */}
+      {askName && (
+        <div className="fixed inset-0 z-[99999] bg-black/80 flex items-center justify-center">
+          <div className="w-[420px] rounded-2xl bg-zinc-900 border border-white/10 p-6 text-white">
+            <h1 className="text-2xl font-bold mb-2">
+              Selamat Datang
+            </h1>
+
+            <p className="text-white/60 mb-4">
+              Masukkan nama pemain
+            </p>
+
+            <input
+              autoFocus
+              value={username}
+              onChange={(e) =>
+                setUsername(
+                  e.target.value
+                )
+              }
+              onKeyDown={(
+                e
+              ) => {
+                if (
+                  e.key ===
+                  "Enter"
+                ) {
+                  submitName();
+                }
+              }}
+              placeholder="Nama..."
+              className="w-full h-12 px-4 rounded-xl bg-white/10 outline-none"
+            />
+
+            <button
+              onClick={
+                submitName
+              }
+              className="w-full h-12 rounded-xl bg-green-500 mt-4 font-bold"
+            >
+              Masuk
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MENU ESC */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[99998] bg-black/75 flex items-center justify-center">
+          <div className="w-[380px] rounded-2xl bg-zinc-900 border border-white/10 p-6 text-white space-y-4">
+            <h1 className="text-2xl font-bold">
+              Menu
+            </h1>
+
+            <button
+              onClick={() =>
+                setSoundOn(
+                  !soundOn
+                )
+              }
+              className="w-full h-12 rounded-xl bg-white/10"
+            >
+              Sound :{" "}
+              {soundOn
+                ? "ON"
+                : "OFF"}
+            </button>
+
+            <button
+              onClick={() =>
+                setMenuOpen(
+                  false
+                )
+              }
+              className="w-full h-12 rounded-xl bg-green-500 font-bold"
+            >
+              Lanjut
+            </button>
+
+            <button
+              onClick={() =>
+                location.reload()
+              }
+              className="w-full h-12 rounded-xl bg-red-500 font-bold"
+            >
+              Keluar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* POSTER */}
       {posterOpen && (
         <PosterViewer
           src={
@@ -102,17 +320,18 @@ function PosterViewer({
 
   const [info, setInfo] =
     useState<InfoData>({
-      judul: "Loading...",
+      judul:
+        "Loading...",
       tim: "-",
       deskripsi:
         "Loading...",
     });
 
   /**
-   * LOAD TXT
+   * load text
    */
   useEffect(() => {
-    const loadText =
+    const load =
       async () => {
         try {
           const res =
@@ -120,36 +339,27 @@ function PosterViewer({
               `/uploads/${booth}-teks.txt?time=${Date.now()}`
             );
 
-          if (!res.ok)
-            throw new Error();
-
           const txt =
             await res.text();
 
-          const judul =
-            txt.match(
-              /Judul:\s*(.*)/i
-            )?.[1] ||
-            "-";
-
-          const tim =
-            txt.match(
-              /Tim:\s*(.*)/i
-            )?.[1] ||
-            "-";
-
-          const deskripsi =
-            txt.match(
-              /Deskripsi:\s*([\s\S]*)/i
-            )?.[1] ||
-            "-";
-
           setInfo({
             judul:
-              judul.trim(),
-            tim: tim.trim(),
+              txt.match(
+                /Judul:\s*(.*)/i
+              )?.[1] ||
+              "-",
+
+            tim:
+              txt.match(
+                /Tim:\s*(.*)/i
+              )?.[1] ||
+              "-",
+
             deskripsi:
-              deskripsi.trim(),
+              txt.match(
+                /Deskripsi:\s*([\s\S]*)/i
+              )?.[1] ||
+              "-",
           });
         } catch {
           setInfo({
@@ -157,19 +367,19 @@ function PosterViewer({
               "Data Tidak Ditemukan",
             tim: "-",
             deskripsi:
-              `File /uploads/${booth}-teks.txt belum tersedia.`,
+              "File teks belum tersedia.",
           });
         }
       };
 
-    loadText();
+    load();
   }, [booth]);
 
   /**
-   * ESC CLOSE
+   * esc close
    */
   useEffect(() => {
-    const keyDown = (
+    const down = (
       e: KeyboardEvent
     ) => {
       if (
@@ -182,49 +392,43 @@ function PosterViewer({
 
     window.addEventListener(
       "keydown",
-      keyDown
+      down
     );
 
     return () =>
       window.removeEventListener(
         "keydown",
-        keyDown
+        down
       );
   }, [onClose]);
 
   /**
-   * ZOOM HANYA GAMBAR
+   * zoom
    */
-  const handlePosterWheel = (
+  const wheel = (
     e: React.WheelEvent
   ) => {
     e.preventDefault();
-    e.stopPropagation();
 
-    setZoom((prev) => {
-      const next =
-        prev -
-        e.deltaY *
-          0.0015;
-
-      return Math.min(
+    setZoom((p) =>
+      Math.min(
         Math.max(
-          next,
+          p -
+            e.deltaY *
+              0.0015,
           0.5
         ),
         5
-      );
-    });
+      )
+    );
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-black/95 flex">
-      {/* LEFT IMAGE */}
+    <div className="fixed inset-0 z-[99997] bg-black/95 flex">
+      {/* LEFT */}
       <div
-        onWheel={
-          handlePosterWheel
-        }
-        className="w-[65%] h-full overflow-auto flex items-center justify-center p-10 border-r border-white/10"
+        onWheel={wheel}
+        className="w-[65%] h-full flex items-center justify-center p-10 border-r border-white/10 overflow-auto"
       >
         <img
           src={src}
@@ -233,20 +437,17 @@ function PosterViewer({
           }
           style={{
             transform: `scale(${zoom})`,
-            transition:
-              "transform 0.1s linear",
           }}
           className="max-w-full max-h-full select-none"
         />
       </div>
 
-      {/* RIGHT INFO */}
-      <div className="w-[35%] h-full flex flex-col text-white">
-        {/* HEADER */}
+      {/* RIGHT */}
+      <div className="w-[35%] h-full text-white flex flex-col">
         <div className="h-16 px-5 border-b border-white/10 flex items-center justify-between">
-          <div className="font-bold text-lg">
+          <h1 className="font-bold text-lg">
             Detail Booth
-          </div>
+          </h1>
 
           <div className="flex gap-2">
             <button
@@ -271,14 +472,13 @@ function PosterViewer({
           </div>
         </div>
 
-        {/* CONTENT */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <div>
-            <p className="text-white/50 text-sm mb-1">
+            <p className="text-white/50 text-sm">
               Judul
             </p>
 
-            <h1 className="text-2xl font-bold leading-tight">
+            <h1 className="text-2xl font-bold">
               {
                 info.judul
               }
@@ -286,11 +486,11 @@ function PosterViewer({
           </div>
 
           <div>
-            <p className="text-white/50 text-sm mb-1">
+            <p className="text-white/50 text-sm">
               Tim
             </p>
 
-            <p className="text-lg">
+            <p>
               {info.tim}
             </p>
           </div>
@@ -300,16 +500,11 @@ function PosterViewer({
               Deskripsi
             </p>
 
-            <p className="text-white/80 leading-relaxed whitespace-pre-line">
+            <p className="whitespace-pre-line text-white/80 leading-relaxed">
               {
                 info.deskripsi
               }
             </p>
-          </div>
-
-          <div className="text-sm text-white/40 pt-6">
-            Scroll di poster =
-            zoom
           </div>
         </div>
       </div>

@@ -19,39 +19,49 @@ import * as THREE from "three";
 
 type Props = {
   mode: "first" | "third";
-
-  /**
-   * TRUE = player tetap aktif
-   * FALSE = gerak dikunci tapi posisi tidak reset
-   */
   controlsLocked: boolean;
+  setWalking?: (
+    value: boolean
+  ) => void;
 };
 
 export default function Player({
   mode,
   controlsLocked,
+  setWalking,
 }: Props) {
-  const { camera, scene: world } =
-    useThree();
+  const {
+    camera,
+    scene: world,
+  } = useThree();
 
-  const orbitRef = useRef<any>(null);
+  const orbitRef =
+    useRef<any>(null);
+
   const pointerRef =
     useRef<any>(null);
 
-  /**
-   * POSISI PLAYER TIDAK AKAN RESET
-   * karena pakai useRef
-   */
-  const position = useRef(
-    new THREE.Vector3(0, 8, 5)
-  );
+  const playerMesh =
+    useRef<THREE.Mesh>(
+      null!
+    );
+
+  const raycaster =
+    useRef(
+      new THREE.Raycaster()
+    );
+
+  const position =
+    useRef(
+      new THREE.Vector3(
+        0,
+        20,
+        -s8
+      )
+    );
 
   const velocityY =
     useRef(0);
-
-  const raycaster = useRef(
-    new THREE.Raycaster()
-  );
 
   const keys = useRef({
     w: false,
@@ -60,53 +70,107 @@ export default function Player({
     d: false,
   });
 
-  const playerMesh =
-    useRef<THREE.Mesh>(null!);
+  const colliders =
+    useRef<
+      THREE.Object3D[]
+    >([]);
 
-  /**
-   * KEYBOARD
-   */
+  /* ===================== */
+  /* COLLIDER CACHE */
+  /* ===================== */
+
+  useEffect(() => {
+    const scan = () => {
+      const arr:
+        THREE.Object3D[] =
+        [];
+
+      world.traverse(
+        (obj: any) => {
+          if (
+            obj.userData
+              ?.collider &&
+            obj.isMesh
+          ) {
+            arr.push(obj);
+            obj.visible =
+              false;
+          }
+        }
+      );
+
+      colliders.current =
+        arr;
+
+      console.log(
+        "Collider Found:",
+        arr.length
+      );
+    };
+
+    const timer =
+      setTimeout(
+        scan,
+        300
+      );
+
+    return () =>
+      clearTimeout(
+        timer
+      );
+  }, [world]);
+
+  /* ===================== */
+  /* KEYBOARD */
+  /* ===================== */
+
   useEffect(() => {
     const down = (
       e: KeyboardEvent
     ) => {
-      if (!controlsLocked) return;
-
-      if (e.code === "KeyC") {
-        e.preventDefault();
+      if (
+        !controlsLocked
+      )
         return;
-      }
 
       if (e.code === "KeyW")
-        keys.current.w = true;
+        keys.current.w =
+          true;
 
       if (e.code === "KeyA")
-        keys.current.a = true;
+        keys.current.a =
+          true;
 
       if (e.code === "KeyS")
-        keys.current.s = true;
+        keys.current.s =
+          true;
 
       if (e.code === "KeyD")
-        keys.current.d = true;
+        keys.current.d =
+          true;
     };
 
     const up = (
       e: KeyboardEvent
     ) => {
       if (e.code === "KeyW")
-        keys.current.w = false;
+        keys.current.w =
+          false;
 
       if (e.code === "KeyA")
-        keys.current.a = false;
+        keys.current.a =
+          false;
 
       if (e.code === "KeyS")
-        keys.current.s = false;
+        keys.current.s =
+          false;
 
       if (e.code === "KeyD")
-        keys.current.d = false;
+        keys.current.d =
+          false;
     };
 
-    const resetKeys = () => {
+    const reset = () => {
       keys.current = {
         w: false,
         a: false,
@@ -127,7 +191,7 @@ export default function Player({
 
     window.addEventListener(
       "blur",
-      resetKeys
+      reset
     );
 
     return () => {
@@ -143,17 +207,19 @@ export default function Player({
 
       window.removeEventListener(
         "blur",
-        resetKeys
+        reset
       );
     };
   }, [controlsLocked]);
 
-  /**
-   * SAAT POPUP BUKA:
-   * unlock mouse
-   */
+  /* ===================== */
+  /* UNLOCK */
+  /* ===================== */
+
   useEffect(() => {
-    if (!controlsLocked) {
+    if (
+      !controlsLocked
+    ) {
       keys.current = {
         w: false,
         a: false,
@@ -161,33 +227,28 @@ export default function Player({
         d: false,
       };
 
+      setWalking?.(
+        false
+      );
+
       document.exitPointerLock?.();
     }
-  }, [controlsLocked]);
+  }, [
+    controlsLocked,
+    setWalking,
+  ]);
+
+  /* ===================== */
+  /* FRAME */
+  /* ===================== */
 
   useFrame(() => {
-    const speed = 0.15;
-    const playerHeight = 3;
+    const speed =
+      0.15;
 
-    const colliders: THREE.Object3D[] =
-      [];
+    const playerHeight =
+      3;
 
-    world.traverse((obj: any) => {
-      if (
-        obj.name
-          ?.toLowerCase()
-          .includes(
-            "collider"
-          )
-      ) {
-        colliders.push(obj);
-        obj.visible = false;
-      }
-    });
-
-    /**
-     * ARAH KAMERA
-     */
     const dir =
       new THREE.Vector3();
 
@@ -199,23 +260,25 @@ export default function Player({
     dir.normalize();
 
     const right =
-      new THREE.Vector3();
+      new THREE.Vector3()
+        .crossVectors(
+          dir,
+          camera.up
+        )
+        .normalize();
 
-    right
-      .crossVectors(
-        dir,
-        camera.up
-      )
-      .normalize();
-
-    /**
-     * MOVE HANYA SAAT LOCKED
-     */
     const next =
       position.current.clone();
 
-    if (controlsLocked) {
-      if (keys.current.w)
+    let moving =
+      false;
+
+    if (
+      controlsLocked
+    ) {
+      if (
+        keys.current.w
+      ) {
         next.add(
           dir
             .clone()
@@ -223,8 +286,13 @@ export default function Player({
               speed
             )
         );
+        moving =
+          true;
+      }
 
-      if (keys.current.s)
+      if (
+        keys.current.s
+      ) {
         next.add(
           dir
             .clone()
@@ -232,8 +300,13 @@ export default function Player({
               -speed
             )
         );
+        moving =
+          true;
+      }
 
-      if (keys.current.a)
+      if (
+        keys.current.a
+      ) {
         next.add(
           right
             .clone()
@@ -241,8 +314,13 @@ export default function Player({
               -speed
             )
         );
+        moving =
+          true;
+      }
 
-      if (keys.current.d)
+      if (
+        keys.current.d
+      ) {
         next.add(
           right
             .clone()
@@ -250,35 +328,54 @@ export default function Player({
               speed
             )
         );
+        moving =
+          true;
+      }
     }
 
-    /**
-     * COLLISION
-     */
-    const moveDir = next
-      .clone()
-      .sub(
-        position.current
-      );
+    setWalking?.(
+      moving
+    );
 
-    if (moveDir.length() > 0) {
+    /* ===================== */
+    /* WALL COLLISION */
+    /* ===================== */
+
+    const moveDir =
+      next
+        .clone()
+        .sub(
+          position.current
+        );
+
+    if (
+      moveDir.length() >
+      0
+    ) {
       moveDir.normalize();
 
+      const origin =
+        position.current.clone();
+
+      origin.y -= 1;
+
       raycaster.current.set(
-        position.current,
+        origin,
         moveDir
       );
 
+      raycaster.current.far =
+        0.7;
+
       const hits =
         raycaster.current.intersectObjects(
-          colliders,
+          colliders.current,
           true
         );
 
       if (
-        !hits.length ||
-        hits[0]
-          .distance > 0.6
+        hits.length ===
+        0
       ) {
         position.current.copy(
           next
@@ -286,19 +383,30 @@ export default function Player({
       }
     }
 
-    /**
-     * FLOOR
-     */
-    let grounded = false;
+    /* ===================== */
+    /* FLOOR */
+    /* ===================== */
+
+    let grounded =
+      false;
+
+    const floorOrigin =
+      position.current.clone();
+
+    floorOrigin.y +=
+      0.3;
 
     raycaster.current.set(
-      position.current,
+      floorOrigin,
       new THREE.Vector3(
         0,
         -1,
         0
       )
     );
+
+    raycaster.current.far =
+      20;
 
     const floorHits =
       raycaster.current
@@ -307,52 +415,61 @@ export default function Player({
           true
         )
         .filter(
-          (hit) =>
-            !hit.object.name
-              ?.toLowerCase()
-              .includes(
-                "collider"
-              )
+          (
+            hit: any
+          ) =>
+            hit.object
+              .isMesh &&
+            !hit.object
+              .userData
+              ?.collider &&
+            hit.point.y <=
+              position
+                .current.y
+        )
+        .sort(
+          (a, b) =>
+            a.distance -
+            b.distance
         );
 
-    if (floorHits.length) {
-      const dist =
-        floorHits[0]
-          .distance;
-
+    if (
+      floorHits.length >
+      0
+    ) {
       const floorY =
         floorHits[0]
           .point.y +
         playerHeight;
 
-      if (
-        dist <=
-        playerHeight +
-          0.15
-      ) {
-        grounded = true;
+      grounded =
+        true;
 
-        position.current.y =
-          floorY;
+      position.current.y =
+        floorY;
 
-        velocityY.current = 0;
-      }
+      velocityY.current =
+        0;
     }
 
-    if (!grounded) {
+    if (
+      !grounded
+    ) {
       velocityY.current -=
-        0.01;
+        0.008;
 
       position.current.y +=
         velocityY.current;
     }
 
-    /**
-     * THIRD PERSON BODY
-     */
+    /* ===================== */
+    /* BODY TPS */
+    /* ===================== */
+
     if (
       playerMesh.current &&
-      mode === "third"
+      mode ===
+        "third"
     ) {
       playerMesh.current.position.copy(
         position.current
@@ -362,17 +479,22 @@ export default function Player({
         1.5;
     }
 
-    /**
-     * CAMERA
-     */
-    if (mode === "first") {
+    /* ===================== */
+    /* CAMERA */
+    /* ===================== */
+
+    if (
+      mode ===
+      "first"
+    ) {
       camera.position.copy(
         position.current
       );
     }
 
     if (
-      mode === "third" &&
+      mode ===
+        "third" &&
       orbitRef.current
     ) {
       orbitRef.current.target.copy(
@@ -385,31 +507,48 @@ export default function Player({
 
   return (
     <>
-      {mode === "first" && (
+      {mode ===
+        "first" && (
         <PointerLockControls
-          ref={pointerRef}
+          ref={
+            pointerRef
+          }
         />
       )}
 
-      {mode === "third" && (
+      {mode ===
+        "third" && (
         <>
           <OrbitControls
-            ref={orbitRef}
-            enablePan={false}
+            ref={
+              orbitRef
+            }
+            enablePan={
+              false
+            }
             enableRotate={
               controlsLocked
             }
             enableZoom={
               controlsLocked
             }
-            minDistance={4}
-            maxDistance={8}
+            minDistance={
+              4
+            }
+            maxDistance={
+              8
+            }
             maxPolarAngle={
-              Math.PI / 2.1
+              Math.PI /
+              2.1
             }
           />
 
-          <mesh ref={playerMesh}>
+          <mesh
+            ref={
+              playerMesh
+            }
+          >
             <capsuleGeometry
               args={[
                 0.5,
@@ -419,7 +558,13 @@ export default function Player({
               ]}
             />
 
-            <meshStandardMaterial />
+            <meshStandardMaterial
+              color="lime"
+              transparent
+              opacity={
+                0.35
+              }
+            />
           </mesh>
         </>
       )}
