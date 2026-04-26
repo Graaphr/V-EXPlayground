@@ -8,7 +8,7 @@ export default function NavAdmin({ onAddClick, isFormOpen }) {
   const pathname = usePathname();
 
   const menuItems = [
-    { id: 1, icon: <FaUser size={18} />, link: "/admin" },
+    { id: 1, icon: <FaUser className="rounded-full" size={18} />, link: "/admin" },
     { id: 2, icon: <FaBook size={18} />, link: "/admin/pameran" },
   ];
 
