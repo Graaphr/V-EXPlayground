@@ -1,11 +1,44 @@
 "use client";
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Logo, Button, ButtonPutih } from "@/components/Componen";
 import { VectorBox, VectorBlueBox } from "@/components/model/BoxModel";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function RegisterPage() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    // DATA
+    const [form, setForm] = React.useState({
+        nama: "",
+        password: "",
+    });
+    // AMBIL DATA DARI INPUT
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+
+        if (!form.nama || !form.email || !form.password || !form.confirm) {
+            alert("Semua field wajib diisi");
+            return;
+        }
+
+        if (form.password !== form.confirm) {
+            alert("Password tidak sama");
+            return;
+        }
+
+        console.log("DATA REGISTER:", form);
+
+        // nanti kirim ke API Laravel pakai axios/fetch
+    };
+    // ANIMATE
     const slideUp = {
         initial: { y: "100vh", opacity: 0 },
         animate: { y: [0, -15, 0], opacity: 1 },
@@ -86,13 +119,111 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="w-full space-y-4">
-                    <input type="text" placeholder="Nama Lengkap" className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
-                    <input type="email" placeholder="Email" className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
-                    <input type="password" placeholder="Password" className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/50 text-black" />
+                    <input
+                        name="nama"
+                        value={form.nama}
+                        onChange={handleChange}
+                        type="text"
+                        placeholder="Nama Lengkap"
+                        className="input-form"
+                    />
+
+                    <input
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        type="email"
+                        placeholder="Email"
+                        className="input-form"
+                    />
+                    <div className='relative'>
+                        <input
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            className="input-form"
+                        />
+
+                        <motion.span
+                            onClick={() => setShowPassword(prev => !prev)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 flex items-center justify-center"
+                            whileTap={{ scale: 0.8 }} // efek klik
+                            whileHover={{ scale: 1.1 }} // efek hover
+                        >
+                            <AnimatePresence mode="wait">
+                                {showPassword ? (
+                                    <motion.div
+                                        key="hide"
+                                        initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEyeSlash size={20} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="show"
+                                        initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEye size={20} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.span>
+                    </div>
+                    <div className='relative'>
+                        <input
+                            name="confirm"
+                            value={form.confirm}
+                            onChange={handleChange}
+                            type={showConfirm ? "text" : "password"}
+                            placeholder="Konfirmasi Password"
+                            className="input-form"
+                        />
+                        <motion.span
+                            onClick={() => setShowConfirm(prev => !prev)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 flex items-center justify-center"
+                            whileTap={{ scale: 0.8 }}
+                            whileHover={{ scale: 1.1 }}
+                        >
+                            <AnimatePresence mode="wait">
+                                {showConfirm ? (
+                                    <motion.div
+                                        key="hide"
+                                        initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEyeSlash size={20} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="show"
+                                        initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                        exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaEye size={20} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.span>
+                    </div>
+
+
+
                 </div>
 
                 <div className="w-full mt-8 border-b-2 border-gray-400 pb-8">
-                    <ButtonPutih link="/" className="w-full py-3 border-2 rounded-lg text-lg font-bold">
+                    <ButtonPutih link="/" className="w-full py-3 border-2 rounded-lg text-lg font-bold" onClick={handleSubmit}>
                         Daftar
                     </ButtonPutih>
                 </div>
@@ -106,4 +237,5 @@ export default function RegisterPage() {
             </motion.div>
         </motion.div>
     );
+
 }
