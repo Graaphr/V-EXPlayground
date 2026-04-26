@@ -8,7 +8,7 @@ pengguna{
     ui penilaian : 
     ui komentar : 
     halaman verify-otp : 
-    halaman session-habis :
+    halaman/ui session-habis :
 }, 
 admin{
     halaman kelola pengguna (kps,ketua) : ok
