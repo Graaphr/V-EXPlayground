@@ -9,7 +9,7 @@ export const ALL_EXHIBITIONS = [
         bannerImage: "/image/TRPLExpoBanner.png",
         posterImage: "/image/TRPLExpoBanner.png",
         likes: 196,
-        karya: 72,
+        karya: 24,
 
         description: [
             {
@@ -61,7 +61,7 @@ export const ALL_EXHIBITIONS = [
 
         stats: {
             likes: 196,
-            karya: 72,
+            karya: 24,
             startDate: "26/04/2026",
             endDate: "28/04/2026",
             studyLevel: "Teknologi Rekayasa Perangkat Lunak"
