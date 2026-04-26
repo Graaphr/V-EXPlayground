@@ -26,6 +26,18 @@ type Props = {
 
   controlsLocked: boolean;
   soundOn: boolean;
+
+  mobileMove?: {
+    w: boolean;
+    a: boolean;
+    s: boolean;
+    d: boolean;
+  };
+
+  lookDelta?: React.MutableRefObject<{
+    x: number;
+    y: number;
+  }>;
 };
 
 export default function Experience({
@@ -33,6 +45,8 @@ export default function Experience({
   openPoster,
   controlsLocked,
   soundOn,
+  mobileMove,
+  lookDelta,
 }: Props) {
   const [mode, setMode] =
     useState<
@@ -130,7 +144,7 @@ export default function Experience({
 
       bgmRef.current
         .play()
-        .catch(() => {});
+        .catch(() => { });
     } else {
       bgmRef.current.pause();
       footRef.current?.pause();
@@ -151,7 +165,7 @@ export default function Experience({
     ) {
       footRef.current
         .play()
-        .catch(() => {});
+        .catch(() => { });
     } else {
       footRef.current.pause();
       footRef.current.currentTime =
@@ -164,12 +178,7 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* PANEL DISPLAY */
-  /* paneldisplaya1-a4
-     paneldisplayb1-b4
-     paneldisplayc1-c4
-     paneldisplayd1-d4
-  */
+  /* TEXTURE DISPLAY */
   /* ===================== */
 
   useEffect(() => {
@@ -182,7 +191,6 @@ export default function Experience({
           obj.name?.toLowerCase() ||
           "";
 
-        /* PANELDISPLAY */
         if (
           name.startsWith(
             "paneldisplay"
@@ -194,18 +202,12 @@ export default function Experience({
               ""
             );
 
-          const zone =
-            code[0]; // a,b,c,d
-
           const num =
             parseInt(
               code[1]
-            ); //1-4
+            );
 
-          if (
-            !zone ||
-            isNaN(num)
-          )
+          if (isNaN(num))
             return;
 
           const path =
@@ -228,14 +230,10 @@ export default function Experience({
                       false,
                   }
                 );
-
-              obj.material.needsUpdate =
-                true;
             }
           );
         }
 
-        /* PANEL */
         if (
           name ===
           "panel"
@@ -260,9 +258,6 @@ export default function Experience({
                       false,
                   }
                 );
-
-              obj.material.needsUpdate =
-                true;
             }
           );
         }
@@ -274,7 +269,7 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* POSTER BOOTH */
+  /* POSTER */
   /* ===================== */
 
   useEffect(() => {
@@ -337,9 +332,6 @@ export default function Experience({
                     false,
                 }
               );
-
-            obj.material.needsUpdate =
-              true;
           }
         );
       }
@@ -350,7 +342,7 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* BOOTH */
+  /* BOOTH POINT */
   /* ===================== */
 
   const boothPoints =
@@ -364,11 +356,9 @@ export default function Experience({
 
       scene.traverse(
         (obj: any) => {
-          const name =
-            obj.name || "";
-
           const lower =
-            name.toLowerCase();
+            obj.name?.toLowerCase() ||
+            "";
 
           if (
             lower.startsWith(
@@ -390,7 +380,7 @@ export default function Experience({
             );
 
             result.push({
-              name,
+              name: obj.name,
               position: [
                 pos.x,
                 pos.y,
@@ -504,14 +494,13 @@ export default function Experience({
         )
       )}
 
+      {/* PLAYER FIX MOBILE */}
       <Player
         mode={mode}
-        controlsLocked={
-          controlsLocked
-        }
-        setWalking={
-          setWalking
-        }
+        controlsLocked={controlsLocked}
+        setWalking={setWalking}
+        mobileMove={mobileMove}
+        lookDelta={lookDelta}
       />
 
       <CameraSwitcher

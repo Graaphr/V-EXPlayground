@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -11,6 +12,7 @@ import {
 } from "next/navigation";
 
 import { Canvas } from "@react-three/fiber";
+
 import Experience from "@/app/component/experience";
 import Crosshair from "@/app/component/crosshair";
 
@@ -35,25 +37,26 @@ export default function Page() {
   const id =
     params.id as string;
 
-  /**
-   * poster
-   */
+  const [
+    isMobile,
+    setIsMobile,
+  ] = useState(false);
+
+  const [
+    isPortrait,
+    setIsPortrait,
+  ] = useState(false);
+
   const [
     posterOpen,
     setPosterOpen,
   ] = useState(false);
 
-  /**
-   * esc menu
-   */
   const [
     menuOpen,
     setMenuOpen,
   ] = useState(false);
 
-  /**
-   * sound
-   */
   const [
     soundOn,
     setSoundOn,
@@ -67,20 +70,81 @@ export default function Page() {
     booth: "",
   });
 
-  /**
-   * ESC buka menu
-   */
+  /* MOVE */
+  const [
+    mobileMove,
+    setMobileMove,
+  ] = useState({
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+  });
+
+  /* LOOK */
+  const lookDelta =
+    useRef({
+      x: 0,
+      y: 0,
+    });
+
+  /* ====================== */
+  /* DETECT MOBILE */
+  /* ====================== */
+
+  useEffect(() => {
+    const check = () => {
+      setIsMobile(
+        window.innerWidth <
+        1024
+      );
+
+      setIsPortrait(
+        window.matchMedia(
+          "(orientation: portrait)"
+        ).matches
+      );
+    };
+
+    check();
+
+    window.addEventListener(
+      "resize",
+      check
+    );
+
+    window.addEventListener(
+      "orientationchange",
+      check
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        check
+      );
+
+      window.removeEventListener(
+        "orientationchange",
+        check
+      );
+    };
+  }, []);
+
+  /* ====================== */
+  /* ESC MENU */
+  /* ====================== */
+
   useEffect(() => {
     const down = (
       e: KeyboardEvent
     ) => {
       if (
         e.key ===
-          "Escape" &&
+        "Escape" &&
         !posterOpen
       ) {
         setMenuOpen(true);
-
         document.exitPointerLock?.();
       }
     };
@@ -97,9 +161,6 @@ export default function Page() {
       );
   }, [posterOpen]);
 
-  /**
-   * buka poster
-   */
   const openPoster = (
     src: string,
     booth: string
@@ -112,50 +173,91 @@ export default function Page() {
     setPosterOpen(true);
   };
 
-  /**
-   * lock game
-   */
   const controlsLocked =
     !posterOpen &&
     !menuOpen;
 
   return (
-    <div className="w-screen h-screen relative overflow-hidden bg-black">
+    <div className="w-screen h-screen bg-black overflow-hidden relative touch-none">
+
+      {/* PORTRAIT WARNING */}
+      {isMobile &&
+        isPortrait && (
+          <div className="fixed inset-0 z-[999999] bg-black text-white flex flex-col items-center justify-center text-center px-6">
+            <h1 className="text-4xl font-bold mb-4">
+              Putar HP Anda
+            </h1>
+
+            <p className="text-white/70 text-lg">
+              Gunakan mode
+              landscape untuk
+              masuk pameran 3D
+            </p>
+          </div>
+        )}
+
       {/* GAME */}
-      <Canvas
-        shadows
-        camera={{
-          position: [
-            0, 2, 5,
-          ],
-          fov: 75,
-        }}
-      >
-        <Experience
-          exhibitionId={
-            id
-          }
-          openPoster={
-            openPoster
-          }
-          controlsLocked={
-            controlsLocked
-          }
-          soundOn={
-            soundOn
-          }
-        />
-      </Canvas>
+      {(!isMobile ||
+        !isPortrait) && (
+          <>
+            <Canvas
+              shadows
+              camera={{
+                position: [
+                  0, 2, 5,
+                ],
+                fov: 75,
+              }}
+            >
+              <Experience
+                exhibitionId={
+                  id
+                }
+                openPoster={
+                  openPoster
+                }
+                controlsLocked={
+                  controlsLocked
+                }
+                soundOn={
+                  soundOn
+                }
+                mobile={
+                  isMobile
+                }
+                mobileMove={
+                  mobileMove
+                }
+                lookDelta={
+                  lookDelta
+                }
+              />
+            </Canvas>
 
-      {/* CROSSHAIR */}
-      {controlsLocked && (
-        <Crosshair />
-      )}
+            {!isMobile &&
+              controlsLocked && (
+                <Crosshair />
+              )}
 
-      {/* MENU ESC */}
+            {isMobile &&
+              controlsLocked && (
+                <MobileHUD
+                  setMobileMove={
+                    setMobileMove
+                  }
+                  lookDelta={
+                    lookDelta
+                  }
+                />
+              )}
+          </>
+        )}
+
+      {/* MENU */}
       {menuOpen && (
         <div className="fixed inset-0 z-[99998] bg-black/75 flex items-center justify-center">
-          <div className="w-[380px] rounded-2xl bg-zinc-900 border border-white/10 p-6 text-white space-y-4">
+          <div className="w-[380px] max-w-[90%] rounded-2xl bg-zinc-900 p-6 text-white space-y-4">
+
             <h1 className="text-2xl font-bold">
               Menu
             </h1>
@@ -168,10 +270,10 @@ export default function Page() {
               }
               className="w-full h-12 rounded-xl bg-white/10"
             >
-              Sound :{" "}
+              Sound :
               {soundOn
-                ? "ON"
-                : "OFF"}
+                ? " ON"
+                : " OFF"}
             </button>
 
             <button
@@ -195,6 +297,7 @@ export default function Page() {
             >
               Keluar
             </button>
+
           </div>
         </div>
       )}
@@ -220,9 +323,216 @@ export default function Page() {
   );
 }
 
-/* ========================= */
-/* POSTER VIEWER */
-/* ========================= */
+/* ======================= */
+/* MOBILE HUD */
+/* ======================= */
+
+function MobileHUD({
+  setMobileMove,
+  lookDelta,
+}: any) {
+  const moveBase = useRef<any>(null);
+  const moveStick = useRef<any>(null);
+
+  const lookBase = useRef<any>(null);
+  const lookStick = useRef<any>(null);
+
+  const moveTouchId =
+    useRef<number | null>(null);
+
+  const lookTouchId =
+    useRef<number | null>(null);
+
+  const clamp = (
+    n: number,
+    min: number,
+    max: number
+  ) =>
+    Math.max(
+      min,
+      Math.min(max, n)
+    );
+
+  const updateMove = (
+    touch: Touch
+  ) => {
+    const rect =
+      moveBase.current.getBoundingClientRect();
+
+    const x =
+      touch.clientX -
+      rect.left -
+      rect.width / 2;
+
+    const y =
+      touch.clientY -
+      rect.top -
+      rect.height / 2;
+
+    const dx = clamp(x, -35, 35);
+    const dy = clamp(y, -35, 35);
+
+    moveStick.current.style.transform =
+      `translate(${dx}px,${dy}px)`;
+
+    setMobileMove({
+      w: dy < -10,
+      s: dy > 10,
+      a: dx < -10,
+      d: dx > 10,
+    });
+  };
+
+  const updateLook = (
+    touch: Touch
+  ) => {
+    const rect =
+      lookBase.current.getBoundingClientRect();
+
+    const x =
+      touch.clientX -
+      rect.left -
+      rect.width / 2;
+
+    const y =
+      touch.clientY -
+      rect.top -
+      rect.height / 2;
+
+    const dx = clamp(x, -35, 35);
+    const dy = clamp(y, -35, 35);
+
+    lookStick.current.style.transform =
+      `translate(${dx}px,${dy}px)`;
+
+    lookDelta.current = {
+      x: dx * 0.0015,
+      y: dy * 0.0015,
+    };
+  };
+
+  /* MOVE START */
+  const moveStart = (e: any) => {
+    const touch =
+      e.changedTouches[0];
+
+    moveTouchId.current =
+      touch.identifier;
+
+    updateMove(touch);
+  };
+
+  const moveMove = (e: any) => {
+    for (const touch of e.touches) {
+      if (
+        touch.identifier ===
+        moveTouchId.current
+      ) {
+        updateMove(touch);
+      }
+    }
+  };
+
+  const moveEnd = (e: any) => {
+    for (const touch of e.changedTouches) {
+      if (
+        touch.identifier ===
+        moveTouchId.current
+      ) {
+        moveTouchId.current =
+          null;
+
+        moveStick.current.style.transform =
+          `translate(0px,0px)`;
+
+        setMobileMove({
+          w: false,
+          a: false,
+          s: false,
+          d: false,
+        });
+      }
+    }
+  };
+
+  /* LOOK START */
+  const lookStart = (e: any) => {
+    const touch =
+      e.changedTouches[0];
+
+    lookTouchId.current =
+      touch.identifier;
+
+    updateLook(touch);
+  };
+
+  const lookMove = (e: any) => {
+    for (const touch of e.touches) {
+      if (
+        touch.identifier ===
+        lookTouchId.current
+      ) {
+        updateLook(touch);
+      }
+    }
+  };
+
+  const lookEnd = (e: any) => {
+    for (const touch of e.changedTouches) {
+      if (
+        touch.identifier ===
+        lookTouchId.current
+      ) {
+        lookTouchId.current =
+          null;
+
+        lookStick.current.style.transform =
+          `translate(0px,0px)`;
+
+        lookDelta.current = {
+          x: 0,
+          y: 0,
+        };
+      }
+    }
+  };
+
+  return (
+    <>
+      {/* LEFT */}
+      <div
+        ref={moveBase}
+        onTouchStart={moveStart}
+        onTouchMove={moveMove}
+        onTouchEnd={moveEnd}
+        className="fixed bottom-5 left-5 z-[99999] w-28 h-28 rounded-full bg-white/10 border border-white/20"
+      >
+        <div
+          ref={moveStick}
+          className="absolute left-1/2 top-1/2 w-10 h-10 -ml-5 -mt-5 rounded-full bg-white/60"
+        />
+      </div>
+
+      {/* RIGHT */}
+      <div
+        ref={lookBase}
+        onTouchStart={lookStart}
+        onTouchMove={lookMove}
+        onTouchEnd={lookEnd}
+        className="fixed bottom-5 right-5 z-[99999] w-28 h-28 rounded-full bg-white/10 border border-white/20"
+      >
+        <div
+          ref={lookStick}
+          className="absolute left-1/2 top-1/2 w-10 h-10 -ml-5 -mt-5 rounded-full bg-white/60"
+        />
+      </div>
+    </>
+  );
+}
+
+/* ======================= */
+/* POSTER */
+/* ======================= */
 
 function PosterViewer({
   id,
@@ -247,16 +557,13 @@ function PosterViewer({
         "Loading...",
     });
 
-  /**
-   * load text
-   */
   useEffect(() => {
     const load =
       async () => {
         try {
           const res =
             await fetch(
-              `/uploads/${id}/${booth}-teks.txt?time=${Date.now()}`
+              `/uploads/${id}/${booth}-teks.txt`
             );
 
           const txt =
@@ -295,36 +602,6 @@ function PosterViewer({
     load();
   }, [id, booth]);
 
-  /**
-   * esc close
-   */
-  useEffect(() => {
-    const down = (
-      e: KeyboardEvent
-    ) => {
-      if (
-        e.key ===
-        "Escape"
-      ) {
-        onClose();
-      }
-    };
-
-    window.addEventListener(
-      "keydown",
-      down
-    );
-
-    return () =>
-      window.removeEventListener(
-        "keydown",
-        down
-      );
-  }, [onClose]);
-
-  /**
-   * zoom
-   */
   const wheel = (
     e: React.WheelEvent
   ) => {
@@ -334,8 +611,8 @@ function PosterViewer({
       Math.min(
         Math.max(
           p -
-            e.deltaY *
-              0.0015,
+          e.deltaY *
+          0.0015,
           0.5
         ),
         5
@@ -344,11 +621,11 @@ function PosterViewer({
   };
 
   return (
-    <div className="fixed inset-0 z-[99997] bg-black/95 flex">
-      {/* LEFT */}
+    <div className="fixed inset-0 z-[99997] bg-black/95 flex flex-col lg:flex-row">
+
       <div
         onWheel={wheel}
-        className="w-[65%] h-full flex items-center justify-center p-10 border-r border-white/10 overflow-auto"
+        className="w-full lg:w-[65%] h-[45%] lg:h-full flex items-center justify-center p-4 border-b lg:border-r border-white/10"
       >
         <img
           src={src}
@@ -358,47 +635,35 @@ function PosterViewer({
           style={{
             transform: `scale(${zoom})`,
           }}
-          className="max-w-full max-h-full select-none"
+          className="max-w-full max-h-full"
         />
       </div>
 
-      {/* RIGHT */}
-      <div className="w-[35%] h-full text-white flex flex-col">
+      <div className="w-full lg:w-[35%] h-[55%] lg:h-full text-white flex flex-col">
+
         <div className="h-16 px-5 border-b border-white/10 flex items-center justify-between">
-          <h1 className="font-bold text-lg">
+          <h1 className="font-bold">
             Detail Booth
           </h1>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() =>
-                setZoom(
-                  1
-                )
-              }
-              className="px-4 h-10 rounded-lg bg-white/10"
-            >
-              Reset
-            </button>
-
-            <button
-              onClick={
-                onClose
-              }
-              className="px-4 h-10 rounded-lg bg-red-500"
-            >
-              ✕
-            </button>
-          </div>
+          <button
+            onClick={
+              onClose
+            }
+            className="px-4 h-10 rounded-lg bg-red-500"
+          >
+            ✕
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+
           <div>
             <p className="text-white/50 text-sm">
               Judul
             </p>
 
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl font-bold">
               {
                 info.judul
               }
@@ -420,12 +685,13 @@ function PosterViewer({
               Deskripsi
             </p>
 
-            <p className="whitespace-pre-line text-white/80 leading-relaxed">
+            <p className="text-white/80 whitespace-pre-line text-sm">
               {
                 info.deskripsi
               }
             </p>
           </div>
+
         </div>
       </div>
     </div>

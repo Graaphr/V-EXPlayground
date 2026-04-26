@@ -13,6 +13,7 @@ import {
 import {
   useEffect,
   useRef,
+  useState,
 } from "react";
 
 import * as THREE from "three";
@@ -20,15 +21,30 @@ import * as THREE from "three";
 type Props = {
   mode: "first" | "third";
   controlsLocked: boolean;
+
   setWalking?: (
     value: boolean
   ) => void;
+
+  mobileMove?: {
+    w: boolean;
+    a: boolean;
+    s: boolean;
+    d: boolean;
+  };
+
+  lookDelta?: React.MutableRefObject<{
+    x: number;
+    y: number;
+  }>;
 };
 
 export default function Player({
   mode,
   controlsLocked,
   setWalking,
+  mobileMove,
+  lookDelta,
 }: Props) {
   const {
     camera,
@@ -75,8 +91,32 @@ export default function Player({
       THREE.Object3D[]
     >([]);
 
+  const [
+    isMobile,
+    setIsMobile,
+  ] = useState(false);
+
+  /* LOOK ROTATION */
+  const yaw =
+    useRef(0);
+
+  const pitch =
+    useRef(0);
+
   /* ===================== */
-  /* COLLIDER CACHE */
+  /* MOBILE DETECT */
+  /* ===================== */
+
+  useEffect(() => {
+    setIsMobile(
+      /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      )
+    );
+  }, []);
+
+  /* ===================== */
+  /* COLLIDER */
   /* ===================== */
 
   useEffect(() => {
@@ -101,23 +141,16 @@ export default function Player({
 
       colliders.current =
         arr;
-
-      console.log(
-        "Collider Found:",
-        arr.length
-      );
     };
 
-    const timer =
+    const t =
       setTimeout(
         scan,
         300
       );
 
     return () =>
-      clearTimeout(
-        timer
-      );
+      clearTimeout(t);
   }, [world]);
 
   /* ===================== */
@@ -128,9 +161,7 @@ export default function Player({
     const down = (
       e: KeyboardEvent
     ) => {
-      if (
-        !controlsLocked
-      )
+      if (!controlsLocked)
         return;
 
       if (e.code === "KeyW")
@@ -170,15 +201,6 @@ export default function Player({
           false;
     };
 
-    const reset = () => {
-      keys.current = {
-        w: false,
-        a: false,
-        s: false,
-        d: false,
-      };
-    };
-
     window.addEventListener(
       "keydown",
       down
@@ -187,11 +209,6 @@ export default function Player({
     window.addEventListener(
       "keyup",
       up
-    );
-
-    window.addEventListener(
-      "blur",
-      reset
     );
 
     return () => {
@@ -204,39 +221,8 @@ export default function Player({
         "keyup",
         up
       );
-
-      window.removeEventListener(
-        "blur",
-        reset
-      );
     };
   }, [controlsLocked]);
-
-  /* ===================== */
-  /* UNLOCK */
-  /* ===================== */
-
-  useEffect(() => {
-    if (
-      !controlsLocked
-    ) {
-      keys.current = {
-        w: false,
-        a: false,
-        s: false,
-        d: false,
-      };
-
-      setWalking?.(
-        false
-      );
-
-      document.exitPointerLock?.();
-    }
-  }, [
-    controlsLocked,
-    setWalking,
-  ]);
 
   /* ===================== */
   /* FRAME */
@@ -248,6 +234,40 @@ export default function Player({
 
     const playerHeight =
       3;
+
+    /* ===================== */
+    /* MOBILE LOOK FIX */
+    /* ===================== */
+
+    if (
+      isMobile &&
+      mode === "first" &&
+      lookDelta
+    ) {
+      yaw.current -= lookDelta.current.x * 1;
+      pitch.current -= lookDelta.current.y * 1;
+
+      pitch.current =
+        Math.max(
+          -1.2,
+          Math.min(
+            1.2,
+            pitch.current
+          )
+        );
+
+      const euler =
+        new THREE.Euler(
+          pitch.current,
+          yaw.current,
+          0,
+          "YXZ"
+        );
+
+      camera.quaternion.setFromEuler(
+        euler
+      );
+    }
 
     const dir =
       new THREE.Vector3();
@@ -273,12 +293,26 @@ export default function Player({
     let moving =
       false;
 
+    const W =
+      keys.current.w ||
+      mobileMove?.w;
+
+    const A =
+      keys.current.a ||
+      mobileMove?.a;
+
+    const S =
+      keys.current.s ||
+      mobileMove?.s;
+
+    const D =
+      keys.current.d ||
+      mobileMove?.d;
+
     if (
       controlsLocked
     ) {
-      if (
-        keys.current.w
-      ) {
+      if (W) {
         next.add(
           dir
             .clone()
@@ -290,9 +324,7 @@ export default function Player({
           true;
       }
 
-      if (
-        keys.current.s
-      ) {
+      if (S) {
         next.add(
           dir
             .clone()
@@ -304,9 +336,7 @@ export default function Player({
           true;
       }
 
-      if (
-        keys.current.a
-      ) {
+      if (A) {
         next.add(
           right
             .clone()
@@ -318,9 +348,7 @@ export default function Player({
           true;
       }
 
-      if (
-        keys.current.d
-      ) {
+      if (D) {
         next.add(
           right
             .clone()
@@ -338,7 +366,7 @@ export default function Player({
     );
 
     /* ===================== */
-    /* WALL COLLISION */
+    /* COLLISION */
     /* ===================== */
 
     const moveDir =
@@ -422,10 +450,7 @@ export default function Player({
               .isMesh &&
             !hit.object
               .userData
-              ?.collider &&
-            hit.point.y <=
-              position
-                .current.y
+              ?.collider
         )
         .sort(
           (a, b) =>
@@ -437,16 +462,13 @@ export default function Player({
       floorHits.length >
       0
     ) {
-      const floorY =
+      position.current.y =
         floorHits[0]
           .point.y +
         playerHeight;
 
       grounded =
         true;
-
-      position.current.y =
-        floorY;
 
       velocityY.current =
         0;
@@ -463,13 +485,21 @@ export default function Player({
     }
 
     /* ===================== */
-    /* BODY TPS */
+    /* CAMERA */
     /* ===================== */
+
+    if (
+      mode === "first"
+    ) {
+      camera.position.copy(
+        position.current
+      );
+    }
 
     if (
       playerMesh.current &&
       mode ===
-        "third"
+      "third"
     ) {
       playerMesh.current.position.copy(
         position.current
@@ -479,22 +509,9 @@ export default function Player({
         1.5;
     }
 
-    /* ===================== */
-    /* CAMERA */
-    /* ===================== */
-
     if (
       mode ===
-      "first"
-    ) {
-      camera.position.copy(
-        position.current
-      );
-    }
-
-    if (
-      mode ===
-        "third" &&
+      "third" &&
       orbitRef.current
     ) {
       orbitRef.current.target.copy(
@@ -507,67 +524,64 @@ export default function Player({
 
   return (
     <>
-      {mode ===
+      {!isMobile &&
+        mode ===
         "first" && (
-        <PointerLockControls
-          ref={
-            pointerRef
-          }
-        />
-      )}
+          <PointerLockControls
+            ref={
+              pointerRef
+            }
+          />
+        )}
 
       {mode ===
         "third" && (
-        <>
-          <OrbitControls
-            ref={
-              orbitRef
-            }
-            enablePan={
-              false
-            }
-            enableRotate={
-              controlsLocked
-            }
-            enableZoom={
-              controlsLocked
-            }
-            minDistance={
-              4
-            }
-            maxDistance={
-              8
-            }
-            maxPolarAngle={
-              Math.PI /
-              2.1
-            }
-          />
-
-          <mesh
-            ref={
-              playerMesh
-            }
-          >
-            <capsuleGeometry
-              args={[
-                0.5,
-                1.2,
-                4,
-                8,
-              ]}
-            />
-
-            <meshStandardMaterial
-              color="lime"
-              transparent
-              opacity={
-                0.35
+          <>
+            <OrbitControls
+              ref={
+                orbitRef
+              }
+              enablePan={
+                false
+              }
+              enableRotate={
+                controlsLocked
+              }
+              enableZoom={
+                controlsLocked
+              }
+              minDistance={
+                4
+              }
+              maxDistance={
+                8
               }
             />
-          </mesh>
-        </>
-      )}
+
+            <mesh
+              ref={
+                playerMesh
+              }
+            >
+              <capsuleGeometry
+                args={[
+                  0.5,
+                  1.2,
+                  4,
+                  8,
+                ]}
+              />
+
+              <meshStandardMaterial
+                color="lime"
+                transparent
+                opacity={
+                  0.35
+                }
+              />
+            </mesh>
+          </>
+        )}
     </>
   );
 }
