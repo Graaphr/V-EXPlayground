@@ -10,11 +10,11 @@ export default function AddPameran() {
           <NavAdmin />
 
           {/* CONTENT */}
-          <div className="flex flex-col lg:flex-row gap-6 w-full">
+          <div className="flex flex-col lg:flex-row gap-10 w-full">
 
             {/* LEFT - UPLOAD */}
             <div className="w-full lg:w-[40%]">
-              <p className="font-poppins text-xl mt-4">Thumbnail</p>
+              <p className="font-poppins text-xl mt-10">Thumbnail</p>
 
               <label
                 htmlFor="file"
@@ -35,7 +35,7 @@ export default function AddPameran() {
             </div>
 
             {/* RIGHT - FORM */}
-            <div className="mt-4 w-full lg:w-[60%] flex flex-col gap-4">
+            <div className="mt-10 w-full lg:w-[60%] flex flex-col gap-4">
 
               {/* PRODI */}
               <div>

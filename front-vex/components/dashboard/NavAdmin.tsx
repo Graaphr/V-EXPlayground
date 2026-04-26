@@ -4,11 +4,15 @@ import { FaUser, FaBook, FaPlus, FaTimes } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function NavAdmin({ onAddClick, isFormOpen }) {
+interface AddOn{
+  onAddClick? : string,
+  isFormOpen? : string,
+}
+export default function NavAdmin({ onAddClick, isFormOpen }: AddOn) {
   const pathname = usePathname();
 
   const menuItems = [
-    { id: 1, icon: <FaUser className="rounded-full" size={18} />, link: "/admin" },
+    { id: 1, icon: <FaUser className="rounded-full" size={18} />, link: "/admin/pengguna" },
     { id: 2, icon: <FaBook size={18} />, link: "/admin/pameran" },
   ];
 
