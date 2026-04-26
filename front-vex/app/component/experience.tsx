@@ -49,9 +49,9 @@ export default function Experience({
   lookDelta,
 }: Props) {
   const [mode, setMode] =
-    useState<
-      "first" | "third"
-    >("first");
+    useState<"first" | "third">(
+      "first"
+    );
 
   const [walking, setWalking] =
     useState(false);
@@ -74,10 +74,9 @@ export default function Experience({
       new THREE.TextureLoader()
     );
 
-  const { scene } =
-    useGLTF(
-      "/models/hall2.glb"
-    );
+  const { scene } = useGLTF(
+    "/models/hall2.glb"
+  );
 
   /* ===================== */
   /* DATA PAMERAN */
@@ -86,18 +85,16 @@ export default function Experience({
   const currentExpo =
     ALL_EXHIBITIONS.find(
       (item) =>
-        item.id ===
-        exhibitionId
+        item.id === exhibitionId
     );
 
   const category =
     currentExpo?.category ||
     "default";
 
-  const folder =
-    category
-      .toLowerCase()
-      .replaceAll(" ", "-");
+  const folder = category
+    .toLowerCase()
+    .replaceAll(" ", "-");
 
   /* ===================== */
   /* AUDIO */
@@ -111,7 +108,6 @@ export default function Experience({
 
     bgmRef.current.loop =
       true;
-
     bgmRef.current.volume =
       0.35;
 
@@ -122,7 +118,6 @@ export default function Experience({
 
     footRef.current.loop =
       true;
-
     footRef.current.volume =
       0.55;
 
@@ -133,8 +128,7 @@ export default function Experience({
   }, []);
 
   useEffect(() => {
-    if (!bgmRef.current)
-      return;
+    if (!bgmRef.current) return;
 
     if (soundOn) {
       bgmRef.current.volume =
@@ -144,7 +138,7 @@ export default function Experience({
 
       bgmRef.current
         .play()
-        .catch(() => { });
+        .catch(() => {});
     } else {
       bgmRef.current.pause();
       footRef.current?.pause();
@@ -165,7 +159,7 @@ export default function Experience({
     ) {
       footRef.current
         .play()
-        .catch(() => { });
+        .catch(() => {});
     } else {
       footRef.current.pause();
       footRef.current.currentTime =
@@ -178,7 +172,32 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* TEXTURE DISPLAY */
+  /* SAFE TEXTURE LOADER */
+  /* ===================== */
+
+  const loadTextureSafe = (
+    path: string,
+    onLoad: (
+      tex: THREE.Texture
+    ) => void
+  ) => {
+    loader.current.load(
+      path,
+      (tex) => {
+        tex.flipY = false;
+        tex.colorSpace =
+          THREE.SRGBColorSpace;
+        onLoad(tex);
+      },
+      undefined,
+      () => {
+        /* ignore missing file */
+      }
+    );
+  };
+
+  /* ===================== */
+  /* DISPLAY TEXTURE */
   /* ===================== */
 
   useEffect(() => {
@@ -213,15 +232,9 @@ export default function Experience({
           const path =
             `/prodi/${folder}/${num}.png`;
 
-          loader.current.load(
+          loadTextureSafe(
             path,
             (tex) => {
-              tex.flipY =
-                false;
-
-              tex.colorSpace =
-                THREE.SRGBColorSpace;
-
               obj.material =
                 new THREE.MeshBasicMaterial(
                   {
@@ -234,22 +247,13 @@ export default function Experience({
           );
         }
 
-        if (
-          name ===
-          "panel"
-        ) {
+        if (name === "panel") {
           const path =
             `/prodi/${folder}/${folder}.png`;
 
-          loader.current.load(
+          loadTextureSafe(
             path,
             (tex) => {
-              tex.flipY =
-                false;
-
-              tex.colorSpace =
-                THREE.SRGBColorSpace;
-
               obj.material =
                 new THREE.MeshBasicMaterial(
                   {
@@ -263,10 +267,7 @@ export default function Experience({
         }
       }
     );
-  }, [
-    scene,
-    folder,
-  ]);
+  }, [scene, folder]);
 
   /* ===================== */
   /* POSTER */
@@ -315,15 +316,9 @@ export default function Experience({
         const path =
           `/uploads/${exhibitionId}/booth${zone}${posterNum}-poster.png`;
 
-        loader.current.load(
+        loadTextureSafe(
           path,
           (tex) => {
-            tex.flipY =
-              false;
-
-            tex.colorSpace =
-              THREE.SRGBColorSpace;
-
             obj.material =
               new THREE.MeshBasicMaterial(
                 {
@@ -470,10 +465,7 @@ export default function Experience({
       />
 
       {boothPoints.map(
-        (
-          item,
-          i
-        ) => (
+        (item, i) => (
           <Booth
             key={i}
             boothName={
@@ -494,19 +486,24 @@ export default function Experience({
         )
       )}
 
-      {/* PLAYER FIX MOBILE */}
       <Player
         mode={mode}
-        controlsLocked={controlsLocked}
-        setWalking={setWalking}
-        mobileMove={mobileMove}
-        lookDelta={lookDelta}
+        controlsLocked={
+          controlsLocked
+        }
+        setWalking={
+          setWalking
+        }
+        mobileMove={
+          mobileMove
+        }
+        lookDelta={
+          lookDelta
+        }
       />
 
       <CameraSwitcher
-        setMode={
-          setMode
-        }
+        setMode={setMode}
         disabled={
           !controlsLocked
         }

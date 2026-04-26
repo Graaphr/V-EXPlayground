@@ -121,30 +121,54 @@ export default function PameranDetail() {
                 </div>
 
                 {/* tombol */}
-                <div className="flex flex-col sm:flex-row gap-6 mt-4 md:mt-0">
+                <div className="flex flex-col sm:flex-row gap-4 md:gap-6 mt-4 md:mt-0 w-full">
                   {isOpen ? (
                     <Button
                       link={`/exhibition/${id}`}
-                      className="flex-1 md:flex-none py-4 px-[100px] items-center text-md flex rounded-md shadow-md/30 hover:bg-green-500/20"
+                      className="
+        w-full sm:w-auto
+        min-w-[140px]
+        py-4 px-6 sm:px-10 lg:px-[100px]
+        flex items-center justify-center
+        text-md rounded-md
+        shadow-md/30
+        hover:bg-green-500/20
+      "
                     >
                       <FaPlay />
                     </Button>
                   ) : (
-                    <div className="flex-1 md:flex-none py-4 px-[100px] flex items-center justify-center rounded-md bg-gray-300 text-gray-500 cursor-not-allowed">
+                    <div
+                      className="
+        w-full sm:w-auto
+        min-w-[140px]
+        py-4 px-6 sm:px-10 lg:px-[100px]
+        flex items-center justify-center
+        rounded-md
+        bg-gray-300 text-gray-500
+        cursor-not-allowed
+      "
+                    >
                       <FaPlay />
                     </div>
                   )}
 
                   <div
-                    className={`flex-1 md:flex-none text-white font-bold py-3 px-[40px] text-md rounded-md shadow-md/30 ${
-                      isOpen
+                    className={`
+      w-full sm:w-auto
+      min-w-[140px]
+      py-3 px-6 sm:px-10 lg:px-[40px]
+      text-center
+      text-white font-bold text-md
+      rounded-md shadow-md/30
+      flex items-center justify-center
+      ${isOpen
                         ? "bg-green-500"
                         : "bg-red-500"
-                    }`}
+                      }
+    `}
                   >
-                    {isOpen
-                      ? "BUKA"
-                      : "TUTUP"}
+                    {isOpen ? "BUKA" : "TUTUP"}
                   </div>
                 </div>
               </div>

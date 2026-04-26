@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 
 import { useGLTF } from "@react-three/drei";
@@ -33,28 +34,24 @@ type BoothProps = {
 
 export default function Booth({
   position = [0, 0, 0],
-
   quaternion = [0, 0, 0, 1],
-
   boothName,
-
   poster,
-
   video,
-
   openPoster,
 }: BoothProps) {
-  const randomNumber = useMemo(() => {
-    return (
-      Math.floor(
-        Math.random() * 3
-      ) + 1
-    );
-  }, []);
+  const [canRender, setCanRender] =
+    useState(false);
 
-  /**
-   * LOAD MODEL
-   */
+  const randomNumber =
+    useMemo(() => {
+      return (
+        Math.floor(
+          Math.random() * 3
+        ) + 1
+      );
+    }, []);
+
   const gltf = useGLTF(
     `/models/stand${randomNumber}.glb`
   );
@@ -79,10 +76,89 @@ export default function Booth({
       null
     );
 
-  /**
-   * SETUP OBJECT
-   */
+  /* ===================== */
+  /* CHECK FILE EXISTS */
+  /* ===================== */
+
+  const fileExists = async (
+    path: string
+  ) => {
+    try {
+      const res = await fetch(
+        path,
+        {
+          method: "HEAD",
+        }
+      );
+
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  /* ===================== */
+  /* CHECK BOOTH DATA */
+  /* ===================== */
+
   useEffect(() => {
+    const check =
+      async () => {
+        const posterOk =
+          await fileExists(
+            poster
+          );
+
+        if (!posterOk) {
+          setCanRender(
+            false
+          );
+          return;
+        }
+
+        setCanRender(true);
+      };
+
+    check();
+  }, [poster]);
+
+  /* ===================== */
+  /* SAFE LOAD TEXTURE */
+  /* ===================== */
+
+  const loadTextureSafe = async (
+    path: string,
+    onLoad: (
+      texture: THREE.Texture
+    ) => void
+  ) => {
+    const exists =
+      await fileExists(path);
+
+    if (!exists) return;
+
+    const loader =
+      new THREE.TextureLoader();
+
+    loader.load(
+      path,
+      (texture) => {
+        texture.flipY = false;
+        texture.colorSpace =
+          THREE.SRGBColorSpace;
+
+        onLoad(texture);
+      }
+    );
+  };
+
+  /* ===================== */
+  /* SETUP */
+  /* ===================== */
+
+  useEffect(() => {
+    if (!canRender) return;
+
     scene.traverse((obj: any) => {
       if (!obj.isMesh) return;
 
@@ -95,13 +171,9 @@ export default function Booth({
           "collider"
         )
       ) {
+        obj.visible = false;
         obj.userData.collider =
           true;
-
-        obj.visible = false;
-      } else {
-        obj.userData.collider =
-          false;
       }
     });
 
@@ -114,134 +186,125 @@ export default function Booth({
       scene.getObjectByName(
         "PanelVideo"
       ) as THREE.Mesh;
-  }, [scene]);
+  }, [
+    scene,
+    canRender,
+  ]);
 
-  /**
-   * POSTER TEXTURE
-   */
+  /* ===================== */
+  /* POSTER */
+  /* ===================== */
+
   useEffect(() => {
     if (
-      !poster ||
+      !canRender ||
       !posterMesh.current
     )
       return;
 
-    const loader =
-      new THREE.TextureLoader();
-
-    loader.load(
+    loadTextureSafe(
       poster,
       (texture) => {
-        texture.flipY = false;
+        if (!posterMesh.current)
+          return;
 
-        texture.colorSpace =
-          THREE.SRGBColorSpace;
-
-        posterMesh.current!.material =
+        posterMesh.current.material =
           new THREE.MeshBasicMaterial(
             {
               map: texture,
-              toneMapped: false,
+              toneMapped:
+                false,
             }
           );
       }
     );
-  }, [poster]);
+  }, [
+    canRender,
+    poster,
+  ]);
 
-  /**
-   * VIDEO TEXTURE
-   */
+  /* ===================== */
+  /* VIDEO */
+  /* ===================== */
+
   useEffect(() => {
-    if (
-      !video ||
-      !videoMesh.current
-    )
-      return;
+    const setup =
+      async () => {
+        if (
+          !canRender ||
+          !video ||
+          !videoMesh.current
+        )
+          return;
 
-    const isVideo =
-      video.endsWith(
-        ".mp4"
-      ) ||
-      video.endsWith(
-        ".webm"
-      );
+        const exists =
+          await fileExists(
+            video
+          );
 
-    if (!isVideo) return;
+        if (!exists) return;
 
-    const htmlVideo =
-      document.createElement(
-        "video"
-      );
+        const htmlVideo =
+          document.createElement(
+            "video"
+          );
 
-    htmlVideo.src = video;
-    htmlVideo.loop = true;
-    htmlVideo.muted = false;
-    htmlVideo.playsInline = true;
-    htmlVideo.preload =
-      "metadata";
+        htmlVideo.src =
+          video;
+        htmlVideo.loop =
+          true;
+        htmlVideo.muted =
+          false;
+        htmlVideo.playsInline =
+          true;
 
-    videoElement.current =
-      htmlVideo;
+        videoElement.current =
+          htmlVideo;
 
-    const texture =
-      new THREE.VideoTexture(
-        htmlVideo
-      );
+        const texture =
+          new THREE.VideoTexture(
+            htmlVideo
+          );
 
-    texture.colorSpace =
-      THREE.SRGBColorSpace;
+        texture.colorSpace =
+          THREE.SRGBColorSpace;
 
-    videoMesh.current!.material =
-      new THREE.MeshBasicMaterial(
-        {
-          map: texture,
-          toneMapped: false,
-        }
-      );
+        videoMesh.current!.material =
+          new THREE.MeshBasicMaterial(
+            {
+              map: texture,
+              toneMapped:
+                false,
+            }
+          );
+      };
+
+    setup();
 
     return () => {
-      htmlVideo.pause();
-      htmlVideo.remove();
+      videoElement.current?.pause();
+      videoElement.current?.remove();
+      videoElement.current =
+        null;
     };
-  }, [video]);
+  }, [
+    canRender,
+    video,
+  ]);
 
-  /**
-   * INTERACT
-   */
+  /* ===================== */
+  /* CLICK */
+  /* ===================== */
+
   const handleClick = (
     e: any
   ) => {
     const clicked =
-      e.object.name;
+      e?.object?.name;
 
-    /**
-     * VIDEO PANEL
-     */
     if (
       clicked ===
-      "PanelVideo" &&
-      video
-    ) {
-      const vid =
-        videoElement.current;
-
-      if (!vid) return;
-
-      if (vid.paused) {
-        vid.play().catch(
-          () => { }
-        );
-      } else {
-        vid.pause();
-      }
-    }
-
-    /**
-     * POSTER PANEL
-     */
-    if (
-      clicked ===
-      "PanelPoster" &&
+        "PanelPoster" &&
       poster
     ) {
       openPoster(
@@ -249,7 +312,30 @@ export default function Booth({
         boothName
       );
     }
+
+    if (
+      clicked ===
+        "PanelVideo" &&
+      videoElement.current
+    ) {
+      const vid =
+        videoElement.current;
+
+      if (vid.paused) {
+        vid.play().catch(
+          () => {}
+        );
+      } else {
+        vid.pause();
+      }
+    }
   };
+
+  /* ===================== */
+  /* NO POSTER = NO BOOTH */
+  /* ===================== */
+
+  if (!canRender) return null;
 
   return (
     <group
@@ -265,7 +351,6 @@ export default function Booth({
         position={[
           0, 0, -1.2,
         ]}
-        scale={1}
         onClick={
           handleClick
         }
