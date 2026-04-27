@@ -3,7 +3,7 @@
 import { Card, Logo, Button, BestTag, FavTag } from "@/components/Componen";
 import Carousel from "@/components/model/Carousel";
 // data
-import { DataFoto } from "@/components/model/CarouselData"; //foto terbaik
+import { DataFotoTerbaik, DataFotoTerfavorit } from "@/components/model/CarouselData"; //foto terbaik & favorit
 // icon
 import { BiCube, BiGlobe } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
