@@ -226,7 +226,7 @@ export default function Home() {
 
               <div className="w-full aspect-video">
                 <Carousel
-                  data={DataFoto}
+                  data={DataFotoTerbaik}
                   className="w-full h-full rounded-xl overflow-hidden"
                 />
               </div>
@@ -286,7 +286,7 @@ export default function Home() {
                 {/* carousel 16:9 */}
                 <div className="w-full aspect-video">
                   <Carousel
-                    data={DataFoto}
+                    data={DataFotoTerfavorit}
                     className="w-full h-full rounded-xl overflow-hidden"
                   />
                 </div>

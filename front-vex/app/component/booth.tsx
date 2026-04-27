@@ -13,12 +13,7 @@ import * as THREE from "three";
 type BoothProps = {
   position?: [number, number, number];
 
-  quaternion?: [
-    number,
-    number,
-    number,
-    number
-  ];
+  quaternion?: [number, number, number, number];
 
   boothName: string;
 
