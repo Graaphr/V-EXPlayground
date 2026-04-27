@@ -10,7 +10,7 @@ import { FaStar } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <div className="flex flex-col w-full  bg-secondary-color">
+    <div className="flex flex-col w-full  bg-secondary-color select-none">
 
       <div>
         {/* section1 */}

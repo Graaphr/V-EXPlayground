@@ -149,7 +149,7 @@ export default function Admin() {
   const prevPage = () => setPageMhs((p) => Math.max(p - 1, 1));
 
   return (
-    <div className="min-h-screen bg-secondary-color font-poppins w-full  pb-[120px]">
+    <div className="min-h-screen bg-secondary-color font-poppins w-full  pb-[120px] select-none">
       {/* NAV */}
       <NavAdmin
         isFormOpen={isFormOpen}

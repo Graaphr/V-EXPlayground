@@ -196,7 +196,7 @@ export default function Page() {
     !menuOpen;
 
   return (
-    <div className="w-screen h-screen bg-black overflow-hidden relative touch-none">
+    <div className="w-screen h-screen bg-black overflow-hidden relative touch-none select-none">
 
       {/* PORTRAIT WARNING */}
       {isMobile &&
@@ -783,7 +783,7 @@ function PosterViewer({
             onClick={
               onClose
             }
-            className="px-3 h-9 rounded-lg bg-red-500 text-sm font-bold"
+            className="px-3 h-9 bg-none text-md font-bold"
           >
             ✕
           </button>
@@ -871,7 +871,7 @@ function PosterViewer({
                 </div>
 
                 {/* RIGHT BADGE */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-start gap-2 shrink-0">
 
                   {/* BADGE TERBAIK */}
                   {info.penilaian
@@ -889,7 +889,7 @@ function PosterViewer({
                     .includes("terbanyak") && (
                       <img
                         src="/icon/Favorite.svg"
-                        className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
+                        className="w-11 h-11 lg:w-15 lg:h-15 object-contain"
                       />
                     )}
                 </div>
@@ -924,7 +924,7 @@ function PosterViewer({
                   ) => (
                     <div
                       key={i}
-                      className="bg-white/5 rounded-xl p-3"
+                      className="bg-white/5 rounded-[6px] p-3"
                     >
                       <p className="text-xs font-bold mb-1">
                         {
@@ -962,14 +962,14 @@ function PosterViewer({
                   )
                 }
                 placeholder="Tulis komentar..."
-                className="flex-1 h-11 px-3 rounded-xl bg-white/10 text-sm outline-none"
+                className="flex-1 h-11 px-3 rounded-[6px] bg-white/10 text-sm outline-none"
               />
 
               <button
                 onClick={
                   sendComment
                 }
-                className="w-11 h-11 rounded-xl bg-blue-500 flex items-center justify-center"
+                className="w-11 h-11 rounded-[6px] bg-main-blue flex items-center justify-center"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

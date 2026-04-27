@@ -127,7 +127,7 @@ export default function PameranPage() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary-color text-black font-poppins">
+    <div className="min-h-screen bg-secondary-color text-black font-poppins select-none">
       {/* HERO */}
       <section className="bg-main-blue rounded-b-[25px] md:rounded-b-[40px] py-6 md:py-[30px]">
         <div className="autoMid">

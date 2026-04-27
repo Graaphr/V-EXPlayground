@@ -3,7 +3,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import {Button} from "@/components/Componen"
 export default function AddPameran() {
   return (
-    <div className="min-h-screen bg-secondary-color">
+    <div className="min-h-screen bg-secondary-color select-none">
       <section className="autoMid">
         <div className="flex flex-col lg:flex-row gap-6 min-h-screen">
           

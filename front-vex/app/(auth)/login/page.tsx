@@ -138,7 +138,7 @@ export default function LoginPage() {
           <Logo />
         </div>
 
-        <div className="w-full space-y-5">
+        <div className="w-full space-y-5 select-none">
            <input
                         name="email"
                         value={form.email}

@@ -1,5 +1,15 @@
-Judul: SiTawar - Project Aplikasi Berbasis Web 
+Judul: Ruang - Aplikasi Pencatatan Keuangan RT/RW Digital
 
-Tim: PBL-TRPL101-A1
+Tim: TRPL101-A2
 
-Deskripsi: SiTawar merupakan aplikasi administrasi warga berbasis web yang dirancang untuk membantu menyelesaikan berbagai kebutuhan pelayanan masyarakat secara lebih mudah, cepat, dan terorganisir. Aplikasi ini memudahkan warga dalam mengurus keperluan administrasi sehari-hari seperti pengajuan surat pengantar, pendataan warga, pelaporan keluhan, penyampaian informasi lingkungan, hingga pemantauan status permohonan secara online tanpa harus datang langsung ke kantor pelayanan. Dengan sistem yang terintegrasi, SiTawar membantu meningkatkan efisiensi kerja pengurus lingkungan, mempercepat proses pelayanan, mengurangi penggunaan kertas, serta menciptakan komunikasi yang lebih transparan antara warga dan pihak administrasi. Melalui SiTawar, pelayanan masyarakat menjadi lebih modern, praktis, dan responsif terhadap kebutuhan warga.
+Deskripsi: Ruang merupakan aplikasi pencatatan keuangan RT/RW berbasis digital yang dirancang untuk membantu pengurus lingkungan dalam mengelola administrasi keuangan secara lebih rapi, transparan, dan efisien. Aplikasi ini memudahkan pencatatan pemasukan seperti iuran warga, dana kas, maupun sumbangan, serta pengeluaran untuk kebutuhan operasional, kegiatan lingkungan, dan perawatan fasilitas umum. Dengan sistem yang terintegrasi, pengurus dapat memantau laporan keuangan secara real-time, menyusun rekap bulanan, serta membagikan informasi keuangan kepada warga dengan lebih terbuka. Melalui Ruang, pengelolaan keuangan RT/RW menjadi lebih modern, akurat, dan terpercaya.
+
+Likes: 12
+
+Penilaian: Karya
+
+Komentar:
+Andi | Aplikasi sangat membantu pencatatan kas RT.
+Siska | Tampilannya rapi dan mudah digunakan.
+Rudi | Bagus untuk transparansi keuangan warga.
+Maya | Ide yang sangat bermanfaat untuk lingkungan.

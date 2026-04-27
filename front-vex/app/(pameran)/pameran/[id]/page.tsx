@@ -60,7 +60,7 @@ export default function PameranDetail() {
     !isAfterClose;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 select-none">
       <main className="relative pb-16 bg-white">
         {/* Banner */}
         <div className="absolute hidden md:block relative w-full h-[60vh] overflow-hidden">

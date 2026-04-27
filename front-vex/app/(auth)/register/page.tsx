@@ -118,7 +118,7 @@ export default function RegisterPage() {
                     <Logo />
                 </div>
 
-                <div className="w-full space-y-4">
+                <div className="w-full space-y-4 select-none">
                     <input
                         name="nama"
                         value={form.nama}
