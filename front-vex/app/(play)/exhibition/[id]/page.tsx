@@ -621,11 +621,12 @@ function PosterViewer({
   };
 
   return (
-    <div className="fixed inset-0 z-[99997] bg-black/95 flex flex-col lg:flex-row">
+    <div className="fixed inset-0 z-[99997] bg-black/95 flex flex-row">
 
+      {/* IMAGE */}
       <div
         onWheel={wheel}
-        className="w-full lg:w-[65%] h-[45%] lg:h-full flex items-center justify-center p-4 border-b lg:border-r border-white/10"
+        className="w-[55%] h-full flex items-center justify-center p-3 border-r border-white/10"
       >
         <img
           src={src}
@@ -635,14 +636,16 @@ function PosterViewer({
           style={{
             transform: `scale(${zoom})`,
           }}
-          className="max-w-full max-h-full"
+          className="max-w-full max-h-full object-contain"
         />
       </div>
 
-      <div className="w-full lg:w-[35%] h-[55%] lg:h-full text-white flex flex-col">
+      {/* INFO */}
+      <div className="w-[45%] h-full text-white flex flex-col">
 
-        <div className="h-16 px-5 border-b border-white/10 flex items-center justify-between">
-          <h1 className="font-bold">
+        {/* HEADER */}
+        <div className="h-14 px-4 border-b border-white/10 flex items-center justify-between shrink-0">
+          <h1 className="font-bold text-sm lg:text-base">
             Detail Booth
           </h1>
 
@@ -650,20 +653,21 @@ function PosterViewer({
             onClick={
               onClose
             }
-            className="px-4 h-10 rounded-lg bg-red-500"
+            className="px-3 h-9 rounded-lg bg-red-500 text-sm font-bold"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* CONTENT */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
           <div>
-            <p className="text-white/50 text-sm">
+            <p className="text-white/50 text-xs mb-1">
               Judul
             </p>
 
-            <h1 className="text-xl font-bold">
+            <h1 className="text-base lg:text-xl font-bold leading-tight">
               {
                 info.judul
               }
@@ -671,21 +675,21 @@ function PosterViewer({
           </div>
 
           <div>
-            <p className="text-white/50 text-sm">
+            <p className="text-white/50 text-xs mb-1">
               Tim
             </p>
 
-            <p>
+            <p className="text-sm lg:text-base">
               {info.tim}
             </p>
           </div>
 
           <div>
-            <p className="text-white/50 text-sm mb-2">
+            <p className="text-white/50 text-xs mb-2">
               Deskripsi
             </p>
 
-            <p className="text-white/80 whitespace-pre-line text-sm">
+            <p className="text-white/80 whitespace-pre-line text-xs lg:text-sm leading-relaxed">
               {
                 info.deskripsi
               }
