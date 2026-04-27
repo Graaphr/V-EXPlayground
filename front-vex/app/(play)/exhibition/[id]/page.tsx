@@ -25,6 +25,12 @@ type InfoData = {
   judul: string;
   tim: string;
   deskripsi: string;
+  likes: number;
+  penilaian: string;
+  komentar: {
+    nama: string;
+    isi: string;
+  }[];
 };
 
 export default function Page() {
@@ -132,6 +138,16 @@ export default function Page() {
   }, []);
 
   /* ====================== */
+  /* EXIT POINTERLOCK SAAT POSTER BUKA */
+  /* ====================== */
+
+  useEffect(() => {
+    if (posterOpen) {
+      document.exitPointerLock?.();
+    }
+  }, [posterOpen]);
+
+  /* ====================== */
   /* ESC MENU */
   /* ====================== */
 
@@ -165,6 +181,8 @@ export default function Page() {
     src: string,
     booth: string
   ) => {
+    document.exitPointerLock?.();
+
     setPosterData({
       src,
       booth,
@@ -548,6 +566,17 @@ function PosterViewer({
   const [zoom, setZoom] =
     useState(1);
 
+  const [tab, setTab] =
+    useState<
+      "detail" | "komentar"
+    >("detail");
+
+  const [liked, setLiked] =
+    useState(false);
+
+  const [newComment, setNewComment] =
+    useState("");
+
   const [info, setInfo] =
     useState<InfoData>({
       judul:
@@ -555,6 +584,9 @@ function PosterViewer({
       tim: "-",
       deskripsi:
         "Loading...",
+      likes: 0,
+      penilaian: "-",
+      komentar: [],
     });
 
   useEffect(() => {
@@ -568,6 +600,39 @@ function PosterViewer({
 
           const txt =
             await res.text();
+
+          const komentarRaw =
+            txt.split(
+              "Komentar:"
+            )[1] || "";
+
+          const komentar =
+            komentarRaw
+              .trim()
+              .split("\n")
+              .filter(Boolean)
+              .map(
+                (
+                  line
+                ) => {
+                  const [
+                    nama,
+                    isi,
+                  ] =
+                    line.split(
+                      "|"
+                    );
+
+                  return {
+                    nama:
+                      nama?.trim() ||
+                      "Anonim",
+                    isi:
+                      isi?.trim() ||
+                      "",
+                  };
+                }
+              );
 
           setInfo({
             judul:
@@ -584,9 +649,25 @@ function PosterViewer({
 
             deskripsi:
               txt.match(
-                /Deskripsi:\s*([\s\S]*)/i
+                /Deskripsi:\s*([\s\S]*?)Likes:/i
+              )?.[1]
+                ?.trim() ||
+              "-",
+
+            likes: Number(
+              txt.match(
+                /Likes:\s*(\d+)/i
+              )?.[1] ||
+              0
+            ),
+
+            penilaian:
+              txt.match(
+                /Penilaian:\s*(.*)/i
               )?.[1] ||
               "-",
+
+            komentar,
           });
         } catch {
           setInfo({
@@ -595,6 +676,11 @@ function PosterViewer({
             tim: "-",
             deskripsi:
               "File teks belum tersedia.",
+            likes: 0,
+            penilaian:
+              "-",
+            komentar:
+              [],
           });
         }
       };
@@ -620,6 +706,50 @@ function PosterViewer({
     );
   };
 
+  const toggleLike =
+    () => {
+      setLiked(
+        !liked
+      );
+
+      setInfo(
+        (prev) => ({
+          ...prev,
+          likes:
+            liked
+              ? prev.likes -
+              1
+              : prev.likes +
+              1,
+        })
+      );
+    };
+
+  const sendComment =
+    () => {
+      if (
+        !newComment.trim()
+      )
+        return;
+
+      setInfo(
+        (prev) => ({
+          ...prev,
+          komentar: [
+            ...prev.komentar,
+            {
+              nama:
+                "Guest",
+              isi:
+                newComment,
+            },
+          ],
+        })
+      );
+
+      setNewComment("");
+    };
+
   return (
     <div className="fixed inset-0 z-[99997] bg-black/95 flex flex-row">
 
@@ -640,7 +770,7 @@ function PosterViewer({
         />
       </div>
 
-      {/* INFO */}
+      {/* RIGHT PANEL */}
       <div className="w-[45%] h-full text-white flex flex-col">
 
         {/* HEADER */}
@@ -659,44 +789,201 @@ function PosterViewer({
           </button>
         </div>
 
-        {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* TAB */}
+        <div className="grid grid-cols-2 border-b border-white/10">
+          <button
+            onClick={() =>
+              setTab(
+                "detail"
+              )
+            }
+            className={`h-11 text-sm ${tab ===
+              "detail"
+              ? "bg-white text-black font-bold"
+              : "text-white/70"
+              }`}
+          >
+            Detail
+          </button>
 
-          <div>
-            <p className="text-white/50 text-xs mb-1">
-              Judul
-            </p>
-
-            <h1 className="text-base lg:text-xl font-bold leading-tight">
-              {
-                info.judul
-              }
-            </h1>
-          </div>
-
-          <div>
-            <p className="text-white/50 text-xs mb-1">
-              Tim
-            </p>
-
-            <p className="text-sm lg:text-base">
-              {info.tim}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-white/50 text-xs mb-2">
-              Deskripsi
-            </p>
-
-            <p className="text-white/80 whitespace-pre-line text-xs lg:text-sm leading-relaxed">
-              {
-                info.deskripsi
-              }
-            </p>
-          </div>
-
+          <button
+            onClick={() =>
+              setTab(
+                "komentar"
+              )
+            }
+            className={`h-11 text-sm ${tab ===
+              "komentar"
+              ? "bg-white text-black font-bold"
+              : "text-white/70"
+              }`}
+          >
+            Komentar (
+            {
+              info
+                .komentar
+                .length
+            }
+            )
+          </button>
         </div>
+
+        {/* CONTENT */}
+        <div className="flex-1 overflow-y-auto">
+
+          {/* DETAIL */}
+          {tab === "detail" && (
+            <div className="p-4 space-y-5">
+
+              {/* TOP */}
+              <div className="flex items-start justify-between gap-4">
+
+                {/* LEFT */}
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl font-bold leading-tight">
+                    {info.judul}
+                  </h1>
+
+                  <p className="text-sm text-white/60 mt-1">
+                    {info.tim}
+                  </p>
+
+                  {/* LIKE DI BAWAH TIM */}
+                  <button
+                    onClick={toggleLike}
+                    className="flex items-center gap-2 mt-3"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill={liked ? "white" : "none"}
+                      stroke="white"
+                      strokeWidth="2"
+                      className="w-5 h-5"
+                    >
+                      <path d="M12 21s-7-4.35-9.5-8C.5 9.5 2.5 5 7 5c2.54 0 4 1.5 5 3 1-1.5 2.46-3 5-3 4.5 0 6.5 4.5 4.5 8-2.5 3.65-9.5 8-9.5 8z" />
+                    </svg>
+
+                    <span className="text-sm">
+                      {info.likes}
+                    </span>
+                  </button>
+                </div>
+
+                {/* RIGHT BADGE */}
+                <div className="flex items-center gap-2 shrink-0">
+
+                  {/* BADGE TERBAIK */}
+                  {info.penilaian
+                    .toLowerCase()
+                    .includes("terbaik") && (
+                      <img
+                        src="/icon/Medalion.svg"
+                        className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
+                      />
+                    )}
+
+                  {/* BADGE TERBANYAK LIKE */}
+                  {info.penilaian
+                    .toLowerCase()
+                    .includes("terbanyak") && (
+                      <img
+                        src="/icon/Favorite.svg"
+                        className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
+                      />
+                    )}
+                </div>
+              </div>
+
+              {/* DESC */}
+              <p className="text-sm text-white/80 whitespace-pre-line leading-relaxed text-justify">
+                {info.deskripsi}
+              </p>
+
+            </div>
+          )}
+
+          {/* KOMENTAR */}
+          {tab ===
+            "komentar" && (
+              <div className="p-4 space-y-3">
+
+                {info
+                  .komentar
+                  .length ===
+                  0 && (
+                    <p className="text-sm text-white/50">
+                      Belum ada komentar
+                    </p>
+                  )}
+
+                {info.komentar.map(
+                  (
+                    item,
+                    i
+                  ) => (
+                    <div
+                      key={i}
+                      className="bg-white/5 rounded-xl p-3"
+                    >
+                      <p className="text-xs font-bold mb-1">
+                        {
+                          item.nama
+                        }
+                      </p>
+
+                      <p className="text-sm text-white/70">
+                        {
+                          item.isi
+                        }
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+        </div>
+
+        {/* INPUT */}
+        {tab ===
+          "komentar" && (
+            <div className="p-3 border-t border-white/10 flex gap-2">
+              <input
+                value={
+                  newComment
+                }
+                onChange={(
+                  e
+                ) =>
+                  setNewComment(
+                    e
+                      .target
+                      .value
+                  )
+                }
+                placeholder="Tulis komentar..."
+                className="flex-1 h-11 px-3 rounded-xl bg-white/10 text-sm outline-none"
+              />
+
+              <button
+                onClick={
+                  sendComment
+                }
+                className="w-11 h-11 rounded-xl bg-blue-500 flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="white"
+                  strokeWidth="2"
+                  className="w-5 h-5"
+                >
+                  <path d="M3 20l18-8L3 4v6l13 2-13 2v6z" />
+                </svg>
+              </button>
+            </div>
+          )}
       </div>
     </div>
   );

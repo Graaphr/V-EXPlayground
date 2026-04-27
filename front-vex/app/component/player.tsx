@@ -225,6 +225,17 @@ export default function Player({
   }, [controlsLocked]);
 
   /* ===================== */
+  /* FORCE UNLOCK */
+  /* ===================== */
+
+  useEffect(() => {
+    if (!controlsLocked) {
+      pointerRef.current?.unlock?.();
+      document.exitPointerLock?.();
+    }
+  }, [controlsLocked]);
+
+  /* ===================== */
   /* FRAME */
   /* ===================== */
 
@@ -525,12 +536,10 @@ export default function Player({
   return (
     <>
       {!isMobile &&
-        mode ===
-        "first" && (
+        mode === "first" &&
+        controlsLocked && (
           <PointerLockControls
-            ref={
-              pointerRef
-            }
+            ref={pointerRef}
           />
         )}
 
