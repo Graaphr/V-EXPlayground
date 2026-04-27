@@ -121,36 +121,33 @@ export default function Player({
 
   useEffect(() => {
     const scan = () => {
-      const arr:
-        THREE.Object3D[] =
-        [];
+      const arr: THREE.Object3D[] = [];
 
-      world.traverse(
-        (obj: any) => {
-          if (
-            obj.userData
-              ?.collider &&
-            obj.isMesh
-          ) {
-            arr.push(obj);
-            obj.visible =
-              false;
-          }
+      world.traverse((obj: any) => {
+        if (
+          obj.userData?.collider &&
+          obj.isMesh
+        ) {
+          arr.push(obj);
+          obj.visible = false;
         }
-      );
+      });
 
-      colliders.current =
-        arr;
+      colliders.current = arr;
+      console.log("colliders:", arr.length);
     };
 
-    const t =
-      setTimeout(
-        scan,
-        300
-      );
+    const t1 = setTimeout(scan, 300);
+    const t2 = setTimeout(scan, 1000);
+    const t3 = setTimeout(scan, 2000);
+    const t4 = setTimeout(scan, 3500);
 
-    return () =>
-      clearTimeout(t);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+    };
   }, [world]);
 
   /* ===================== */
