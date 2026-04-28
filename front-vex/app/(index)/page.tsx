@@ -224,7 +224,7 @@ export default function Home() {
 
               <BestTag className="absolute right-0 top-0 z-10 scale-75 sm:scale-90 lg:scale-100 origin-top-right" />
 
-              <div className="w-full aspect-video">
+              <div className="w-full aspect-[3/4] md:aspect-video">
                 <Carousel
                   data={DataFotoTerbaik}
                   className="w-full h-full rounded-xl overflow-hidden"
@@ -284,7 +284,7 @@ export default function Home() {
                 <FavTag className="absolute left-0 top-0 z-10 scale-75 sm:scale-90 lg:scale-100 origin-top-left" />
 
                 {/* carousel 16:9 */}
-                <div className="w-full aspect-video">
+                <div className="w-full aspect-[3/4] md:aspect-video">
                   <Carousel
                     data={DataFotoTerfavorit}
                     className="w-full h-full rounded-xl overflow-hidden"

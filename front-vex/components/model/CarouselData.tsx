@@ -2,30 +2,76 @@ import { SlideItem } from "@/components/model/Carousel";
 
 export const DataFotoTerbaik: SlideItem[] = [
   {
-    src: "/image/BG1.jpg",
-    title: "Pameran PBL-909 - Booth Terbaik 1",
+    poster: "/uploads/1/BoothA3-poster.png",
+    banner: "/uploads/1/BoothA3-banner.png",
+    title: "Suara Warga - PBL-TRPL-101-A3",
   },
   {
-    src: "/image/img-lobby.svg",
-    title: "Pameran PBL-909 - Booth Terbaik 2",
+    poster: "/uploads/2/BoothA1-poster.png",
+    banner: "/uploads/2/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
   },
   {
-    src: "/image/img-lobby.svg",
-    title: "Pameran PBL-909 - Booth Terbaik 3",
+    poster: "/uploads/3/BoothA1-poster.png",
+    banner: "/uploads/3/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
   },
+  {
+    poster: "/uploads/4/BoothA1-poster.png",
+    banner: "/uploads/4/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+  {
+    poster: "/uploads/5/BoothA1-poster.png",
+    banner: "/uploads/5/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+  {
+    poster: "/uploads/6/BoothA1-poster.png",
+    banner: "/uploads/6/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+  {
+    poster: "/uploads/7/BoothA1-poster.png",
+    banner: "/uploads/7/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  }
 ];
 
 export const DataFotoTerfavorit: SlideItem[] = [
   {
-    src: "/image/img-lobby.svg",
-    title: "Pameran PBL-909 - Booth Terfavorit 1",
+    poster: "/uploads/1/BoothA3-poster.png",
+    banner: "/uploads/1/BoothA3-banner.png",
+    title: "Suara Warga - PBL-TRPL101-A3",
   },
   {
-    src: "/image/img-lobby.svg",
-    title: "Pameran PBL-909 - Booth Terfavorit 2",
+    poster: "/uploads/2/BoothA3-poster.png",
+    banner: "/uploads/2/BoothA3-banner.png",
+    title: "Nama Karya - Nama Tim",
   },
   {
-    src: "/image/img-lobby.svg",
-    title: "Pameran PBL-909 - Booth Terfavorit 3",
+    poster: "/uploads/3/BoothA1-poster.png",
+    banner: "/uploads/3/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
   },
+    {
+    poster: "/uploads/4/BoothA1-poster.png",
+    banner: "/uploads/4/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+    {
+    poster: "/uploads/5/BoothA1-poster.png",
+    banner: "/uploads/5/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+    {
+    poster: "/uploads/6/BoothA1-poster.png",
+    banner: "/uploads/6/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  },
+    {
+    poster: "/uploads/7/BoothA1-poster.png",
+    banner: "/uploads/7/BoothA1-banner.png",
+    title: "Nama Karya - Nama Tim",
+  }
 ];

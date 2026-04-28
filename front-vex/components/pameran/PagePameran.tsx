@@ -12,7 +12,7 @@ import SelectSemester, {
   SemesterType,
 } from "@/components/dashboard/SelectSemester";
 
-import { ALL_EXHIBITIONS } from "@/app/data/Pameran";
+import ALL_EXHIBITIONS from "@/public/data/Pameran.json";
 
 import FilterSection from "@/components/pameran/FilterSection";
 import CarouselSection from "@/components/pameran/CarouselSection";
@@ -66,7 +66,7 @@ export default function PagePameran({ href = "/pameran/" }: PameranProps) {
             selectedSemester={selectedSemester}
             setSelectedSemester={setSelectedSemester}
           />
-          <div className="realtive">
+          <div className="relative">
             <h2 className="mb-5 md:mb-6 text-2xl sm:text-3xl md:text-[40px] text-white font-semibold border-b-2 md:border-b-3 pb-2">
               SEGERA HADIR
             </h2>
