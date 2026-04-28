@@ -16,5 +16,10 @@ admin{
 },
 ketua{
     halaman tambah karya : 
+},
+Fajri{
+    halaman verifikasi,
+    halaman pameran admin,
+    halaman karya,
 }
 
