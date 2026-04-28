@@ -215,7 +215,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* section5  */}
+        {/* section5 */}
         <div className="bg-secondary-color w-full">
           <div className="autoMid pt-[68px] pb-[78px] min-h-[580px] grid grid-cols-1 lg:grid-cols-8 gap-10 px-4 sm:px-6 lg:px-0 items-start">
 
@@ -226,7 +226,7 @@ export default function Home() {
 
               <div className="w-full aspect-[3/4] md:aspect-video">
                 <Carousel
-                  data={DataFotoTerbaik}
+                  type="DataFotoTerbaik"
                   className="w-full h-full rounded-xl overflow-hidden"
                 />
               </div>
@@ -239,11 +239,11 @@ export default function Home() {
               <div className="flex flex-col gap-8">
 
                 <div className="text-main-blue">
-                  <p className="font-poppins font-thin text-4xl sm:text-5xl lg:text-6xl  leading-none">
+                  <p className="font-poppins font-thin text-4xl sm:text-5xl lg:text-6xl leading-none">
                     KARYA
                   </p>
 
-                  <p className="font-tilt-wrap font-bold text-4xl sm:text-5xl lg:text-6xl  leading-none">
+                  <p className="font-tilt-wrap font-bold text-4xl sm:text-5xl lg:text-6xl leading-none">
                     TERBAIK
                   </p>
                 </div>
@@ -283,10 +283,9 @@ export default function Home() {
 
                 <FavTag className="absolute left-0 top-0 z-10 scale-75 sm:scale-90 lg:scale-100 origin-top-left" />
 
-                {/* carousel 16:9 */}
                 <div className="w-full aspect-[3/4] md:aspect-video">
                   <Carousel
-                    data={DataFotoTerfavorit}
+                    type="DataFotoTerfavorit"
                     className="w-full h-full rounded-xl overflow-hidden"
                   />
                 </div>

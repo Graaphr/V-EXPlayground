@@ -16,6 +16,11 @@ import {
 } from "react-icons/bi";
 
 /* ===================== */
+/* IMPORT JSON */
+/* ===================== */
+import CarouselData from "@/public/data/Carousel.json";
+
+/* ===================== */
 /* TYPE */
 /* ===================== */
 
@@ -26,7 +31,10 @@ export interface SlideItem {
 }
 
 interface CarouselProps {
-  data: SlideItem[];
+  type:
+    | "DataFotoTerbaik"
+    | "DataFotoTerfavorit";
+
   className?: string;
 }
 
@@ -35,11 +43,14 @@ interface CarouselProps {
 /* ===================== */
 
 export default function Carousel({
-  data = [],
+  type,
   className,
 }: CarouselProps) {
   const [isMobile, setIsMobile] =
     useState(false);
+
+  const [data, setData] =
+    useState<SlideItem[]>([]);
 
   const [emblaRef, emblaApi] =
     useEmblaCarousel(
@@ -52,7 +63,23 @@ export default function Carousel({
       ]
     );
 
-  /* detect mobile */
+  /* ===================== */
+  /* LOAD DATA JSON */
+  /* ===================== */
+
+  useEffect(() => {
+    const jsonData =
+      CarouselData[
+        type
+      ] as SlideItem[];
+
+    setData(jsonData || []);
+  }, [type]);
+
+  /* ===================== */
+  /* DETECT MOBILE */
+  /* ===================== */
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(
@@ -96,43 +123,55 @@ export default function Carousel({
     <div
       className={`relative group max-w-5xl mx-auto ${className}`}
     >
-      {/* carousel */}
+      {/* CAROUSEL */}
       <div
         className="overflow-hidden rounded-2xl shadow-lg border border-gray-100"
         ref={emblaRef}
       >
         <div className="flex">
-          {data.map((item, index) => (
-            <div
-              key={index}
-              className="
-      flex-[0_0_100%]
-      min-w-0
-      relative
-      aspect-[3/4]
-      md:aspect-video
-    "
-            >
-              <Image
-                src={isMobile ? item.poster : item.banner}
-                alt={item.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                priority={index === 0}
-                sizes="100vw"
-              />
+          {data.map(
+            (item, index) => (
+              <div
+                key={index}
+                className="
+                flex-[0_0_100%]
+                min-w-0
+                relative
+                aspect-[3/4]
+                md:aspect-video
+              "
+              >
+                <Image
+                  src={
+                    isMobile
+                      ? item.poster
+                      : item.banner
+                  }
+                  alt={
+                    item.title
+                  }
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority={
+                    index === 0
+                  }
+                  sizes="100vw"
+                />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6 md:p-8">
-                <p className="text-white font-semibold text-lg md:text-xl">
-                  {item.title}
-                </p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6 md:p-8">
+                  <p className="text-white font-semibold text-lg md:text-xl">
+                    {
+                      item.title
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       </div>
 
-      {/* prev */}
+      {/* PREV */}
       <button
         onClick={scrollPrev}
         className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
@@ -140,7 +179,7 @@ export default function Carousel({
         <BiSolidLeftArrow className="text-xl" />
       </button>
 
-      {/* next */}
+      {/* NEXT */}
       <button
         onClick={scrollNext}
         className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
