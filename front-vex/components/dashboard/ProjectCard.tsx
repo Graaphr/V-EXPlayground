@@ -13,7 +13,7 @@ import { BsStars } from "react-icons/bs";
 /* ===================== */
 
 export interface ProjectCard {
-  id: number;
+  id: string;
   bannerImage: string;
   title: string;
   category: string;

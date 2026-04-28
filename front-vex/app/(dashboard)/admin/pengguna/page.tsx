@@ -350,7 +350,7 @@ function UserCard({ user, onClick, isActive }: any) {
 
   const toggleStatus = (e: any) => {
     e.stopPropagation();
-    setOn((prev) => (prev === "active" ? "inactive" : "active"));
+    setOn((prev:any) => (prev === "active" ? "inactive" : "active"));
   };
 
   return (

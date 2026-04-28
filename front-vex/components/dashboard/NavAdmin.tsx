@@ -5,15 +5,15 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AddOn{
-  onAddClick? : string,
-  isFormOpen? : string,
+  onAddClick? : ()=>void,
+  isFormOpen? : boolean,
 }
 export default function NavAdmin({ onAddClick, isFormOpen }: AddOn) {
   const pathname = usePathname();
 
   const menuItems = [
     { id: 1, icon: <FaUser className="rounded-full" size={18} />, link: "/admin/pengguna" },
-    { id: 2, icon: <FaBook size={18} />, link: "/admin/pameran" },
+    { id: 2, icon: <FaBook size={18} />, link: "/admin/pameran"},
   ];
 
   return (
@@ -50,7 +50,8 @@ export default function NavAdmin({ onAddClick, isFormOpen }: AddOn) {
         >
           {/* MENU */}
           {menuItems.map((item) => {
-            const isActive = pathname.endsWith(item.link);
+            const isActive =
+              pathname === item.link || pathname.startsWith(item.link + "/");
 
             return (
               <div key={item.id} className="relative w-9 h-9 md:w-12 md:h-12">
