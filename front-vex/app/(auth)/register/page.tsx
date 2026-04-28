@@ -4,42 +4,62 @@ import { motion, AnimatePresence, Transition } from "framer-motion";
 import { Logo, Button, ButtonPutih } from "@/components/Componen";
 import { VectorBlueBox } from "@/components/model/BoxModel";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    nama: "",
-    email: "",
-    password: "",
-    confirm: "",
-  });
+  // ✅ SAMAKAN DENGAN VERSI KEDUA (INDIVIDUAL STATE)
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [password_confirmation, setPasswordConfirmation] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  // ✅ REGISTER FUNCTION (FIXED)
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.nama || !form.email || !form.password || !form.confirm) {
-      alert("Semua field wajib diisi");
+    if (!nama || !email || !password || !password_confirmation) {
+      alert("Semua kolom wajib diisi!");
       return;
     }
 
-    if (form.password !== form.confirm) {
-      alert("Password tidak sama");
+    if (password !== password_confirmation) {
+      alert("Password tidak sama!");
       return;
     }
 
-    console.log("DATA REGISTER:", form);
+    setIsLoading(true);
+
+    try {
+      await api.get("/sanctum/csrf-cookie");
+
+      const response = await api.post("/api/register", {
+        nama: nama,
+        email: email,
+        password: password,
+        password_confirmation: password_confirmation,
+      });
+
+      alert(response.data.message || "Registrasi Berhasil!");
+
+      localStorage.setItem("pending_email", email);
+
+      router.push("/verifikasi");
+    } catch (error: any) {
+      console.error(error.response?.data);
+      alert(error.response?.data?.message || "Registrasi Gagal");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // ===== ANIMASI (TIDAK DIUBAH) =====
   const slideUp = {
     initial: { y: "100vh", opacity: 0 },
     animate: { y: [0, -15, 0], opacity: 1 },
@@ -56,7 +76,6 @@ export default function RegisterPage() {
     ease: "easeOut",
   });
 
-  // 🔥 CONFIG posisi lama (INI KUNCI BIAR SAMA KAYAK DULU)
   const boxes = [
     {
       d: 0.2,
@@ -121,23 +140,21 @@ export default function RegisterPage() {
       >
         <Logo />
 
-        {/* FORM */}
+        {/* FORM (UI TIDAK DIUBAH) */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleRegister}
           className="w-full space-y-4 mt-6 select-none"
         >
           <input
-            name="nama"
-            value={form.nama}
-            onChange={handleChange}
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
             placeholder="Nama Lengkap"
             className="input-form"
           />
 
           <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="Email"
             className="input-form"
@@ -146,9 +163,8 @@ export default function RegisterPage() {
           {/* PASSWORD */}
           <div className="relative">
             <input
-              name="password"
-              value={form.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               className="input-form"
@@ -157,39 +173,16 @@ export default function RegisterPage() {
             <motion.span
               onClick={() => setShowPassword((prev) => !prev)}
               className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-              whileTap={{ scale: 0.8 }}
-              whileHover={{ scale: 1.1 }}
             >
-              <AnimatePresence mode="wait">
-                {showPassword ? (
-                  <motion.div
-                    key="hide"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <FaEyeSlash />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="show"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <FaEye />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </motion.span>
           </div>
 
           {/* CONFIRM */}
           <div className="relative">
             <input
-              name="confirm"
-              value={form.confirm}
-              onChange={handleChange}
+              value={password_confirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
               type={showConfirm ? "text" : "password"}
               placeholder="Konfirmasi Password"
               className="input-form"
@@ -198,20 +191,17 @@ export default function RegisterPage() {
             <motion.span
               onClick={() => setShowConfirm((prev) => !prev)}
               className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-              whileTap={{ scale: 0.8 }}
-              whileHover={{ scale: 1.1 }}
             >
-              <AnimatePresence mode="wait">
-                {showConfirm ? <FaEyeSlash /> : <FaEye />}
-              </AnimatePresence>
+              {showConfirm ? <FaEyeSlash /> : <FaEye />}
             </motion.span>
           </div>
 
           <ButtonPutih
-            type="submit"
+            onClick={handleRegister}
+            disabled={isLoading}
             className="w-full py-3 rounded-lg font-bold"
           >
-            Daftar
+            {isLoading ? "Loading..." : "Daftar"}
           </ButtonPutih>
         </form>
 

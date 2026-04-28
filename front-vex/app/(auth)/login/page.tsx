@@ -7,7 +7,46 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Logo, Button, ButtonPutih } from "@/components/Componen";
 import { VectorBox } from "@/components/model/BoxModel";
 
+import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
+
 export default function LoginPage() {
+  const router = useRouter();
+
+  // 1. State Input
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 2. Fungsi Login
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Harap isi email dan kata sandi");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await api.get("/sanctum/csrf-cookie");
+
+      const response = await api.post("/api/login", {
+        email: email,
+        password: password,
+      });
+
+      localStorage.setItem("token", response.data.access_token);
+
+      alert("Login Berhasil!");
+      router.push("/pameran");
+
+    } catch (error: any) {
+      console.error(error.response?.data);
+      alert(error.response?.data?.message || "Email atau Kata Sandi salah");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
   // DATA
   const [form, setForm] = React.useState({
@@ -16,6 +55,7 @@ export default function LoginPage() {
     password: "",
     confirm: "",
   });
+  
   // AMBIL DATA DARI INPUT
   const handleChange = (e: any) => {
     const { name, value } = e.target;

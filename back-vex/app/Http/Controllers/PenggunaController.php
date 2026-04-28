@@ -9,53 +9,46 @@ use Illuminate\Support\Facades\Auth;
 use App\Mail\OtpMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class PenggunaController extends Controller
 {
-    /**
-     * METHOD VIEW DIHAPUS 
-     * Karena Front-end menggunakan Next.js, 
-     * Laravel tidak lagi bertanggung jawab menampilkan form.
-     */
-
-    // --- METHOD LOGIKA ---
 
     public function register(Request $request)
     {
         $request->validate([
-            'nama'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:pengguna,email',
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:pengguna,email',
             'password' => 'required|min:8|confirmed',
         ]);
 
         try {
             $otpCode = rand(100000, 999999);
-            
-            // SIMPAN DATA SEMENTARA DI SESSION
+
             $userData = [
-                'nama'           => $request->nama,
-                'email'          => $request->email,
-                'password'       => Hash::make($request->password), 
-                'role'           => $request->role ?? 'Pengunjung',
-                'otp_code'       => $otpCode,
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role ?? 'Pengunjung',
+                'otp_code' => $otpCode,
+                'otp_expires_at' => Carbon::now()->addMinutes(10),
             ];
 
-            session(['temp_user' => $userData]);
+            // ✅ CACHE (bukan session)
+            Cache::put('temp_user_' . $request->email, $userData, now()->addMinutes(10));
 
-            // Kirim Email OTP
-            Mail::to($request -> email)-> send(new OtpMail($otpCode));
+            Mail::to($request->email)->send(new OtpMail($otpCode));
 
-            // RETURN JSON (Bukan Redirect)
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Silakan cek email Anda untuk kode OTP.'
-            ], 200);
+                'status' => 'success',
+                'message' => 'Silakan cek email OTP Anda.'
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Gagal memproses registrasi: ' . $e->getMessage()
+                'status' => 'error',
+                'message' => $e->getMessage()
             ], 500);
         }
     }
@@ -63,45 +56,42 @@ class PenggunaController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
+            // 'email' => 'required|email',
             'otp' => 'required|digits:6',
         ]);
 
-        $tempUser = session('temp_user');
+        $tempUser = Cache::get('temp_user_' . $request->email);
 
         if (!$tempUser) {
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Sesi habis atau tidak ditemukan, silakan daftar kembali.'
+                'status' => 'error',
+                'message' => 'OTP expired atau tidak ditemukan'
             ], 408);
         }
 
-        $isOtpValid = $tempUser['otp_code'] == $request->otp;
-        $isNotExpired = Carbon::now()->isBefore($tempUser['otp_expires_at']);
-
-        if (!$isOtpValid || !$isNotExpired) {
+        if ($tempUser['otp_code'] != $request->otp) {
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Kode OTP salah atau sudah kedaluarsa.'
+                'status' => 'error',
+                'message' => 'OTP salah'
             ], 422);
         }
 
-        // SIMPAN KE DATABASE
         $user = Pengguna::create([
-            'nama'              => $tempUser['nama'],
-            'email'             => $tempUser['email'],
-            'password'          => $tempUser['password'],
-            'role'              => $tempUser['role'],
+            'nama' => $tempUser['nama'],
+            'email' => $tempUser['email'],
+            'password' => $tempUser['password'],
+            'role' => $tempUser['role'],
             'email_verified_at' => Carbon::now(),
         ]);
 
-        // Hapus data sementara
-        session()->forget('temp_user');
+        // ❌ hapus cache
+        Cache::forget('temp_user_' . $request->email);
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Akun berhasil dibuat dan diverifikasi!',
-            'user'    => $user
-        ], 201);
+            'status' => 'success',
+            'message' => 'Akun berhasil diverifikasi!',
+            'user' => $user
+        ]);
     }
 
     public function resendOtp(Request $request)

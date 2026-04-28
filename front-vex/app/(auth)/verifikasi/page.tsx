@@ -13,15 +13,23 @@ export default function VerifikasiPage() {
 
   const router = useRouter();
 
+  // =========================
+  // GET EMAIL FROM STORAGE
+  // =========================
   useEffect(() => {
     const savedEmail = localStorage.getItem("pending_email");
+
     if (!savedEmail) {
       router.push("/register");
-    } else {
-      setEmail(savedEmail);
+      return;
     }
+
+    setEmail(savedEmail);
   }, [router]);
 
+  // =========================
+  // VERIFY OTP
+  // =========================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -38,8 +46,9 @@ export default function VerifikasiPage() {
 
       await api.get("/sanctum/csrf-cookie");
 
-      const res = await api.post("/verify-otp", {
-        otp,
+      const res = await api.post("/api/verify-otp", {
+        email: email,
+        otp: otp,
       });
 
       setSuccess(res.data.message);
@@ -50,51 +59,50 @@ export default function VerifikasiPage() {
         router.push("/login");
       }, 1200);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Gagal verifikasi");
+      setError(err.response?.data?.message || "Gagal verifikasi OTP");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // =========================
+  // RESEND OTP
+  // =========================
   const handleResend = async () => {
     try {
       setError("");
       setSuccess("");
 
-      await api.post("/resend-otp", { email });
+      await api.post("/api/resend-otp", {
+        email: email,
+      });
 
-      setSuccess("Kode OTP berhasil dikirim ulang.");
-    } catch {
-      setError("Gagal mengirim ulang OTP.");
+      setSuccess("OTP berhasil dikirim ulang");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Gagal kirim ulang OTP");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-main-blue px-4">
-      {/* CARD */}
       <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8">
-        {/* TITLE */}
+        {/* HEADER */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 mx-auto flex items-center justify-center bg-blue-100 text-blue-600 rounded-full text-2xl">
-            🔒
-          </div>
+          <h1 className="text-2xl font-bold">Verifikasi Email</h1>
 
-          <h1 className="text-2xl font-bold mt-4">Verifikasi Email</h1>
-
-          <p className="text-sm text-gray-500 mt-2">
-            Masukkan 6 digit OTP yang dikirim ke email
-          </p>
+          <p className="text-sm text-gray-500 mt-2">Masukkan 6 digit OTP</p>
 
           {email && <p className="text-xs text-gray-400 mt-1">{email}</p>}
         </div>
 
-        {/* ERROR / SUCCESS */}
+        {/* ERROR */}
         {error && (
           <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4">
             {error}
           </div>
         )}
 
+        {/* SUCCESS */}
         {success && (
           <div className="bg-green-50 text-green-600 text-sm p-3 rounded-lg mb-4">
             {success}
