@@ -3,7 +3,7 @@
 import { Card, Logo, Button, BestTag, FavTag } from "@/components/Componen";
 import Carousel from "@/components/model/Carousel";
 // data
-import { DataFotoTerbaik, DataFotoTerfavorit } from "@/components/model/CarouselData"; //foto terbaik & favorit
+import { DataFotoTerbaik, DataFotoTerfavorit } from "@/public/data/Carousel.json"; //foto terbaik & favorit
 // icon
 import { BiCube, BiGlobe } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
@@ -252,15 +252,15 @@ export default function Home() {
 
                   <div className="flex items-start gap-3">
                     <FaStar className="text-[22px] sm:text-lg shrink-0 mt-1" />
-                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light">
-                      Dinilai oleh kepala program studi berdasarkan
+                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light text-justify">
+                      Dinilai langsung oleh kepala program studi berdasarkan kualitas, kreativitas, inovasi, dan nilai terbaik dari setiap karya.
                     </p>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <FaStar className="text-[22px] sm:text-lg shrink-0 mt-1" />
-                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light">
-                      Berkesempatan memperoleh medali terbaik di setiap program studi
+                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light text-justify">
+                      Setiap program studi memilih satu karya terbaik sebagai perwakilan yang akan ditampilkan di landing page hingga pameran berikutnya.
                     </p>
                   </div>
 
@@ -294,7 +294,7 @@ export default function Home() {
             </div>
 
             {/* text bawah saat mobile */}
-            <div className="order-2 lg:order-2 lg:col-span-3 w-full lg:w-[80%] lg:ml-auto">
+            <div className="order-2 lg:order-2 lg:col-span-3 w-full lg:w-[100%] lg:ml-auto">
 
               <div className="flex flex-col gap-8">
 
@@ -314,15 +314,15 @@ export default function Home() {
 
                   <div className="flex items-start gap-3">
                     <FaStar className="text-[22px] sm:text-lg shrink-0 mt-1" />
-                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light">
-                      Dinilai oleh kepala program studi berdasarkan.
+                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light text-justify">
+                      Ditentukan berdasarkan jumlah likes terbanyak dari seluruh pengunjung sebagai karya terfavorit global dari keseluruhan pameran.
                     </p>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <FaStar className="text-[22px] sm:text-lg shrink-0 mt-1" />
-                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light">
-                      Berkesempatan memperoleh medali terbaik di setiap program studi.
+                    <p className="text-[16px] sm:text-[18px] lg:text-lg font-poppins font-light text-justify">
+                      Karya dengan likes tertinggi akan menjadi yang paling populer dan berhak memperoleh medali karya terfavorit utama.
                     </p>
                   </div>
 

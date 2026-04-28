@@ -528,21 +528,11 @@ export default function Admin() {
                     user
                   ) => (
                     <UserCard
-                      key={
-                        user.id
-                      }
-                      user={
-                        user
-                      }
-                      isActive={
-                        selectedUser?.id ===
-                        user.id
-                      }
-                      onClick={() =>
-                        setSelectedUser(
-                          user
-                        )
-                      }
+                      key={user.id}
+                      user={user}
+                      isActive={selectedUser?.id === user.id}
+                      onClick={() => setSelectedUser(user)}
+                      onToggleStatus={toggleStatus}
                     />
                   )
                 )}

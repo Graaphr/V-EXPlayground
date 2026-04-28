@@ -133,30 +133,3 @@ export async function PUT(
       "User berhasil diupdate",
   });
 }
-
-/* ===================== */
-/* DELETE USER */
-/* ===================== */
-
-export async function DELETE(
-  req: Request
-) {
-  const body =
-    await req.json();
-
-  const users =
-    readFile();
-
-  const filtered =
-    users.filter(
-      (user) =>
-        user.id !== body.id
-    );
-
-  writeFile(filtered);
-
-  return NextResponse.json({
-    message:
-      "User berhasil dihapus",
-  });
-}
