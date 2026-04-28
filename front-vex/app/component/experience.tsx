@@ -14,7 +14,8 @@ import Booth from "./booth";
 import Player from "./player";
 import CameraSwitcher from "./cameraSwitcher";
 
-import { ALL_EXHIBITIONS } from "@/app/data/Pameran";
+/* ✅ IMPORT JSON BIASA */
+import exhibitions from "@/public/data/Pameran.json";
 
 type Props = {
   exhibitionId: string;
@@ -83,8 +84,8 @@ export default function Experience({
   /* ===================== */
 
   const currentExpo =
-    ALL_EXHIBITIONS.find(
-      (item) =>
+    exhibitions.find(
+      (item: any) =>
         item.id === exhibitionId
     );
 
@@ -172,7 +173,7 @@ export default function Experience({
   ]);
 
   /* ===================== */
-  /* SAFE TEXTURE LOADER */
+  /* SAFE TEXTURE */
   /* ===================== */
 
   const loadTextureSafe = (
@@ -187,12 +188,11 @@ export default function Experience({
         tex.flipY = false;
         tex.colorSpace =
           THREE.SRGBColorSpace;
+
         onLoad(tex);
       },
       undefined,
-      () => {
-        /* ignore missing file */
-      }
+      () => {}
     );
   };
 
@@ -229,11 +229,8 @@ export default function Experience({
           if (isNaN(num))
             return;
 
-          const path =
-            `/prodi/${folder}/${num}.png`;
-
           loadTextureSafe(
-            path,
+            `/prodi/${folder}/${num}.png`,
             (tex) => {
               obj.material =
                 new THREE.MeshBasicMaterial(
@@ -248,11 +245,8 @@ export default function Experience({
         }
 
         if (name === "panel") {
-          const path =
-            `/prodi/${folder}/${folder}.png`;
-
           loadTextureSafe(
-            path,
+            `/prodi/${folder}/${folder}.png`,
             (tex) => {
               obj.material =
                 new THREE.MeshBasicMaterial(
@@ -313,11 +307,8 @@ export default function Experience({
         const posterNum =
           ((num - 1) % 6) + 1;
 
-        const path =
-          `/uploads/${exhibitionId}/booth${zone}${posterNum}-poster.png`;
-
         loadTextureSafe(
-          path,
+          `/uploads/${exhibitionId}/booth${zone}${posterNum}-poster.png`,
           (tex) => {
             obj.material =
               new THREE.MeshBasicMaterial(
@@ -392,7 +383,6 @@ export default function Experience({
 
             obj.visible =
               false;
-
             obj.raycast =
               () => null;
           }

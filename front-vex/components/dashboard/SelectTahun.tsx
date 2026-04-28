@@ -10,7 +10,7 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 // ambil data pameran
-import { ALL_EXHIBITIONS } from "@/app/data/Pameran";
+import ALL_EXHIBITIONS from "@/public/data/Pameran.json";
 
 /* ===================== */
 /* TYPE */

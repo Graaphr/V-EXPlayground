@@ -1,8 +1,16 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import NavAdmin from "@/components/dashboard/NavAdmin";
 import SearchBar from "@/components/dashboard/SearchBar";
-import SelectStatus, { StatusType } from "@/components/dashboard/SelectStatus";
+import SelectStatus, {
+  StatusType,
+} from "@/components/dashboard/SelectStatus";
 
 import {
   FiChevronLeft,
@@ -10,240 +18,492 @@ import {
   FiXCircle,
   FiInfo,
 } from "react-icons/fi";
-import { FaTimes, FaUser } from "react-icons/fa";
+
+import {
+  FaTimes,
+  FaUser,
+} from "react-icons/fa";
+
 import { HiPencilAlt } from "react-icons/hi";
 import { FaCircleCheck } from "react-icons/fa6";
 
-// ================= DUMMY DATA =================
+/* ===================== */
+/* TYPE */
+/* ===================== */
 
-const DATA_KPS = [
-  {
-    id: 1,
-    nama: "Yani Rahmayanti",
-    role: "KPS",
-    status: "active",
-    email: "yani@kampus.ac.id",
-    prodi: "Informatika",
-    kelas: "Dosen",
-  },
-  {
-    id: 2,
-    nama: "Yani Rahmayanti",
-    role: "KPS",
-    status: "active",
-    email: "yani@kampus.ac.id",
-    prodi: "Informatika",
-    kelas: "Dosen",
-  },
-  {
-    id: 3,
-    nama: "Yani Rahmayanti",
-    role: "KPS",
-    status: "active",
-    email: "yani@kampus.ac.id",
-    prodi: "Informatika",
-    kelas: "Dosen",
-  },
-  {
-    id: 4,
-    nama: "Happy Yugo",
-    role: "KPS",
-    status: "active",
-    email: "happy@kampus.ac.id",
-    prodi: "TRM",
-    kelas: "Dosen",
-  },
-  {
-    id: 5,
-    nama: "Happy Yugo",
-    role: "KPS",
-    status: "active",
-    email: "happy@kampus.ac.id",
-    prodi: "TRM",
-    kelas: "Dosen",
-  },
-  {
-    id: 6,
-    nama: "Happy Yugo",
-    role: "KPS",
-    status: "active",
-    email: "happy@kampus.ac.id",
-    prodi: "TRM",
-    kelas: "Dosen",
-  },
-  {
-    id: 7,
-    nama: "Happy Yugo",
-    role: "KPS",
-    status: "active",
-    email: "happy@kampus.ac.id",
-    prodi: "TRM",
-    kelas: "Dosen",
-  },
-];
-const DATA_MAHASISWA = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  nama: `Mahasiswa ${i + 1}`,
-  role: "Ketua PBL",
-  status: i % 2 === 0 ? "active" : "inactive",
-  email: `m${i + 1}@mail.com`,
-  prodi: "IF",
-  kelas: `IF-${Math.ceil((i + 1) / 2)}A`,
-}));
+type UserType = {
+  id: number;
+  nama: string;
+  role: string;
+  status: string;
+  email: string;
+  prodi: string;
+  kelas: string;
+};
+
+/* ===================== */
+/* PAGE */
+/* ===================== */
 
 export default function Admin() {
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<StatusType | null>(null);
-  const [pageMhs, setPageMhs] = useState(1);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [formData, setFormData] = useState(selectedUser);
+  const [users, setUsers] =
+    useState<UserType[]>([]);
 
-  const ITEMS_PER_PAGE = 10;
+  const [selectedUser, setSelectedUser] =
+    useState<UserType | null>(null);
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({
-      ...prev,
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [
+    selectedStatus,
+    setSelectedStatus,
+  ] = useState<StatusType | null>(
+    null
+  );
+
+  const [pageMhs, setPageMhs] =
+    useState(1);
+
+  const [isFormOpen, setIsFormOpen] =
+    useState(false);
+
+  const [isEdit, setIsEdit] =
+    useState(false);
+
+  const [
+    formData,
+    setFormData,
+  ] = useState<UserType | null>(
+    null
+  );
+
+  const ITEMS_PER_PAGE = 12;
+
+  /* ===================== */
+  /* LOAD DATA */
+  /* ===================== */
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    try {
+      const res = await fetch("/api/pengguna");
+
+      if (!res.ok) {
+        throw new Error("Gagal fetch");
+      }
+
+      const data = await res.json();
+
+      console.log("DATA:", data);
+
+      setUsers(data);
+    } catch (error) {
+      console.log("ERROR:", error);
+      setUsers([]);
+    }
+  };
+
+  /* sync selected */
+  useEffect(() => {
+    setFormData(selectedUser);
+  }, [selectedUser]);
+
+  /* ===================== */
+  /* INPUT */
+  /* ===================== */
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } =
+      e.target;
+
+    setFormData((prev) => ({
+      ...prev!,
       [name]: value,
     }));
   };
 
-  const filterData = (data: any[]) => {
+  /* ===================== */
+  /* FILTER */
+  /* ===================== */
+
+  const filterData = (
+    data: UserType[]
+  ) => {
     return data.filter((item) => {
-      const matchName = item.nama
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchStatus = selectedStatus
-        ? item.status === selectedStatus.value
-        : true;
-      return matchName && matchStatus;
+      const matchName =
+        item.nama
+          .toLowerCase()
+          .includes(
+            searchTerm.toLowerCase()
+          );
+
+      const matchStatus =
+        selectedStatus
+          ? item.status ===
+          selectedStatus.value
+          : true;
+
+      return (
+        matchName &&
+        matchStatus
+      );
     });
   };
 
-  const filteredKps = useMemo(
-    () => filterData(DATA_KPS),
-    [searchTerm, selectedStatus],
-  );
-  const filteredMhs = useMemo(
-    () => filterData(DATA_MAHASISWA),
-    [searchTerm, selectedStatus],
-  );
+  const filteredKps =
+    useMemo(() => {
+      return filterData(
+        users.filter(
+          (u) => u.role === "KPS"
+        )
+      );
+    }, [
+      users,
+      searchTerm,
+      selectedStatus,
+    ]);
+
+  const filteredMhs =
+    useMemo(() => {
+      return filterData(
+        users.filter(
+          (u) =>
+            u.role !== "KPS"
+        )
+      );
+    }, [
+      users,
+      searchTerm,
+      selectedStatus,
+    ]);
+
+  /* ===================== */
+  /* PAGINATION */
+  /* ===================== */
 
   useEffect(() => {
     setPageMhs(1);
-  }, [searchTerm, selectedStatus]);
+  }, [
+    searchTerm,
+    selectedStatus,
+  ]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredMhs.length / ITEMS_PER_PAGE),
-  );
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredMhs.length /
+        ITEMS_PER_PAGE
+      )
+    );
 
-  const paginatedMhs = filteredMhs.slice(
-    (pageMhs - 1) * ITEMS_PER_PAGE,
-    pageMhs * ITEMS_PER_PAGE,
-  );
+  const paginatedMhs =
+    filteredMhs.slice(
+      (pageMhs - 1) *
+      ITEMS_PER_PAGE,
+      pageMhs *
+      ITEMS_PER_PAGE
+    );
 
-  const nextPage = () => setPageMhs((p) => Math.min(p + 1, totalPages));
-  const prevPage = () => setPageMhs((p) => Math.max(p - 1, 1));
+  const nextPage = () =>
+    setPageMhs((p) =>
+      Math.min(
+        p + 1,
+        totalPages
+      )
+    );
+
+  const prevPage = () =>
+    setPageMhs((p) =>
+      Math.max(p - 1, 1)
+    );
+
+  /* ===================== */
+  /* CRUD */
+  /* ===================== */
+
+  const addUser = async (
+    newUser: UserType
+  ) => {
+    await fetch(
+      "/api/pengguna",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify(
+          newUser
+        ),
+      }
+    );
+
+    loadUsers();
+  };
+
+  const saveEdit = async () => {
+    if (!formData) return;
+
+    await fetch("/api/pengguna", {
+      method: "PUT",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    await loadUsers();
+
+    setSelectedUser(formData);
+    setIsEdit(false);
+  };
+
+  /* TAMBAH DI SINI */
+  const toggleStatus = async (
+    user: UserType
+  ) => {
+    const newStatus =
+      user.status === "active"
+        ? "inactive"
+        : "active";
+
+    await fetch("/api/pengguna", {
+      method: "PUT",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify({
+        ...user,
+        status: newStatus,
+      }),
+    });
+
+    await loadUsers();
+
+    if (
+      selectedUser?.id === user.id
+    ) {
+      setSelectedUser({
+        ...user,
+        status: newStatus,
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-secondary-color font-poppins w-full  pb-[120px] select-none">
-      {/* NAV */}
+    <div className="min-h-screen bg-secondary-color font-poppins pb-[120px]">
       <NavAdmin
-        isFormOpen={isFormOpen}
-        onAddClick={() => setIsFormOpen((prev) => !prev)}
+        isFormOpen={
+          isFormOpen
+        }
+        onAddClick={() =>
+          setIsFormOpen(
+            (prev) => !prev
+          )
+        }
       />
 
-      {/* SEARCH */}
-      <div className="bg-main-blue gap-4 rounded-b-[20px] shadow-lg">
-        <div className="autoMid w-full py-[20px] flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+      {/* TOP */}
+      <div className="bg-main-blue rounded-b-[20px] shadow-lg">
+        <div className="autoMid py-[20px] flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
           <div className="w-full md:w-[70%]">
             <SearchBar
-              text={"Cari nama..."}
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
+              text="Cari nama..."
+              value={
+                searchTerm
+              }
+              onChange={(
+                e: any
+              ) =>
+                setSearchTerm(
+                  e.target.value
+                )
+              }
             />
           </div>
 
           <div className="w-full md:w-[20%]">
             <SelectStatus
-              selected={selectedStatus}
-              onChange={setSelectedStatus}
+              selected={
+                selectedStatus
+              }
+              onChange={
+                setSelectedStatus
+              }
             />
           </div>
         </div>
       </div>
 
-      {/* MAIN */}
-      <div className="autoMid">
-        <div className="w-full px-2 sm:px-4 pb-[100px] mt-6">
-          <div className="flex flex-col xl:flex-row gap-6">
-            {/* DETAIL */}
-            <div className="w-full xl:w-[30%] xl:sticky xl:top-24 h-fit">
-              {isFormOpen ? (
-                <FormTambahUser onClose={() => setIsFormOpen(false)} />
-              ) : (
-                <div className="bg-white rounded-lg min-h-[400px] flex items-center justify-center mt-6 xl:mt-12 p-6 shadow-sm">
-                  {!selectedUser ? (
-                    <div className="text-center">
-                      <FiInfo
-                        className="mx-auto text-gray-400 mb-3"
-                        size={30}
+      {/* CONTENT */}
+      <div className="autoMid mt-6 px-2 sm:px-4">
+        <div className="flex flex-col xl:flex-row gap-6">
+          {/* LEFT */}
+          <div className="w-full xl:w-[30%] xl:sticky xl:top-24 h-fit">
+            {isFormOpen ? (
+              <FormTambahUser
+                onClose={() =>
+                  setIsFormOpen(
+                    false
+                  )
+                }
+                onSave={
+                  addUser
+                }
+              />
+            ) : (
+              <div className="bg-white rounded-lg min-h-[420px] p-6 shadow-sm">
+                {!selectedUser ? (
+                  <div className="h-full min-h-[350px] flex flex-col justify-center items-center text-gray-400">
+                    <FiInfo size={30} />
+                    <p className="mt-3 text-sm">
+                      Pilih akun
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    {/* TOP ACTION */}
+                    <div className="flex justify-end">
+                      <HiPencilAlt
+                        size={26}
+                        className="cursor-pointer"
+                        onClick={() =>
+                          setIsEdit((prev) => !prev)
+                        }
                       />
-                      <p className="text-gray-400 text-sm">Pilih akun</p>
                     </div>
-                  ) : (
-                    <div className="text-center w-full">
-                      <div className="flex justify-end">
-                        <HiPencilAlt
-                          size={28}
-                          className="cursor-pointer text-gray-500 hover:text-black"
-                          onClick={() => setIsEdit((prev) => !prev)}
+
+                    {/* AVATAR */}
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 mx-auto rounded-full bg-main-blue flex justify-center items-center">
+                      <FaUser className="text-white text-6xl" />
+                    </div>
+
+                    {/* FORM DETAIL */}
+                    <div className="space-y-4 mt-6">
+
+                      {/* NAMA */}
+                      <div>
+                        <p className="text-sm font-semibold mb-1 text-gray-600">
+                          Nama
+                        </p>
+
+                        <input
+                          name="nama"
+                          value={formData?.nama || ""}
+                          onChange={handleChange}
+                          disabled={!isEdit}
+                          className={`w-full p-2 px-4 rounded-lg ${isEdit
+                            ? "border bg-white"
+                            : "bg-gray-200"
+                            }`}
                         />
                       </div>
 
-                      <div className="p-5 flex w-32 h-32 sm:w-40 sm:h-40 mx-auto justify-center items-center rounded-full bg-main-blue">
-                        <FaUser size={80} className="text-white" />
+                      {/* EMAIL */}
+                      <div>
+                        <p className="text-sm font-semibold mb-1 text-gray-600">
+                          Email
+                        </p>
+
+                        <input
+                          name="email"
+                          value={formData?.email || ""}
+                          onChange={handleChange}
+                          disabled={!isEdit}
+                          className={`w-full p-2 px-4 rounded-lg ${isEdit
+                            ? "border bg-white"
+                            : "bg-gray-200"
+                            }`}
+                        />
                       </div>
 
-                      <div className="space-y-3 mt-4">
-                        {["nama", "email", "prodi", "kelas"].map((field) => (
-                          <input
-                            key={field}
-                            name={field}
-                            value={selectedUser?.[field] || ""}
-                            disabled={!isEdit}
-                            onChange={handleChange}
-                            className={`px-4 w-full p-2 rounded-lg ${isEdit ? "bg-white border" : "bg-gray-200"}`}
-                          />
-                        ))}
+                      {/* PRODI */}
+                      <div>
+                        <p className="text-sm font-semibold mb-1 text-gray-600">
+                          Program Studi
+                        </p>
 
-                        <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          name="prodi"
+                          value={formData?.prodi || ""}
+                          onChange={handleChange}
+                          disabled={!isEdit}
+                          className={`w-full p-2 px-4 rounded-lg ${isEdit
+                            ? "border bg-white"
+                            : "bg-gray-200"
+                            }`}
+                        />
+                      </div>
+
+                      {/* KELAS -> HANYA JIKA BUKAN KPS */}
+                      {selectedUser.role !== "KPS" && (
+                        <div>
+                          <p className="text-sm font-semibold mb-1 text-gray-600">
+                            Kelas
+                          </p>
+
+                          <input
+                            name="kelas"
+                            value={formData?.kelas || ""}
+                            onChange={handleChange}
+                            disabled={!isEdit}
+                            className={`w-full p-2 px-4 rounded-lg ${isEdit
+                              ? "border bg-white"
+                              : "bg-gray-200"
+                              }`}
+                          />
+                        </div>
+                      )}
+
+                      {/* ROLE + STATUS */}
+                      <div className="flex gap-2 flex-col sm:flex-row">
+
+                        <div className="w-full">
+                          <p className="text-sm font-semibold mb-1 text-gray-600">
+                            Role
+                          </p>
+
                           <input
                             name="role"
-                            value={selectedUser?.role || ""}
-                            disabled={!isEdit}
+                            value={formData?.role || ""}
                             onChange={handleChange}
-                            className={`w-full sm:w-[50%] px-4 p-2 rounded-lg ${isEdit ? "bg-white border" : "bg-gray-200"}`}
+                            disabled={!isEdit}
+                            className={`w-full p-2 px-4 rounded-lg ${isEdit
+                              ? "border bg-white"
+                              : "bg-gray-200"
+                              }`}
                           />
+                        </div>
+
+                        <div className="w-full">
+                          <p className="text-sm font-semibold mb-1 text-gray-600">
+                            Status
+                          </p>
 
                           {isEdit ? (
-                            <button className="w-full sm:w-[50%] bg-purple-600 text-white rounded-lg">
+                            <button
+                              onClick={saveEdit}
+                              className="w-full h-[42px] bg-purple-600 text-white rounded-lg"
+                            >
                               Simpan
                             </button>
                           ) : (
                             <div
-                              className={`w-full sm:w-[50%] p-2 rounded-lg text-center
-                                                        ${
-                                                          selectedUser?.status ===
-                                                          "active"
-                                                            ? "bg-green-400 text-white"
-                                                            : "bg-red-100 text-red-600"
-                                                        }`}
+                              className={`w-full h-[42px] rounded-lg flex items-center justify-center ${selectedUser.status === "active"
+                                ? "bg-green-500 text-white"
+                                : "bg-red-100 text-red-600"
+                                }`}
                             >
-                              {selectedUser?.status === "active"
+                              {selectedUser.status === "active"
                                 ? "Aktif"
                                 : "Tidak Aktif"}
                             </div>
@@ -251,50 +511,67 @@ export default function Admin() {
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-            {/* LIST */}
-            <div className="flex-1 space-y-8">
-              {/* KPS */}
-              <section>
-                <SectionHeader title="Kepala Program Studi" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                  {filteredKps.map((user) => (
+          {/* RIGHT */}
+          <div className="flex-1 space-y-8">
+            <section>
+              <SectionHeader title="Kepala Program Studi" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                {filteredKps.map(
+                  (
+                    user
+                  ) => (
                     <UserCard
                       key={user.id}
                       user={user}
                       isActive={selectedUser?.id === user.id}
                       onClick={() => setSelectedUser(user)}
+                      onToggleStatus={toggleStatus}
                     />
-                  ))}
-                </div>
-              </section>
+                  )
+                )}
+              </div>
+            </section>
 
-              {/* MAHASISWA */}
-              <section>
-                <SectionHeader
-                  title="Mahasiswa"
-                  currentPage={pageMhs}
-                  totalPages={totalPages}
-                  onNext={nextPage}
-                  onPrev={prevPage}
-                />
+            <section>
+              <SectionHeader
+                title="Mahasiswa"
+                currentPage={
+                  pageMhs
+                }
+                totalPages={
+                  totalPages
+                }
+                onNext={
+                  nextPage
+                }
+                onPrev={
+                  prevPage
+                }
+              />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                  {paginatedMhs.map((user) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                {paginatedMhs.map(
+                  (
+                    user
+                  ) => (
                     <UserCard
                       key={user.id}
                       user={user}
                       isActive={selectedUser?.id === user.id}
                       onClick={() => setSelectedUser(user)}
+                      onToggleStatus={toggleStatus}
                     />
-                  ))}
-                </div>
-              </section>
-            </div>
+                  )
+                )}
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -302,7 +579,9 @@ export default function Admin() {
   );
 }
 
-// ================= COMPONENT =================
+/* ===================== */
+/* HEADER */
+/* ===================== */
 
 function SectionHeader({
   title,
@@ -311,30 +590,37 @@ function SectionHeader({
   onNext,
   onPrev,
 }: any) {
+  const showPagination =
+    totalPages > 1;
+
   return (
-    <div className="flex justify-between items-center mb-3">
-      <h3 className="pb-2 font-semibold text-[18px] sm:text-[22px] w-full border-b-2">
+    <div className="flex justify-between items-center mb-3 gap-3">
+      <h3 className="font-semibold text-[18px] sm:text-[22px] border-b-2 w-full pb-2">
         {title}
       </h3>
 
-      {currentPage && (
-        <div className="flex items-center gap-2">
+      {showPagination && (
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onPrev}
-            disabled={currentPage === 1}
-            className="text-gray-400 disabled:opacity-30"
+            disabled={
+              currentPage === 1
+            }
           >
             <FiChevronLeft />
           </button>
 
-          <span className="text-sm text-gray-400">
-            {currentPage}/{totalPages}
+          <span>
+            {currentPage}/
+            {totalPages}
           </span>
 
           <button
             onClick={onNext}
-            disabled={currentPage === totalPages}
-            className="bg-purple-600 text-white rounded-full disabled:bg-gray-300 px-1"
+            disabled={
+              currentPage ===
+              totalPages
+            }
           >
             <FiChevronRight />
           </button>
@@ -344,101 +630,287 @@ function SectionHeader({
   );
 }
 
-function UserCard({ user, onClick, isActive }: any) {
-  const [on, setOn] = useState(user.status);
-  const isInactive = on === "inactive";
+/* ===================== */
+/* CARD */
+/* ===================== */
 
-  const toggleStatus = (e: any) => {
-    e.stopPropagation();
-    setOn((prev:any) => (prev === "active" ? "inactive" : "active"));
-  };
+function UserCard({
+  user,
+  onClick,
+  isActive,
+  onToggleStatus,
+}: any) {
+  const inactive =
+    user.status === "inactive";
 
   return (
     <div
       onClick={onClick}
-      className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all duration-200
-            ${isActive ? "border-main-blue shadow-md scale-[1.02]" : "bg-white hover:shadow-md"}
-            ${isInactive ? "bg-gray-300/60" : ""}`}
+      className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition ${isActive
+        ? "border-main-blue shadow-md scale-[1.02]"
+        : "bg-white hover:shadow-md"
+        } ${inactive
+          ? "bg-gray-300/60"
+          : ""
+        }`}
     >
-      <div className="flex gap-3 items-center">
+      {/* kiri */}
+      <div className="flex gap-3 items-center min-w-0">
         <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center
-                ${isInactive ? "bg-gray-400" : "bg-main-blue"}`}
+          className={`w-10 h-10 rounded-full flex justify-center items-center shrink-0 ${inactive
+            ? "bg-gray-400"
+            : "bg-main-blue"
+            }`}
         >
-          <FaUser className="text-white " />
+          <FaUser className="text-white" />
         </div>
 
-        <div>
+        <div className="min-w-0">
+          {/* nama 1 baris + ... */}
           <h4
-            className={`text-sm font-bold ${isInactive ? "text-gray-400" : ""}`}
+            className={`text-sm font-bold truncate whitespace-nowrap overflow-hidden ${inactive
+              ? "text-gray-400"
+              : ""
+              }`}
           >
             {user.nama}
           </h4>
-          <p className="text-xs text-gray-400">{user.role}</p>
+
+          <p className="text-xs text-gray-400 truncate">
+            {user.role}
+          </p>
         </div>
       </div>
 
-      <div
-        onClick={toggleStatus}
-        className="w-10 h-10 flex items-center justify-center"
+      {/* kanan */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleStatus(user);
+        }}
+        className="shrink-0 ml-2"
       >
-        {on === "active" ? (
-          <FaCircleCheck size={20} className="text-green-500" />
+        {inactive ? (
+          <FiXCircle className="text-red-500 text-xl hover:scale-110 transition" />
         ) : (
-          <FiXCircle size={20} className="text-red-500" />
+          <FaCircleCheck className="text-green-500 text-xl hover:scale-110 transition" />
         )}
-      </div>
+      </button>
     </div>
   );
 }
 
-function FormTambahUser({ onClose }: { onClose: () => void }) {
+/* ===================== */
+/* FORM */
+/* ===================== */
+
+function FormTambahUser({
+  onClose,
+  onSave,
+}: any) {
+  const [step, setStep] =
+    useState<"pilih" | "form">(
+      "pilih"
+    );
+
+  const [form, setForm] =
+    useState({
+      nama: "",
+      email: "",
+      prodi: "",
+      kelas: "",
+      role: "",
+      status: "active",
+    });
+
+  const pilihRole = (
+    role: string
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      role,
+    }));
+
+    setStep("form");
+  };
+
+  const change = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement
+    >
+  ) => {
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  const submit = () => {
+    if (
+      !form.nama ||
+      !form.email ||
+      !form.prodi
+    )
+      return;
+
+    onSave(form);
+    onClose();
+  };
+
   return (
-    <div className="bg-white rounded-lg min-h-[500px] flex flex-col justify-between py-4 p-4 mt-6 xl:mt-12 shadow-xl">
-      <div className="flex justify-end mb-4">
-        <button onClick={onClose}>
-          <FaTimes className="text-black text-[24px]" />
+    <div className="bg-white rounded-lg min-h-[560px] p-5 shadow-xl">
+      {/* close */}
+      <div className="flex justify-end">
+        <button
+          onClick={onClose}
+        >
+          <FaTimes className="text-xl" />
         </button>
       </div>
 
-      <div className="space-y-3">
-        <div className="p-5 flex w-32 h-32 sm:w-40 sm:h-40 mx-auto justify-center items-center rounded-full bg-main-blue">
-          <FaUser size={100} className="text-white" />
-        </div>
-
-        <input
-          className="px-4 bg-gray-200 w-full p-2 rounded-lg"
-          placeholder="Nama"
-        />
-        <input
-          className="px-4 bg-gray-200 w-full p-2 rounded-lg"
-          placeholder="Email"
-        />
-        <input
-          className="px-4 bg-gray-200 w-full p-2 rounded-lg"
-          placeholder="Prodi"
-        />
-        <input
-          className="px-4 bg-gray-200 w-full p-2 rounded-lg"
-          placeholder="Kelas"
-        />
-
-        <div className="flex flex-col sm:flex-row gap-2">
-          <select className="w-full sm:w-1/2 p-2 rounded-lg bg-gray-200">
-            <option>KPS</option>
-            <option>Ketua PBL</option>
-          </select>
-
-          <select className="w-full sm:w-1/2 p-2 rounded-lg bg-gray-200">
-            <option>Aktif</option>
-            <option>Tidak Aktif</option>
-          </select>
-        </div>
+      {/* logo profile */}
+      <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-main-blue mx-auto flex justify-center items-center mt-2">
+        <FaUser className="text-white text-6xl" />
       </div>
 
-      <button className="mt-4 w-full sm:w-[40%] self-end bg-green-600 text-white py-2 rounded-lg hover:bg-green-600/60">
-        Simpan
-      </button>
+      {/* STEP 1 */}
+      {step === "pilih" && (
+        <div className="mt-8 space-y-4">
+          <p className="text-center font-semibold text-lg">
+            Pilih Jenis Akun
+          </p>
+
+          <button
+            onClick={() =>
+              pilihRole("KPS")
+            }
+            className="w-full bg-main-blue text-white py-3 rounded-lg hover:opacity-90"
+          >
+            Kepala Program
+            Studi
+          </button>
+
+          <button
+            onClick={() =>
+              pilihRole(
+                "Ketua PBL"
+              )
+            }
+            className="w-full bg-purple-600 text-white py-3 rounded-lg hover:opacity-90"
+          >
+            Ketua PBL
+          </button>
+        </div>
+      )}
+
+      {/* STEP 2 */}
+      {step === "form" && (
+        <div className="space-y-4 mt-6">
+          <div className="text-center font-semibold text-lg">
+            {form.role}
+          </div>
+
+          {/* Nama */}
+          <div>
+            <p className="text-sm font-semibold mb-1 text-gray-600">
+              Nama
+            </p>
+
+            <input
+              name="nama"
+              value={form.nama}
+              onChange={change}
+              className="w-full bg-gray-200 p-2 px-4 rounded-lg"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <p className="text-sm font-semibold mb-1 text-gray-600">
+              Email
+            </p>
+
+            <input
+              name="email"
+              value={form.email}
+              onChange={change}
+              className="w-full bg-gray-200 p-2 px-4 rounded-lg"
+            />
+          </div>
+
+          {/* Program Studi */}
+          <div>
+            <p className="text-sm font-semibold mb-1 text-gray-600">
+              Program Studi
+            </p>
+
+            <input
+              name="prodi"
+              value={form.prodi}
+              onChange={change}
+              className="w-full bg-gray-200 p-2 px-4 rounded-lg"
+            />
+          </div>
+
+          {/* Kelas hanya Ketua PBL */}
+          {form.role === "Ketua PBL" && (
+            <div>
+              <p className="text-sm font-semibold mb-1 text-gray-600">
+                Kelas
+              </p>
+
+              <input
+                name="kelas"
+                value={form.kelas}
+                onChange={change}
+                className="w-full bg-gray-200 p-2 px-4 rounded-lg"
+              />
+            </div>
+          )}
+
+          {/* Status */}
+          <div>
+            <p className="text-sm font-semibold mb-1 text-gray-600">
+              Status
+            </p>
+
+            <select
+              name="status"
+              value={form.status}
+              onChange={change}
+              className="w-full bg-gray-200 p-2 px-4 rounded-lg"
+            >
+              <option value="active">
+                Aktif
+              </option>
+
+              <option value="inactive">
+                Tidak Aktif
+              </option>
+            </select>
+          </div>
+
+          {/* Button */}
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={() =>
+                setStep("pilih")
+              }
+              className="w-1/2 bg-gray-300 py-2 rounded-lg"
+            >
+              Kembali
+            </button>
+
+            <button
+              onClick={submit}
+              className="w-1/2 bg-green-600 text-white py-2 rounded-lg"
+            >
+              Simpan
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

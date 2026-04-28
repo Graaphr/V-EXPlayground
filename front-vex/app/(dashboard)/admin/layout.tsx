@@ -16,8 +16,8 @@ export default function IndexLayout({
 }) {
   const userMenu = [
     { title: "BERANDA", subtitle: "UTAMA", link: "/" },
-    { title: "PAMERAN", subtitle: "3D BOOTH", link: "/pameran" },
-    { title: "DASHBOARD", subtitle: "ADMIN", link: "/admin" },
+    { title: "PAMERAN", subtitle: "3D BOOTH", link: "/admin/pameran" },
+    { title: "DASHBOARD", subtitle: "ADMIN", link: "/admin/pengguna" },
   ];
   return (
     <div>

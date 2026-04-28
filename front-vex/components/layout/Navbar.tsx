@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FaUser, FaLock } from "react-icons/fa";
@@ -21,6 +22,7 @@ interface NavbarProps {
 
 // ===== COMPONENT =====
 export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
 
@@ -178,6 +180,7 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
                 onClick={() => {
                   setOpenProfile(false);
                   alert("Logout berhasil");
+                  router.push("/");
                 }}
                 className="w-full p-3 flex items-center justify-center gap-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition active:scale-95"
               >
