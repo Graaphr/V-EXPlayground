@@ -45,3 +45,5 @@ php artisan migrate
 ```bash
 php artisan serve
 ```
+
+if you happen an error, contact us
