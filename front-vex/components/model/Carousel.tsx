@@ -13,9 +13,10 @@ export interface SlideItem {
 
 interface CarouselProps {
   data: SlideItem[];
+  className?:string;
 }
 
-export default function Carousel({ data = [] }: CarouselProps) {
+export default function Carousel({ data = [],className }: CarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 6000, stopOnInteraction: false })
   ]);

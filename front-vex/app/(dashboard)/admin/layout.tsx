@@ -2,45 +2,28 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Tilt_Warp, Poppins } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "@/components/layout/Navbar";
-// import Footer from "@/components/layout/Footer";
-
-const poppins = Poppins({
-    subsets: ['latin'],
-    variable: '--font-poppins',
-    weight: ['100', '200', '300', '400', '500', '600', '700'],
-});
-
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
-});
+import NavAdmin from "@/components/dashboard/NavAdmin";
 
 export const metadata: Metadata = {
-    title: "V-EX | Tambah Pameran",
-    description: "Virtual Exhibition",
+  title: "V-EX | Admin",
+  description: "Virtual Exhibition",
 };
-const tiltWarp = Tilt_Warp({
-    subsets: ["latin"],
-    variable: "--font-tilt-warp",
-});
 
-export default function IndexLayout({ children }: { children: React.ReactNode }) {
-        const userMenu = [
-        { title: "BERANDA", subtitle: "UTAMA", link: "/" },
-        { title: "PAMERAN", subtitle: "3D BOOTH", link: "/pameran" },
-        { title: "DASHBOARD", subtitle: "ADMIN", link: "/admin" },
-    ];
-    return (
-        <div>
-            <Navbar menuItems={userMenu} isLogin={true}/>
-            {children}
-        </div>
-
-
-    );
+export default function IndexLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const userMenu = [
+    { title: "BERANDA", subtitle: "UTAMA", link: "/" },
+    { title: "PAMERAN", subtitle: "3D BOOTH", link: "/pameran" },
+    { title: "DASHBOARD", subtitle: "ADMIN", link: "/admin" },
+  ];
+  return (
+    <div>
+      <Navbar menuItems={userMenu} isLogin={true} />
+      <NavAdmin />
+      {children}
+    </div>
+  );
 }
