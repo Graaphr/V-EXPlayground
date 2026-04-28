@@ -7,7 +7,7 @@ pengguna{
     halaman 3d pameran : ok
     ui penilaian : 
     ui komentar : 
-    halaman verify-otp : 
+    halaman verify-otp : ok
     halaman/ui session-habis :
 }, 
 admin{
@@ -18,8 +18,7 @@ ketua{
     halaman tambah karya : 
 },
 Fajri{
-    halaman verifikasi,
-    halaman pameran admin,
-    halaman karya,
+    halaman verifikasi, ok
+    halaman pameran admin, ok
 }
 
