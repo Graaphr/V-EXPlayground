@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence, Transition } from "framer-motion";
-import { Logo, Button, ButtonPutih } from "@/components/Componen";
+import { Logo } from "@/components/Componen";
+import { Button, ButtonPutih } from "@/components/model/Button";
 import { VectorBlueBox } from "@/components/model/BoxModel";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
@@ -166,7 +167,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder="Kata Sandi"
               className="input-form"
             />
 
@@ -184,7 +185,7 @@ export default function RegisterPage() {
               value={password_confirmation}
               onChange={(e) => setPasswordConfirmation(e.target.value)}
               type={showConfirm ? "text" : "password"}
-              placeholder="Konfirmasi Password"
+              placeholder="Konfirmasi Kata Sandi"
               className="input-form"
             />
 
@@ -196,19 +197,27 @@ export default function RegisterPage() {
             </motion.span>
           </div>
 
-          <ButtonPutih
-            onClick={handleRegister}
-            disabled={isLoading}
-            className="w-full py-3 rounded-lg font-bold"
-          >
-            {isLoading ? "Loading..." : "Daftar"}
-          </ButtonPutih>
+          <div className="w-full mt-8 border-b-2 border-gray-300 pb-8">
+            <ButtonPutih
+              onClick={handleRegister}
+              disabled={isLoading}
+              className="w-full py-3 rounded-lg font-bold"
+            >
+              {isLoading ? "Loading..." : "Daftar"}
+            </ButtonPutih>
+          </div>
         </form>
 
-        <div className="mt-6 w-full">
-          <Button link="/login" className="w-full py-3 rounded-lg font-bold">
-            Masuk
-          </Button>
+        <div className="mt-6 flex flex-col   items-center w-full">
+          <span className=" text-sm mb-4">Sudah punya akun?</span>
+          <div className="w-full mt-1 border-b border-gray-200 pb-1">
+            <Button
+              className="w-full py-3 rounded-lg font-bold"
+              link="/login"
+            >
+              Masuk
+            </Button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

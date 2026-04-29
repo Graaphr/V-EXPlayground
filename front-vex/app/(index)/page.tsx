@@ -1,6 +1,7 @@
 
 // komponen
-import { Card, Logo, Button, BestTag, FavTag } from "@/components/Componen";
+import { Card, Logo, BestTag, FavTag } from "@/components/Componen";
+import { Button } from "@/components/model/Button";
 import Carousel from "@/components/model/Carousel";
 // data
 import { DataFotoTerbaik, DataFotoTerfavorit } from "@/public/data/Carousel.json"; //foto terbaik & favorit

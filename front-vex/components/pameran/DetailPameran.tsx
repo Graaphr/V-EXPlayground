@@ -12,7 +12,7 @@ import {
 import { HiPencilAlt } from "react-icons/hi";
 import { useParams } from "next/navigation";
 
-import { Button } from "@/components/Componen";
+import { Button } from "../model/Button";
 import pameranData from "@/public/data/Pameran.json";
 
 interface Status {

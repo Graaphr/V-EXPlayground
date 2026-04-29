@@ -6,7 +6,8 @@ import Link from "next/link";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FaUser, FaLock } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { Logo, TextNav, Button } from "@/components/Componen";
+import { Logo, TextNav } from "@/components/Componen";
+import { Button } from "@/components/model/Button";
 
 // ===== TYPES =====
 interface NavItem {

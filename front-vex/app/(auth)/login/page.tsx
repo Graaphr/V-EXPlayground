@@ -4,7 +4,8 @@ import { motion, AnimatePresence, Transition } from "framer-motion";
 import Link from "next/link";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 // Komponen
-import { Logo, Button, ButtonPutih } from "@/components/Componen";
+import { Logo } from "@/components/Componen";
+import { Button, ButtonPutih } from "@/components/model/Button";
 import { VectorBox } from "@/components/model/BoxModel";
 
 import { useRouter } from "next/navigation";
@@ -191,7 +192,7 @@ export default function LoginPage() {
               value={form.password}
               onChange={handleChange}
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder="Kata Sandi"
               className="input-form"
             />
 
@@ -227,7 +228,7 @@ export default function LoginPage() {
             </motion.span>
           </div>
           <div className="flex justify-end">
-            <Link href="#" className="text-sm hover:text-main-blue">
+            <Link href="/lupa-password/email" className="text-sm hover:text-main-blue">
               Lupa Kata Sandi?
             </Link>
           </div>

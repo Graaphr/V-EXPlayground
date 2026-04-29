@@ -13,8 +13,8 @@ import {
 
 import { Canvas } from "@react-three/fiber";
 
-import Experience from "@/app/component/experience";
-import Crosshair from "@/app/component/crosshair";
+import Experience from "@/components/play/experience";
+import Crosshair from "@/components/play/crosshair";
 
 type PosterData = {
   src: string;
