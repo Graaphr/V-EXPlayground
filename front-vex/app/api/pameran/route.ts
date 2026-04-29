@@ -483,6 +483,6 @@ function formatLongDate(
 
     return `${day} ${bulan[
         Number(month) - 1
-        ]
+    ]
         } ${year}`;
 }
