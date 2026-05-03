@@ -1,14 +1,23 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-    // Sesuaikan dengan alamat Laravel Anda yang sedang jalan
-    baseURL: 'http://localhost:8000', 
-    withCredentials: true, 
-    withXSRFToken: true, 
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json',
-    },
+  baseURL: "http://localhost:8000",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+
+  return config;
 });
 
 export default api;
