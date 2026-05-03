@@ -76,7 +76,7 @@ export default function Experience({
     );
 
   const { scene } = useGLTF(
-    "/models/hall2.glb"
+    "/models/Default.glb"
   );
 
   /* ===================== */
