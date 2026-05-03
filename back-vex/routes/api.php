@@ -10,44 +10,32 @@ use App\Http\Controllers\PenggunaController;
 |--------------------------------------------------------------------------
 | Prefix Default: /api
 */
+
 Route::post('/test', function () {
     return response()->json(['message' => 'OK']);
 });
-// --- GRUP PUBLIK (Bisa diakses tanpa login) ---
-// Route::prefix('auth')->group(function () {
-Route::post('/register', [PenggunaController::class, 'register']);
-Route::post('/verify-otp', [PenggunaController::class, 'verifyOtp']);
-Route::post('/resend-otp', [PenggunaController::class, 'resendOtp']);
-// 1. Jalur Registrasi
-// Route::post('/register', [PenggunaController::class, 'register']);
 
-// // 2. Jalur Login (Tambahkan ini agar Next.js bisa masuk)
-Route::post('/login', [PenggunaController::class, 'login']);
 
-// // 3. Jalur Verifikasi OTP
-// Route::post('/verify-otp', [PenggunaController::class, 'verifyOtp']);
-
-// // Jalur Resend OTP dengan Throttle (Keamanan agar tidak spam email)
-// Route::middleware('throttle:5,1')->group(function () {
-//     Route::post('/resend-otp', [PenggunaController::class, 'resendOtp'])->name('auth.resend_otp');
-// });
+// === grup publik ===
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [PenggunaController::class, 'register']);
+    Route::post('/verify-otp', [PenggunaController::class, 'verifyOtp']);
+    Route::post('/resend-otp', [PenggunaController::class, 'resendOtp']);
+    Route::post('/login', [PenggunaController::class, 'login']);
+});
 
 
 
-// --- GRUP TERPROTEKSI (Wajib Login/Sanctum) ---
-// Gunakan grup ini untuk semua fitur V-EX yang butuh akses khusus
+// === grup login ===
 Route::middleware('auth:sanctum')->group(function () {
 
-    // 1. Ambil data user yang sedang login (Penting untuk Next.js)
     Route::get('/user', function (Request $request) {
-        return $request->user();
-
+        return response()->json([
+            'status' => 'success',
+            'user' => $request->user()
+        ]);
     })->name('auth.user');
 
-
-    // 2. Jalur Logout
     Route::post('/logout', [PenggunaController::class, 'logout'])->name('auth.logout');
 
-    // 3. Contoh akses profil atau fitur internal lainnya
-    // Route::get('/user-profile', [PenggunaController::class, 'profile']);
 });
