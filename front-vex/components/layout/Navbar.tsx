@@ -9,6 +9,9 @@ import { FiLogOut } from "react-icons/fi";
 import { Logo, TextNav } from "@/components/Componen";
 import { Button } from "@/components/model/Button";
 
+// === AUTH CONTEXT ===
+import { useAuth } from "@/context/AuthContext";
+
 // ===== TYPES =====
 interface NavItem {
   title: string;
@@ -18,14 +21,17 @@ interface NavItem {
 
 interface NavbarProps {
   menuItems: NavItem[];
-  isLogin?: boolean;
 }
 
 // ===== COMPONENT =====
-export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
+export default function Navbar({ menuItems }: NavbarProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
+
+  const { user, logout } = useAuth();
+
+  const isLogin = !!user;
 
   // ===== AUTH DESKTOP =====
   const AuthDesktop = () =>
@@ -34,7 +40,7 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
         onClick={() => setOpenProfile(true)}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-main-blue text-white hover:scale-110 transition-all duration-300 shadow-md"
       >
-        <FaUser size={24} className="rounded-full"/>
+        <FaUser size={24} className="rounded-full" />
       </button>
     ) : (
       <Button
@@ -55,11 +61,14 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
         }}
         className="flex items-center justify-center gap-2 py-3 bg-main-blue text-white rounded-lg"
       >
-        <FaUser size={22} className="rounded-full"/>
+        <FaUser size={22} className="rounded-full" />
         <span>Profile</span>
       </button>
     ) : (
-      <Button link="/login" className="w-full py-3 text-sm font-bold rounded-md">
+      <Button
+        link="/login"
+        className="w-full py-3 text-sm font-bold rounded-md"
+      >
         Masuk
       </Button>
     );
@@ -67,10 +76,8 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
   return (
     <>
       <nav className="sticky top-0 z-40 bg-white shadow-sm rounded-b-2xl font-poppins">
-
-        {/* ===== TOP BAR ===== */}
+        {/* TOP BAR */}
         <div className="max-w-[80rem] mx-auto px-4 sm:px-6 h-[70px] flex items-center justify-between">
-
           {/* LOGO */}
           <Link href="/" className="hover:opacity-80 transition">
             <div className="h-10 w-28 sm:h-12 sm:w-32 flex items-center">
@@ -104,14 +111,13 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
           </button>
         </div>
 
-        {/* ===== MOBILE MENU ===== */}
+        {/* MOBILE MENU */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300 ${
             open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="px-4 pb-5 flex flex-col gap-4">
-
             {menuItems.map((item, index) => (
               <TextNav
                 key={index}
@@ -126,7 +132,7 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
         </div>
       </nav>
 
-      {/* ===== PROFILE SIDEBAR ===== */}
+      {/* PROFILE SIDEBAR */}
       <div
         className={`fixed inset-0 z-50 transition-all duration-300 ${
           openProfile ? "visible opacity-100" : "invisible opacity-0"
@@ -143,18 +149,19 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
           className={`absolute top-0 right-0 min-h-[400px] w-[85%] sm:w-[320px] bg-white shadow-2xl p-4 transform transition-transform duration-300 rounded-l-xl
           ${openProfile ? "translate-x-0" : "translate-x-full"}`}
         >
-
           <div className="flex flex-col h-100">
-
             {/* HEADER */}
             <div className="flex items-center justify-between border-b pb-3">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-main-blue flex items-center justify-center text-white">
-                  <FaUser size={20} className="rounded-full"/>
+                  <FaUser size={20} className="rounded-full" />
                 </div>
+
                 <div>
-                  <p className="font-semibold">User</p>
-                  <p className="text-sm text-gray-400">user@mail.com</p>
+                  <p className="font-semibold">{user?.nama || "User"}</p>
+                  <p className="text-sm text-gray-400">
+                    {user?.email || "user@mail.com"}
+                  </p>
                 </div>
               </div>
 
@@ -166,8 +173,8 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
             {/* MENU */}
             <div className="flex flex-col mt-4">
               <Link
-                href="/forgot-password"
-                onClick={() => setOpenProfile(false)}
+                href="/lupa-password/email"
+                // onClick={() => setOpenProfile(false)}
                 className="p-3 flex items-center gap-3 hover:bg-gray-100 transition border-b-2"
               >
                 <FaLock size={18} />
@@ -175,13 +182,14 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
               </Link>
             </div>
 
-            {/* LOGOUT  */}
+            {/* LOGOUT */}
             <div className="mt-auto pt-4 border-t">
               <button
                 onClick={() => {
+                  logout(); // ✅ dari context
                   setOpenProfile(false);
-                  alert("Logout berhasil");
-                  router.push("/");
+                  confirm("Apakah anda yakin ?");                  
+                  router.push("/pameran");
                 }}
                 className="w-full p-3 flex items-center justify-center gap-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition active:scale-95"
               >
@@ -189,7 +197,6 @@ export default function Navbar({ menuItems, isLogin = false }: NavbarProps) {
                 Logout
               </button>
             </div>
-
           </div>
         </div>
       </div>

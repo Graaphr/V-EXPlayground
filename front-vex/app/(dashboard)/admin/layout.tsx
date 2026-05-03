@@ -21,7 +21,7 @@ export default function IndexLayout({
   ];
   return (
     <div>
-      <Navbar menuItems={userMenu} isLogin={true} />
+      <Navbar menuItems={userMenu} />
       <NavAdmin />
       {children}
     </div>

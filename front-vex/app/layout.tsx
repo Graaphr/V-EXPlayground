@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Tilt_Warp, Poppins } from "next/font/google";
 import "@/app/globals.css";
-
+// API
+import { AuthProvider } from "@/context/AuthContext";
 const poppins = Poppins({
-  subsets: ['latin'],
-  variable: '--font-poppins',
-  weight: ['100', '200', '300', '400', '500', '600', '700'],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
 const geistSans = Geist({
@@ -27,17 +28,18 @@ const tiltWarp = Tilt_Warp({
   variable: "--font-tilt-warp",
 });
 
-
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${poppins.variable} ${tiltWarp.variable} font-poppins`}>
-        {children}
+        <AuthProvider>
+          {children}
+          </AuthProvider>
       </body>
     </html>
-  )
+  );
 }
