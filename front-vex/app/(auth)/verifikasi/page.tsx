@@ -1,48 +1,52 @@
 "use client";
-
+// React
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button, ButtonPutih, } from "@/components/model/Button";
+// Component
+import { Button, ButtonPutih } from "@/components/model/Button";
+// API
 import api from "@/lib/axios";
 
 export default function VerifikasiPage() {
+  // from handel
   const [otp, setOtp] = useState("");
-  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] =
-    useState("");
-  const [isLoading, setIsLoading] =
-    useState(false);
-
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  // router
   const router = useRouter();
+  // timer
+  const [timeLeft, setTimeLeft] = useState(0);
 
-  // =========================
-  // GET EMAIL FROM STORAGE
-  // =========================
   useEffect(() => {
-    const savedEmail =
-      localStorage.getItem(
-        "pending_email"
-      );
+    const exp = localStorage.getItem("otp_expires_at");
+    if (!exp) return;
 
-    if (!savedEmail) {
-      router.push("/register");
-      return;
-    }
+    const expiresAt = Number(exp);
 
-    setEmail(savedEmail);
-  }, [router]);
+    const interval = setInterval(() => {
+      const diff = Math.floor((expiresAt - Date.now()) / 1000);
 
-  // =========================
-  // VERIFY OTP
-  // =========================
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+      if (diff <= 0) {
+        setTimeLeft(0);
+        clearInterval(interval);
+        localStorage.removeItem("otp_expires_at");
+      } else {
+        setTimeLeft(diff);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (t: number) => {
+    const minutes = Math.floor(t / 60);
+    const seconds = t % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    setError("");
-    setSuccess("");
 
     if (otp.length !== 6) {
       setError("OTP harus 6 digit");
@@ -52,87 +56,58 @@ export default function VerifikasiPage() {
     try {
       setIsLoading(true);
 
-      await api.get(
-        "/sanctum/csrf-cookie"
-      );
+      await api.get("/sanctum/csrf-cookie");
+      // post api
+      const res = await api.post("/api/auth/verify-otp", {
+        // get token from local
+        token: localStorage.getItem("token"),
+        otp,
+      });
 
-      const res =
-        await api.post(
-          "/api/verify-otp",
-          {
-            email,
-            otp,
-          }
-        );
+      const {message, user} = res.data
+      setSuccess(message);
 
-      setSuccess(
-        res.data.message
-      );
-
-      localStorage.removeItem(
-        "pending_email"
-      );
+      localStorage.removeItem("token");
 
       setTimeout(() => {
         router.push("/login");
       }, 1200);
     } catch (err: any) {
-      setError(
-        err.response?.data
-          ?.message ||
-          "Gagal verifikasi OTP"
-      );
+      setError(err.response?.data?.message || "Gagal verifikasi OTP");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // =========================
-  // RESEND OTP
-  // =========================
   const handleResend = async () => {
     try {
-      setError("");
-      setSuccess("");
+      const res = await api.post("/api/auth/resend-otp", {
+        token: localStorage.getItem("token"),
+      });
 
-      await api.post(
-        "/api/resend-otp",
-        {
-          email,
-        }
+      localStorage.setItem(
+        "otp_expires_at",
+        res.data.otp_expires_at.toString(),
       );
 
-      setSuccess(
-        "OTP berhasil dikirim ulang"
-      );
+     setTimeout(() => {
+       window.location.reload();
+     }, 1000);
+
+      setSuccess("OTP berhasil di kirim");
     } catch (err: any) {
-      setError(
-        err.response?.data
-          ?.message ||
-          "Gagal kirim ulang OTP"
-      );
+      setError(err.response?.data?.message || "Gagal kirim ulang OTP");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-main-blue px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8">
-
         {/* HEADER */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">
-            Verifikasi Email
-          </h1>
+          <h1 className="text-2xl font-bold">Verifikasi Email</h1>
 
-          <p className="text-sm text-gray-500 mt-2">
-            Masukkan 6 digit OTP
-          </p>
-
-          {email && (
-            <p className="text-xs text-gray-400 mt-1">
-              {email}
-            </p>
-          )}
+          <p className="text-sm text-gray-500 mt-2">Masukkan 6 digit OTP</p>
         </div>
 
         {/* ERROR */}
@@ -150,35 +125,25 @@ export default function VerifikasiPage() {
         )}
 
         {/* FORM */}
-        <form
-          onSubmit={
-            handleSubmit
-          }
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <h1 className="items-center flex w-100 self-center">
+            Countdown: {formatTime(timeLeft)}
+          </h1>
           <input
             type="text"
             maxLength={6}
             value={otp}
-            onChange={(e) =>
-              setOtp(
-                e.target.value
-              )
-            }
+            onChange={(e) => setOtp(e.target.value)}
             placeholder="000000"
             className="w-full text-center tracking-[0.5em] text-2xl font-bold px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <Button
             type="submit"
-            disabled={
-              isLoading
-            }
+            disabled={isLoading}
             className="w-full py-3 rounded-lg disabled:opacity-50"
           >
-            {isLoading
-              ? "Memverifikasi..."
-              : "Verifikasi"}
+            {isLoading ? "Memverifikasi..." : "Verifikasi"}
           </Button>
         </form>
 
@@ -190,9 +155,7 @@ export default function VerifikasiPage() {
 
           <ButtonPutih
             type="button"
-            onClick={
-              handleResend
-            }
+            onClick={handleResend}
             className="w-full py-3 rounded-lg"
           >
             Kirim Ulang OTP

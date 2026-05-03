@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 class PenggunaController extends Controller
 {
@@ -19,35 +20,51 @@ class PenggunaController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:pengguna,email',
+            'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
 
         try {
+            // token
+            $token = Str::uuid();
+            // otp
             $otpCode = rand(100000, 999999);
-
+            // otp habis
+            $otp_expires_at = Carbon::now()->addMinutes(1);
+            // array user data
             $userData = [
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
                 'role' => $request->role ?? 'Pengunjung',
+                'password' => Hash::make($request->password),
                 'otp_code' => $otpCode,
-                'otp_expires_at' => Carbon::now()->addMinutes(10),
+                'otp_expires_at' => $otp_expires_at->timestamp * 1000,
             ];
 
-            // ✅ CACHE (bukan session)
-            Cache::put('temp_user_' . $request->email, $userData, now()->addMinutes(10));
+            // Validasi 
+            if (Pengguna::where('email', $request->email)->exists()) {
+                return response()->json([
+                    'message' => 'Email sudah terdaftar',
+                ], 409);
+            }
 
+            // set cache
+            Cache::put('temp_user_' . $token, $userData, now()->addMinutes(5));
+
+            // email to user
             Mail::to($request->email)->send(new OtpMail($otpCode));
 
+            // return to local storage
             return response()->json([
                 'status' => 'success',
-                'message' => 'Silakan cek email OTP Anda.'
+                'message' => 'Silakan cek email OTP Anda.',
+                'token' => $token,
+                'otp_expires_at' => $otp_expires_at->timestamp * 1000,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status' => 'eror',
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -56,11 +73,12 @@ class PenggunaController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            // 'email' => 'required|email',
+            'token' => 'required',
             'otp' => 'required|digits:6',
         ]);
 
-        $tempUser = Cache::get('temp_user_' . $request->email);
+        // Ambil dari cache
+        $tempUser = Cache::get('temp_user_' . $request->token);
 
         if (!$tempUser) {
             return response()->json([
@@ -75,82 +93,87 @@ class PenggunaController extends Controller
                 'message' => 'OTP salah'
             ], 422);
         }
-
-        $user = Pengguna::create([
+        // insert into table Pengguna
+        Pengguna::create([
             'nama' => $tempUser['nama'],
             'email' => $tempUser['email'],
             'password' => $tempUser['password'],
             'role' => $tempUser['role'],
-            'email_verified_at' => Carbon::now(),
         ]);
 
-        // ❌ hapus cache
-        Cache::forget('temp_user_' . $request->email);
+        // remove cache
+        Cache::forget('temp_user_' . $request->token);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Akun berhasil diverifikasi!',
-            'user' => $user
         ]);
     }
 
     public function resendOtp(Request $request)
     {
-        $tempUser = session('temp_user');
+        
+        $token = $request->token;
 
-        if (!$tempUser) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Sesi habis, silakan daftar ulang.'
-            ], 408);
-        }
+        // Ambil token berdasarkan req->token 
+        $tempUser = Cache::get('temp_user_' . $token);
 
         $otpCode = rand(100000, 999999);
-        
+        $otp_expires_at = Carbon::now()->addMinutes(10);
+        // Set token baru
         $tempUser['otp_code'] = $otpCode;
-        $tempUser['otp_expires_at'] = Carbon::now()->addMinutes(10);
-        session(['temp_user' => $tempUser]);
 
         Mail::to($tempUser['email'])->send(new OtpMail($otpCode));
 
+        // Set ulang cache
+        Cache::put(
+            'temp_user_' . $token,
+            $tempUser,
+            $otp_expires_at
+        );
+
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Kode OTP baru telah dikirim ke email Anda.'
-        ], 200);
+            'status' => 'success',
+            'message' => 'Silakan cek email OTP Anda.',
+            'otp_expires_at' => $otp_expires_at->timestamp * 1000,
+        ]);
+
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        // Ambil data Pengguan dari DB
+        $user = Pengguna::where('email', $request->email)->first();
 
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Selamat datang di Virtual Exhibition!',
-                'user'    => Auth::user(),
-            ], 200);
+                'status' => 'error',
+                'message' => 'Email atau password salah.'
+            ], 401);
         }
 
+        // Token untuk identitas
+        $token = $user->createToken('token')->plainTextToken;
+
         return response()->json([
-            'status'  => 'error',
-            'message' => 'Email atau password salah.'
-        ], 401);
+            'status' => 'success',
+            'user' => $user,
+            'token' => $token
+        ]);
     }
 
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->user()->tokens()->delete();
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Berhasil keluar (Logout).'
-        ], 200);
+            'status' => 'success',
+            'message' => 'Logout berhasil'
+        ]);
     }
 }
