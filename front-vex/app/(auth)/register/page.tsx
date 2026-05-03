@@ -1,27 +1,29 @@
 "use client";
+// React
 import React, { useState } from "react";
-import { motion, AnimatePresence, Transition } from "framer-motion";
+import { motion,  Transition } from "framer-motion";
+import { useRouter } from "next/navigation";
+// Componen
 import { Logo } from "@/components/Componen";
 import { Button, ButtonPutih } from "@/components/model/Button";
 import { VectorBlueBox } from "@/components/model/BoxModel";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+// API
 import api from "@/lib/axios";
 
-export default function RegisterPage() {
-  const router = useRouter();
 
+export default function RegisterPage() {
+  // Form handle  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // ✅ SAMAKAN DENGAN VERSI KEDUA (INDIVIDUAL STATE)
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password_confirmation, setPasswordConfirmation] = useState("");
+  // Router
+  const router = useRouter();
 
-  // ✅ REGISTER FUNCTION (FIXED)
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -39,28 +41,30 @@ export default function RegisterPage() {
 
     try {
       await api.get("/sanctum/csrf-cookie");
-
-      const response = await api.post("/api/register", {
+      // response from API
+      const response = await api.post("/api/auth/register", {
         nama: nama,
         email: email,
         password: password,
         password_confirmation: password_confirmation,
       });
 
-      alert(response.data.message || "Registrasi Berhasil!");
+      alert(response.data.message);
 
-      localStorage.setItem("pending_email", email);
+      // set local for token
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("otp_expires_at", response.data.otp_expires_at);
 
       router.push("/verifikasi");
+
     } catch (error: any) {
-      console.error(error.response?.data);
+      // console.error(error.response?.data);
       alert(error.response?.data?.message || "Registrasi Gagal");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ===== ANIMASI (TIDAK DIUBAH) =====
   const slideUp = {
     initial: { y: "100vh", opacity: 0 },
     animate: { y: [0, -15, 0], opacity: 1 },
@@ -141,7 +145,6 @@ export default function RegisterPage() {
       >
         <Logo />
 
-        {/* FORM (UI TIDAK DIUBAH) */}
         <form
           onSubmit={handleRegister}
           className="w-full space-y-4 mt-6 select-none"
@@ -198,6 +201,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="w-full mt-8 border-b-2 border-gray-300 pb-8">
+
             <ButtonPutih
               onClick={handleRegister}
               disabled={isLoading}
