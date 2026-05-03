@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Tilt_Warp, Poppins } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "@/components/layout/Navbar";
-import NavAdmin from "@/components/dashboard/NavAdmin";
+import NavKetuaPBL from "@/components/dashboard/NavKetuaPBL";
 
 export const metadata: Metadata = {
-  title: "V-EX | Admin",
+  title: "V-EX | Ketua PBL",
   description: "Virtual Exhibition",
 };
 
@@ -16,13 +16,13 @@ export default function IndexLayout({
 }) {
   const userMenu = [
     { title: "BERANDA", subtitle: "UTAMA", link: "/" },
-    { title: "PAMERAN", subtitle: "3D BOOTH", link: "/admin/pameran" },
-    { title: "DASHBOARD", subtitle: "ADMIN", link: "/admin/pengguna" },
+    { title: "PAMERAN", subtitle: "3D BOOTH", link: "/pameran" },
+    { title: "DASHBOARD", subtitle: "KETUA PBL", link: "/ketua-pbl/karya" },
   ];
   return (
     <div>
       <Navbar menuItems={userMenu} />
-      <NavAdmin />
+      <NavKetuaPBL />
       {children}
     </div>
   );
