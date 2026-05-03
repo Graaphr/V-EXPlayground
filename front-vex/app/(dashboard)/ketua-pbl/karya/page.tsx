@@ -151,7 +151,7 @@ function SectionHeader({
    PAGE
 ========================= */
 export default function PageKarya({
-    href = "/admin/karya/",
+    href = "/ketua-pbl/karya/",
 }: KaryaProps) {
     const [selectedProdi, setSelectedProdi] =
         useState<ProdiType | null>(null);
