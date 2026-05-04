@@ -7,56 +7,61 @@ type AuthType = {
   user: any;
   loading: boolean;
   login: (token: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthType | null>(null);
 
 export const AuthProvider = ({ children }: any) => {
-  // const [user, setUser] = useState<any>(null);
-  // const [loading, setLoading] = useState(true);
-const [user, setUser] = useState<any>(null);
-const [loading, setLoading] = useState(true);
-const [initialized, setInitialized] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ GET USER
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       setUser(null);
       setLoading(false);
-      setInitialized(true);
       return;
     }
 
     try {
-      const res = await api.get("/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // 🔥 interceptor sudah handle token → gak perlu headers lagi
+      const res = await api.get("/api/user");
 
-      setUser(res.data.user);
-    } catch {
+      // ⚠️ sesuaikan dengan backend kamu
+      setUser(res.data.user ?? res.data);
+    } catch (error) {
       localStorage.removeItem("token");
       setUser(null);
     } finally {
       setLoading(false);
-      setInitialized(true);
     }
   };
+
+  // ✅ AUTO LOAD USER
   useEffect(() => {
     fetchUser();
   }, []);
 
+  // ✅ LOGIN
   const login = async (token: string) => {
     localStorage.setItem("token", token);
     await fetchUser();
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+  // 🔥 LOGOUT (SUDAH KE API)
+  const logout = async () => {
+    try {
+      await api.post("/api/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("token");
+      setUser(null);
+    }
   };
 
   return (
@@ -66,6 +71,7 @@ const [initialized, setInitialized] = useState(false);
   );
 };
 
+// ✅ HOOK
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth harus di dalam provider");
