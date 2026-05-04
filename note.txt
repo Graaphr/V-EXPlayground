@@ -5,17 +5,17 @@ pengguna{
     halaman pameran : ok
     halaman detail pameran : ok
     halaman 3d pameran : ok
-    ui penilaian : 
-    ui komentar : 
+    ui penilaian : ok
+    ui komentar : ok
     halaman verify-otp : ok
-    halaman/ui session-habis :
+    halaman/ui session-habis : 
 }, 
 admin{
     halaman kelola pengguna (kps,ketua) : ok
     halaman tambah pameran : ok
 },
 ketua{
-    halaman tambah karya : 
+    halaman tambah karya : ok
 },
 Fajri{
     halaman verifikasi, ok
