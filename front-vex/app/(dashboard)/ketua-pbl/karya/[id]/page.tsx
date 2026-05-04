@@ -74,7 +74,7 @@ export default function Page() {
             <div>
               <p className="mb-2 font-medium">Thumbnail</p>
 
-              <label className="border rounded-xl h-[180px] flex items-center justify-center cursor-pointer overflow-hidden">
+              <label className="border rounded-xl h-[240px] flex items-center justify-center cursor-pointer overflow-hidden">
                 {thumbnailPreview ? (
                   <img
                     src={thumbnailPreview}
