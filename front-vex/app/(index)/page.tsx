@@ -48,9 +48,9 @@ export default function Home() {
                 <div className="flex justify-end lg:justify-end">
                   <Button
                     link={"/pameran"}
-                    className="font-medium px-8 sm:px-12 py-3 rounded-md transition-all duration-300 hover:scale-105"
+                    className="font-bold px-8 sm:px-12 py-3 rounded-md transition-all duration-300 hover:scale-105"
                   >
-                    More
+                    Lainnya
                   </Button>
                 </div>
 
