@@ -20,7 +20,6 @@ return new class extends Migration
             $table->enum('role', ['Admin', 'KPS', 'Ketua PBL', 'Pengunjung'])->default('Pengunjung');
 
             $table->rememberToken();
-            $table->timestamps();
         });
     }
 

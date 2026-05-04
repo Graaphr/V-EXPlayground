@@ -52,14 +52,13 @@ export default function LoginPage() {
 
       const { token, user } = response.data;
 
-      await login(token); // 🔥 INI YANG BENAR
-
+      await login(token);
       alert("Login Berhasil!");
 
       if (user.role?.toLowerCase() === "admin") {
         router.push("/admin/pengguna");
       } else {
-        router.push("/pameran");
+        router.push("/");
       }
     } catch (error: any) {
       // console.error(error.response?.data);
