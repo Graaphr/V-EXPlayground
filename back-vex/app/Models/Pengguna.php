@@ -13,6 +13,8 @@ class Pengguna extends Authenticatable
     // HasApiTokens 
     use HasApiTokens, HasFactory, Notifiable;
 
+    public $timestamps = false;
+
     protected $table = 'pengguna';
 
    

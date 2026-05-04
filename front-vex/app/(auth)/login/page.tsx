@@ -58,7 +58,7 @@ export default function LoginPage() {
       if (user.role?.toLowerCase() === "admin") {
         router.push("/admin/pengguna");
       } else {
-        router.push("/pameran");
+        router.push("/");
       }
     } catch (error: any) {
       // console.error(error.response?.data);
