@@ -198,10 +198,10 @@ export default function Navbar({ menuItems }: NavbarProps) {
             <div className="mt-auto pt-4 border-t">
               <button
                 onClick={() => {
-                  logout(); // ✅ dari context
+                  logout(); 
                   setOpenProfile(false);
                   confirm("Apakah anda yakin ?");
-                  router.push("/pameran");
+                  router.push("/");
                 }}
                 className="w-full p-3 flex items-center justify-center gap-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition active:scale-95"
               >
