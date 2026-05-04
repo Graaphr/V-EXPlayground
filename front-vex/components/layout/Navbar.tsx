@@ -29,7 +29,19 @@ export default function Navbar({ menuItems }: NavbarProps) {
   const [open, setOpen] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
 
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+
+  // 🔥 INI WAJIB DI SINI
+  if (loading) {
+    return (
+      <nav className="h-[70px] bg-white shadow-sm flex items-center px-6">
+        <div className="animate-pulse flex gap-3">
+          <div className="h-8 w-24 bg-gray-200 rounded"></div>
+          <div className="h-8 w-20 bg-gray-200 rounded"></div>
+        </div>
+      </nav>
+    );
+  }
 
   const isLogin = !!user;
 
@@ -188,7 +200,7 @@ export default function Navbar({ menuItems }: NavbarProps) {
                 onClick={() => {
                   logout(); // ✅ dari context
                   setOpenProfile(false);
-                  confirm("Apakah anda yakin ?");                  
+                  confirm("Apakah anda yakin ?");
                   router.push("/pameran");
                 }}
                 className="w-full p-3 flex items-center justify-center gap-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition active:scale-95"

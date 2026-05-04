@@ -5,25 +5,27 @@ import api from "@/lib/axios";
 
 type AuthType = {
   user: any;
-  setUser: (user: any) => void;
-  fetchUser: () => Promise<void>;
+  loading: boolean;
   login: (token: string) => Promise<void>;
   logout: () => void;
-  loading: boolean;
+  fetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthType | null>(null);
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
+  // const [user, setUser] = useState<any>(null);
+  // const [loading, setLoading] = useState(true);
+const [user, setUser] = useState<any>(null);
+const [loading, setLoading] = useState(true);
+const [initialized, setInitialized] = useState(false);
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       setUser(null);
       setLoading(false);
+      setInitialized(true);
       return;
     }
 
@@ -40,39 +42,32 @@ export const AuthProvider = ({ children }: any) => {
       setUser(null);
     } finally {
       setLoading(false);
+      setInitialized(true);
     }
   };
   useEffect(() => {
     fetchUser();
   }, []);
 
+  const login = async (token: string) => {
+    localStorage.setItem("token", token);
+    await fetchUser();
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
   };
 
-  const login = async (token: string) => {
-    setLoading(true); 
-
-    localStorage.setItem("token", token);
-
-    await fetchUser();
-  };
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, fetchUser, login, logout, loading }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, fetchUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth harus digunakan di dalam AuthProvider");
-  }
-
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth harus di dalam provider");
+  return ctx;
 };
