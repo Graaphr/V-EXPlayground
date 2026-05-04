@@ -17,6 +17,12 @@ return new class extends Migration
             $table->string('nama', 255); 
             $table->string('email')->unique();
             $table->string('password');
+
+            $table->unsignedBigInteger('kelas')->nullable();
+            $table->string('program_studi')->nullable();
+
+            $table->foreign('kelas')->references('id_kelas')->on('kelas')->cascadeOnDelete();
+            $table->foreign('program_studi')->references('kode_prodi')->on('prodi')->cascadeOnDelete();
             $table->enum('role', ['Admin', 'KPS', 'Ketua PBL', 'Pengunjung'])->default('Pengunjung');
 
             $table->rememberToken();
