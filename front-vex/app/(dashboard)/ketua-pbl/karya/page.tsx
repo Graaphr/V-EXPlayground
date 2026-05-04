@@ -112,7 +112,7 @@ function SectionHeader({
     return (
         <div className="flex justify-between items-center mb-4 gap-3">
             <h3 className="font-semibold text-[18px] sm:text-[22px] border-b-2 w-full pb-2">
-                {title}
+                Karya Saya
             </h3>
 
             {showPagination && (
@@ -151,7 +151,7 @@ function SectionHeader({
    PAGE
 ========================= */
 export default function PageKarya({
-    href = "/admin/karya/",
+    href = "/ketua-pbl/karya/",
 }: KaryaProps) {
     const [selectedProdi, setSelectedProdi] =
         useState<ProdiType | null>(null);
