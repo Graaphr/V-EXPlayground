@@ -36,7 +36,7 @@ export default function Home() {
                 <div className="w-full">
                   <div className="aspect-video rounded-md overflow-hidden shadow-[0px_0px_8px_2px_rgba(0,0,0,0.25)]">
                     <iframe
-                      src="https://www.youtube.com/embed/LPUY6cT-VnY?controls=0&modestbranding=1&rel=0"
+                      src="https://www.youtube.com/embed/Gdq5k6fmuK0?si=gwPbWVPc5CKjnWtk"
                       className="w-full h-full"
                       title="Demo V-Ex"
                       allowFullScreen

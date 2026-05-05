@@ -30,7 +30,7 @@ class PenggunaController extends Controller
             // otp
             $otpCode = rand(100000, 999999);
             // otp habis
-            $otp_expires_at = Carbon::now()->addMinutes(1);
+            $otp_expires_at = Carbon::now()->addMinutes(10);
             // array user data
             $userData = [
                 'nama' => $request->nama,
@@ -49,7 +49,7 @@ class PenggunaController extends Controller
             }
 
             // set cache
-            Cache::put('temp_user_' . $token, $userData, now()->addMinutes(5));
+            Cache::put('temp_user_' . $token, $userData, now()->addMinutes(10));
 
             // email to user
             Mail::to($request->email)->send(new OtpMail($otpCode));

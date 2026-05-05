@@ -40,7 +40,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await api.get("/sanctum/csrf-cookie");
+      //await api.get("/sanctum/csrf-cookie");
       // response from API
       const response = await api.post("/api/auth/register", {
         nama: nama,
