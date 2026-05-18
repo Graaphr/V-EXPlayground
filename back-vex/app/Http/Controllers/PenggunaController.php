@@ -24,7 +24,15 @@ class PenggunaController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
+         // Validasi 
+        if (Pengguna::where('email', $request->email)->exists()) {
+            return response()->json([
+                'message' => 'Email sudah terdaftar',
+            ], 409);
+        }
+
         try {
+
             // token
             $token = Str::uuid();
             // otp
@@ -35,18 +43,11 @@ class PenggunaController extends Controller
             $userData = [
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'role' => $request->role ?? 'Pengunjung',
+                'role' => 'Pengunjung', 
                 'password' => Hash::make($request->password),
                 'otp_code' => $otpCode,
                 'otp_expires_at' => $otp_expires_at->timestamp * 1000,
             ];
-
-            // Validasi 
-            if (Pengguna::where('email', $request->email)->exists()) {
-                return response()->json([
-                    'message' => 'Email sudah terdaftar',
-                ], 409);
-            }
 
             // set cache
             Cache::put('temp_user_' . $token, $userData, now()->addMinutes(10));
