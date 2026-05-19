@@ -186,7 +186,6 @@ export default function Navbar({ menuItems }: NavbarProps) {
             <div className="flex flex-col mt-4">
               <Link
                 href="/lupa-password/email"
-                // onClick={() => setOpenProfile(false)}
                 className="p-3 flex items-center gap-3 hover:bg-gray-100 transition border-b-2"
               >
                 <FaLock size={18} />
