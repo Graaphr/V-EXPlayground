@@ -1,48 +1,50 @@
-"use client";
-// React
-import React, { useState } from "react";
-import { motion,  Transition } from "framer-motion";
-import { useRouter } from "next/navigation";
-// Componen
-import { Logo } from "@/components/Componen";
-import { Button, ButtonPutih } from "@/components/model/Button";
-import { VectorBlueBox } from "@/components/model/BoxModel";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-// API
-import api from "@/lib/axios";
+'use client';
 
+// React
+import React, { useState } from 'react';
+import { motion, Transition } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+
+// Componen
+import { Logo } from '@/components/Componen';
+import { Button, ButtonPutih } from '@/components/model/Button';
+import { VectorBlueBox } from '@/components/model/BoxModel';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
+// API
+import api from '@/lib/axios';
 
 export default function RegisterPage() {
-  // Form handle  
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  // pw_AUTH
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [nama, setNama] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [password_confirmation, setPasswordConfirmation] = useState("");
-  // Router
-  const router = useRouter();
+  // DATA
+  const [nama, setNama] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password_confirmation, setPasswordConfirmation] = useState('');
 
+  // handle_register
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!nama || !email || !password || !password_confirmation) {
-      alert("Semua kolom wajib diisi!");
+      alert('Semua kolom wajib diisi!');
       return;
     }
 
     if (password !== password_confirmation) {
-      alert("Password tidak sama!");
+      alert('Password tidak sama!');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      //await api.get("/sanctum/csrf-cookie");
-      // response from API
-      const response = await api.post("/api/auth/register", {
+      // push and respose from API
+      const response = await api.post('/api/auth/register', {
         nama: nama,
         email: email,
         password: password,
@@ -52,60 +54,59 @@ export default function RegisterPage() {
       alert(response.data.message);
 
       // set local for token
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("otp_expires_at", response.data.otp_expires_at);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('otp_expires_at', response.data.otp_expires_at);
 
-      router.push("/verifikasi");
-
+      router.push('/verifikasi');
     } catch (error: any) {
-      // console.error(error.response?.data);
-      alert(error.response?.data?.message || "Registrasi Gagal");
+      alert(error.response?.data?.message || 'Registrasi Gagal');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Animate
   const slideUp = {
-    initial: { y: "100vh", opacity: 0 },
+    initial: { y: '100vh', opacity: 0 },
     animate: { y: [0, -15, 0], opacity: 1 },
   };
-
   const floatingTransition = (d: number): Transition => ({
     y: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: 'easeInOut',
       delay: d + 1.2,
     },
     opacity: { duration: 1.2, delay: d },
-    ease: "easeOut",
+    ease: 'easeOut',
   });
 
+  // Position
   const boxes = [
     {
       d: 0.2,
-      className: "top-10 left-10",
-      size: "h-[300px] w-[300px] rotate-45",
+      className: 'top-10 left-10',
+      size: 'h-[300px] w-[300px] rotate-45',
     },
     {
       d: 0.3,
-      className: "top-10 right-10",
-      size: "h-[300px] w-[300px] -rotate-12",
+      className: 'top-10 right-10',
+      size: 'h-[300px] w-[300px] -rotate-12',
     },
     {
       d: 0.1,
-      className: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-      size: "h-[250px] w-[250px] rotate-90",
+      className: 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+      size: 'h-[250px] w-[250px] rotate-90',
     },
     {
       d: 0.5,
-      className: "bottom-20 left-1/4",
-      size: "h-[100px] w-[100px] rotate-12",
+      className: 'bottom-20 left-1/4',
+      size: 'h-[100px] w-[100px] rotate-12',
     },
     {
       d: 0.6,
-      className: "bottom-20 right-1/4",
-      size: "h-[100px] w-[100px] -rotate-45",
+      className: 'bottom-20 right-1/4',
+      size: 'h-[100px] w-[100px] -rotate-45',
     },
   ];
 
@@ -117,9 +118,9 @@ export default function RegisterPage() {
     >
       {/* BACKGROUND */}
       <motion.div
-        initial={{ y: "-100vh" }}
+        initial={{ y: '-100vh' }}
         animate={{ y: 0 }}
-        transition={{ duration: 2, ease: "circOut" }}
+        transition={{ duration: 2, ease: 'circOut' }}
         className="absolute h-[95%] top-0 w-[95%] bg-secondary-color rounded-b-full"
       >
         {boxes.map((box, i) => (
@@ -136,7 +137,6 @@ export default function RegisterPage() {
         ))}
       </motion.div>
 
-      {/* CARD */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -145,10 +145,7 @@ export default function RegisterPage() {
       >
         <Logo />
 
-        <form
-          onSubmit={handleRegister}
-          className="w-full space-y-4 mt-6 select-none"
-        >
+        <form onSubmit={handleRegister} className="w-full space-y-4 mt-6 select-none">
           <input
             value={nama}
             onChange={(e) => setNama(e.target.value)}
@@ -169,7 +166,7 @@ export default function RegisterPage() {
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Kata Sandi"
               className="input-form"
             />
@@ -187,7 +184,7 @@ export default function RegisterPage() {
             <input
               value={password_confirmation}
               onChange={(e) => setPasswordConfirmation(e.target.value)}
-              type={showConfirm ? "text" : "password"}
+              type={showConfirm ? 'text' : 'password'}
               placeholder="Konfirmasi Kata Sandi"
               className="input-form"
             />
@@ -201,13 +198,8 @@ export default function RegisterPage() {
           </div>
 
           <div className="w-full mt-8 border-b-2 border-gray-300 pb-8">
-
-            <ButtonPutih
-              onClick={handleRegister}
-              disabled={isLoading}
-              className="w-full py-3 rounded-lg font-bold"
-            >
-              {isLoading ? "Loading..." : "Daftar"}
+            <ButtonPutih onClick={handleRegister} disabled={isLoading} className="w-full py-3 rounded-lg font-bold">
+              {isLoading ? 'Loading...' : 'Daftar'}
             </ButtonPutih>
           </div>
         </form>
@@ -215,10 +207,7 @@ export default function RegisterPage() {
         <div className="mt-6 flex flex-col   items-center w-full">
           <span className=" text-sm mb-4">Sudah punya akun?</span>
           <div className="w-full mt-1 border-b border-gray-200 pb-1">
-            <Button
-              className="w-full py-3 rounded-lg font-bold"
-              link="/login"
-            >
+            <Button className="w-full py-3 rounded-lg font-bold" link="/login">
               Masuk
             </Button>
           </div>
