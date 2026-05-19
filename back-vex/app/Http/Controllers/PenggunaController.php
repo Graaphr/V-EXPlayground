@@ -87,13 +87,7 @@ class PenggunaController extends Controller
                 'message' => 'OTP expired atau tidak ditemukan'
             ], 408);
         }
-
-        if ($tempUser['otp_code'] != $request->otp) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'OTP salah'
-            ], 422);
-        }
+ 
         // insert into table Pengguna
         Pengguna::create([
             'nama' => $tempUser['nama'],
