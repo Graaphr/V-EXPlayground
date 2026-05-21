@@ -1,24 +1,13 @@
-pengguna{
-    halaman login : ok
-    halaman register : ok
-    halaman landing-page : ok
-    halaman pameran : ok
-    halaman detail pameran : ok
-    halaman 3d pameran : ok
-    ui penilaian : ok
-    ui komentar : ok
-    halaman verify-otp : ok
-    halaman/ui session-habis : 
-}, 
-admin{
-    halaman kelola pengguna (kps,ketua) : ok
-    halaman tambah pameran : ok
-},
-ketua{
-    halaman tambah karya : ok
-},
-Fajri{
-    halaman verifikasi, ok
-    halaman pameran admin, ok
-}
+[MERAPIKAN && MERAMPINGKAN && MEMASTIKAN]
 
+(auth){
+    halaman login : OK
+    halaman register : OK
+    halaman lupa password :
+    halaman verifikasi : 
+    
+}, 
+
+_____ rapikan lagi dan merubah definisi {TIDAK menggunakan any}
+_____ logika NavBar jika role?admin ==> /admin/....
+_____ pastikan lagi menggunakan localstorage atau sactrum SPA
