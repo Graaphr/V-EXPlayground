@@ -31,7 +31,6 @@ export default function Navbar({ menuItems }: NavbarProps) {
 
   const { user, logout, loading } = useAuth();
 
-  // 🔥 INI WAJIB DI SINI
   if (loading) {
     return (
       <nav className="h-[70px] bg-white shadow-sm flex items-center px-6">
