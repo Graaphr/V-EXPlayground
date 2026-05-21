@@ -56,7 +56,7 @@ export default function VerifikasiPage() {
     try {
       setIsLoading(true);
 
-      await api.get("/sanctum/csrf-cookie");
+      // await api.get("/sanctum/csrf-cookie");
       // post api
       const res = await api.post("/api/auth/verify-otp", {
         // get token from local

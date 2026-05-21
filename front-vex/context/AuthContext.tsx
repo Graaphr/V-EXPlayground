@@ -1,79 +1,99 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import api from "@/lib/axios";
+import { createContext, useContext, useEffect, useState } from 'react';
+import api from '@/lib/axios';
+
+type User = {
+  id: number;
+  nama: string;
+  email: string;
+  role: string;
+  kelas?: string | null;
+  program_studi?: string | null;
+};
 
 type AuthType = {
-  user: any;
+  user: User | null;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  login: (token: string, user: User) => void;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthType | null>(null);
 
-export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ GET USER
+  // FETCH USER
   const fetchUser = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
     try {
-      // 🔥 interceptor sudah handle token → gak perlu headers lagi
-      const res = await api.get("/api/user");
+      setLoading(true);
 
-      // ⚠️ sesuaikan dengan backend kamu
-      setUser(res.data.user ?? res.data);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
+      const response = await api.get('/api/user');
+
+      setUser(response.data.user ?? response.data);
     } catch (error) {
-      localStorage.removeItem("token");
+      console.error('Fetch user gagal:', error);
+
+      localStorage.removeItem('token');
       setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ AUTO LOAD USER
   useEffect(() => {
     fetchUser();
   }, []);
 
-  // ✅ LOGIN
-  const login = async (token: string) => {
-    localStorage.setItem("token", token);
-    await fetchUser();
+  // LOGIN
+  const login = (token: string, userData: User) => {
+    localStorage.setItem('token', token);
+    setUser(userData);
   };
 
-  // 🔥 LOGOUT (SUDAH KE API)
+  // LOGOUT
   const logout = async () => {
     try {
-      await api.post("/api/logout");
+      await api.post('/api/logout');
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
       setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, fetchUser, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        fetchUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// ✅ HOOK
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth harus di dalam provider");
+
+  if (!ctx) {
+    throw new Error('useAuth harus di dalam AuthProvider');
+  }
+
   return ctx;
 };

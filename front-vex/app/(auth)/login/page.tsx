@@ -13,6 +13,7 @@ import { useAuth } from '@/context/AuthContext';
 
 // API
 import api from '@/lib/axios';
+import axios from 'axios';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,23 +35,6 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Animate
-    const slideUp = {
-      initial: { y: '100vh', opacity: 0 },
-      animate: { y: [0, -15, 0], opacity: 1 },
-    };
-
-    const floatingTransition = (d: number): Transition => ({
-      y: {
-        duration: 3,
-        repeat: Infinity,
-        ease: 'easeInOut',
-        delay: d + 1.2,
-      },
-      opacity: { duration: 1.2, delay: d },
-      ease: 'easeOut',
-    });
-
     try {
       const response = await api.post('/api/auth/login', {
         email: email,
@@ -59,7 +43,7 @@ export default function LoginPage() {
 
       const { token, user } = response.data;
 
-      await login(token);
+      login(token, user);
       alert('Login Berhasil!');
 
       // VALIDASI
@@ -68,8 +52,13 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
-    } catch (error: any) {
-      alert(error.response?.data?.message || 'Email atau Kata Sandi salah');
+    } catch (error) {
+      let message = 'Terjadi kesalahan';
+
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? 'Email atau Kata Sandi salah';
+      }
+      alert(message);
     } finally {
       setIsLoading(false);
     }
