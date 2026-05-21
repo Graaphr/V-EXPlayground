@@ -4,7 +4,7 @@
     halaman login : OK
     halaman register : OK
     halaman lupa password :
-    halaman verifikasi : 
+    halaman verifikasi : OK
     
 }, 
 

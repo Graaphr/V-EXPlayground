@@ -157,7 +157,7 @@ class PenggunaController extends Controller
 
         // abilities berdasarkan role
         $abilities = match($user->role) {
-            Pengguna::ROLE_ADMIN =>['admin'],
+            Pengguna::ROLE_ADMIN =>['Admin'],
             Pengguna::ROLE_KPS =>['kps'],
             Pengguna::ROLE_KETUA_PBL =>['ketua-pbl'],
             default =>['pengunjung'],
@@ -168,10 +168,10 @@ class PenggunaController extends Controller
 
         // redirect berdasarkan role
         $redirectTo = match($user->role) {
-            Pengguna::ROLE_ADMIN =>'/admin/dashboard',
-            Pengguna::ROLE_KPS =>'/kps/dashboard',
-            Pengguna::ROLE_KETUA_PBL =>'/ketua-pbl/dashboard',
-            default =>'/dashboard',
+            Pengguna::ROLE_ADMIN =>'/admin/pengguna',
+            Pengguna::ROLE_KPS =>'/',
+            Pengguna::ROLE_KETUA_PBL =>'/ketua-pbl/karya',
+            default =>'/',
 
         };
 

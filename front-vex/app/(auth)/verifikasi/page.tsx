@@ -8,8 +8,7 @@ import { Button, ButtonPutih } from "@/components/model/Button";
 import api from "@/lib/axios";
 
 export default function VerifikasiPage() {
-  // from handel
-  const [otp, setOtp] = useState("");
+  // handel
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +16,10 @@ export default function VerifikasiPage() {
   const router = useRouter();
   // timer
   const [timeLeft, setTimeLeft] = useState(0);
+  // DATA
+  const [otp, setOtp] = useState("");
 
+  // control timer
   useEffect(() => {
     const exp = localStorage.getItem("otp_expires_at");
     if (!exp) return;
@@ -45,6 +47,7 @@ export default function VerifikasiPage() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  // handler otp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -56,7 +59,6 @@ export default function VerifikasiPage() {
     try {
       setIsLoading(true);
 
-      // await api.get("/sanctum/csrf-cookie");
       // post api
       const res = await api.post("/api/auth/verify-otp", {
         // get token from local
@@ -64,7 +66,7 @@ export default function VerifikasiPage() {
         otp,
       });
 
-      const {message, user} = res.data
+      const {message} = res.data
       setSuccess(message);
 
       localStorage.removeItem("token");
@@ -79,6 +81,7 @@ export default function VerifikasiPage() {
     }
   };
 
+  // handler resend otp
   const handleResend = async () => {
     try {
       const res = await api.post("/api/auth/resend-otp", {
