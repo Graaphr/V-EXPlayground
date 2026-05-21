@@ -38,4 +38,31 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [PenggunaController::class, 'logout'])->name('auth.logout');
 
+     Route::get('/dashboard', function () {
+        return response()->json(['status' => 'success', 'page' => 'Dashboard Umum']);
+    });
+
+    // admin
+    Route::middleware('role:Admin')->prefix('admin')->group(function () {
+        Route::get('/dashboard', function () {
+            return response()->json(['status' => 'success', 'page' => 'Admin Dashboard']);
+        });
+    }); 
+    
+    // kps
+    Route::middleware('role:KPS')->prefix('kps')->group(function () {
+        Route::get('/dashboard', function () {
+            return response()->json(['status' => 'success', 'page' => 'KPS Dashboard']);
+        });
+    });
+
+    // ketua pbl
+    Route::middleware('role:Ketua PBL')->prefix('ketua-pbl')->group(function () {
+        Route::get('/dashboard', function () {
+            return response()->json(['status' => 'success', 'page' => 'Ketua PBL Dashboard']);
+        });
+    });
+
+
+
 });

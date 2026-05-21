@@ -11,7 +11,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 // API
 import api from "@/lib/axios";
 
-
 export default function RegisterPage() {
   // Form handle  
   const [showPassword, setShowPassword] = useState(false);
