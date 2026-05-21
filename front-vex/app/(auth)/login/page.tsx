@@ -47,8 +47,9 @@ export default function LoginPage() {
       alert('Login Berhasil!');
 
       // VALIDASI
+      const direct = response.data['redirect_to'];
       if (user.role?.toLowerCase() === 'admin') {
-        router.push('/admin/pengguna');
+        router.push(direct);
       } else {
         router.push('/');
       }
