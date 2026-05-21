@@ -65,7 +65,7 @@ class PenggunaController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'eror',
+                'status' => 'error',
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -152,20 +152,48 @@ class PenggunaController extends Controller
             ], 401);
         }
 
+        // hapus toke lama
+        $user->tokens()->delete();
+
+        // abilities berdasarkan role
+        $abilities = match($user->role) {
+            Pengguna::ROLE_ADMIN =>['admin'],
+            Pengguna::ROLE_KPS =>['kps'],
+            Pengguna::ROLE_KETUA_PBL =>['ketua-pbl'],
+            default =>['pengunjung'],
+        };
+
         // Token untuk identitas
-        $token = $user->createToken('token')->plainTextToken;
+        $token = $user->createToken('token', $abilities)->plainTextToken;
+
+        // redirect berdasarkan role
+        $redirectTo = match($user->role) {
+            Pengguna::ROLE_ADMIN =>'/admin/dashboard',
+            Pengguna::ROLE_KPS =>'/kps/dashboard',
+            Pengguna::ROLE_KETUA_PBL =>'/ketua-pbl/dashboard',
+            default =>'/dashboard',
+
+        };
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
-            'token' => $token
+            'role' => $user->role,
+            'redirect_to' => $redirectTo,
+            'token' => $token,
+            'user' => [
+                'id'            => $user->id,
+                'nama'          => $user->nama,
+                'email'         => $user->email,
+                'role'          => $user->role,
+                'kelas'         => $user->kelas,
+                'program_studi' => $user->program_studi,
+            ],
         ]);
     }
 
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-    $request->user()->currentAccessToken()->delete();
 
 
         return response()->json([

@@ -16,12 +16,22 @@ class Pengguna extends Authenticatable
     public $timestamps = false;
 
     protected $table = 'pengguna';
+    
+    // konstanta role
+    const ROLE_ADMIN = 'admin';
+    const ROLE_KPS = 'kps';
+    const ROLE_KETUA_PBL = 'ketua pbl';
+    const ROLE_PENGUNJUNG = 'pengunjung';
+
 
    
     protected $fillable = [
         'nama',
         'email',
         'password',
+        'kelas',
+        'program_studi',
+        'role',
         
     ];
 
@@ -40,18 +50,33 @@ class Pengguna extends Authenticatable
     }
 
     // Helper Methods
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->role === 'Admin';
+        return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isKps()
+    public function isKps():  bool
     {
-        return $this->role === 'KPS';
+        return $this->role === self::ROLE_KPS;
     }
 
-    public function isKetuaPbl()
+    public function isKetuaPbl(): bool
     {
-        return $this->role === 'Ketua PBL';
+        return $this->role === self::ROLE_KETUA_PBL;
+    }
+
+    public function isPengunjung(): bool
+    {
+        return $this->role === self::ROLE_PENGUNJUNG;
+    }
+
+    public function kelasBelongsTo()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas', 'id_kelas');
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class, 'program_studi', 'kode_prodi');
     }
 }
