@@ -32,6 +32,9 @@ class Pengguna extends Authenticatable
         'kelas',
         'program_studi',
         'role',
+        'new_email',  //tambah untuk ganti email
+        'new_email_verification_token', // tambah untuk ganti email
+        'new_email_expires_at',  //tambah untuk ganti email
         
     ];
 

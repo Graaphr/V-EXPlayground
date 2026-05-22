@@ -61,4 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
+    // GANTI EMAIL
+    Route::prefix('change-email')->group(function () {
+        Route::post('/send', [App\Http\Controllers\ChangeEmailController::class, 'sendVerification']);
+        Route::post('/verify', [App\Http\Controllers\ChangeEmailController::class, 'verify']);
+    });
+
 });
