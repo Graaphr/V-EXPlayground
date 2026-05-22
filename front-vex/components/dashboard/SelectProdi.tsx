@@ -30,7 +30,7 @@ const prodiList: ProdiType[] = Array.from(
 }));
 
 interface SelectProdiProps {
-  selected: ProdiType | null;
+  selected: ProdiType ;
   onChange: (
     prodi: ProdiType
   ) => void;
