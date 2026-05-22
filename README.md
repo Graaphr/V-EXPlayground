@@ -1,5 +1,4 @@
 ### Progres
-Now in front end -jrn
 
 ---
 
