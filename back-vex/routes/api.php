@@ -5,21 +5,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ResetPasswordController;
 
-Route::post('/test', function () {
-    return response()->json(['message' => 'OK']);
-});
+// Route::post('/test', function () {
+//     return response()->json(['message' => 'OK']);
+// });
 
 // =============================
 // PUBLIC ROUTES
 // =============================
 Route::prefix('auth')->group(function () {
-    Route::post('/register',           [PenggunaController::class,      'register']);
-    Route::post('/verify-otp',         [PenggunaController::class,      'verifyOtp']);
-    Route::post('/resend-otp',         [PenggunaController::class,      'resendOtp']);
-    Route::post('/login',              [PenggunaController::class,      'login']);
-    Route::post('/forgot-password',    [ResetPasswordController::class, 'forgotPassword']);    // ✅ public
-    Route::post('/verify-reset-token', [ResetPasswordController::class, 'verifyResetToken']); // ✅ public
-    Route::post('/reset-password',     [ResetPasswordController::class, 'resetPassword']);    // ✅ public
+    Route::post('/register', [PenggunaController::class, 'register']);
+    Route::post('/verify-otp', [PenggunaController::class, 'verifyOtp']);
+    Route::post('/resend-otp', [PenggunaController::class, 'resendOtp']);
+    Route::post('/login', [PenggunaController::class, 'login']);
+    Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
+    Route::post('/verify-reset-token', [ResetPasswordController::class, 'verifyResetToken']);
+    Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
 });
 
 // =============================
@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json([
             'status' => 'success',
-            'user'   => $request->user(),
+            'user' => $request->user(),
         ]);
     })->name('auth.user');
 
@@ -60,5 +60,5 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => 'success', 'page' => 'Ketua PBL Dashboard']);
         });
     });
-    
+
 });
