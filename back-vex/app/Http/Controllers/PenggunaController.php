@@ -3,69 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengguna;
+use App\Services\OtpService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Mail\OtpMail;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 
 class PenggunaController extends Controller
 {
 
+// construktor
+    protected OtpService $otpService;
+
+    public function __construct(OtpService $otpService)
+    {
+        $this->otpService = $otpService;
+    }
+
     public function register(Request $request)
     {
+
+    // validasi inputan user
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email',
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
 
-         // Validasi 
+    // cek email 
         if (Pengguna::where('email', $request->email)->exists()) {
             return response()->json([
                 'message' => 'Email sudah terdaftar',
             ], 409);
         }
 
+    // buat token dan simpan data sementara di local
         try {
+            $token     = Str::uuid();
+            $otpCode   = $this->otpService->generateOtp();
+            $expiresAt = $this->otpService->getExpiresAt();
 
-            // token
-            $token = Str::uuid();
-            // otp
-            $otpCode = rand(100000, 999999);
-            // otp habis
-            $otp_expires_at = Carbon::now()->addMinutes(10);
-            // array user data
             $userData = [
-                'nama' => $request->nama,
-                'email' => $request->email,
-                'role' => 'Pengunjung', 
-                'password' => Hash::make($request->password),
-                'otp_code' => $otpCode,
-                'otp_expires_at' => $otp_expires_at->timestamp * 1000,
+                'nama'           => $request->nama,
+                'email'          => $request->email,
+                'role'           => 'Pengunjung',
+                'password'       => Hash::make($request->password),
+                'otp_code'       => $otpCode,
+                'otp_expires_at' => $expiresAt->timestamp * 1000,
             ];
+    
+    // kirim otp ke email
+            $this->otpService->storeToCache($token, $userData, $expiresAt);
+            $this->otpService->sendOtpEmail($request->email, $otpCode);
 
-            // set cache
-            Cache::put('temp_user_' . $token, $userData, now()->addMinutes(10));
-
-            // email to user
-            Mail::to($request->email)->send(new OtpMail($otpCode));
-
-            // return to local storage
             return response()->json([
-                'status' => 'success',
-                'message' => 'Silakan cek email OTP Anda.',
-                'token' => $token,
-                'otp_expires_at' => $otp_expires_at->timestamp * 1000,
+                'status'         => 'success',
+                'message'        => 'Silakan cek email OTP Anda.',
+                'token'          => $token,
+                'otp_expires_at' => $expiresAt->timestamp * 1000,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -73,114 +72,104 @@ class PenggunaController extends Controller
 
     public function verifyOtp(Request $request)
     {
+    // validasi inputan
         $request->validate([
             'token' => 'required',
-            'otp' => 'required|digits:6',
+            'otp'   => 'required|digits:6',
         ]);
 
-        // Ambil dari cache
-        $tempUser = Cache::get('temp_user_' . $request->token);
+        // cek token cache user
+        $tempUser = $this->otpService->getFromCache($request->token);
 
         if (!$tempUser) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'OTP expired atau tidak ditemukan'
             ], 408);
         }
- 
-        // insert into table Pengguna
+
+        // buat data user ke db
         Pengguna::create([
-            'nama' => $tempUser['nama'],
-            'email' => $tempUser['email'],
+            'nama'     => $tempUser['nama'],
+            'email'    => $tempUser['email'],
             'password' => $tempUser['password'],
-            'role' => $tempUser['role'],
+            'role'     => $tempUser['role'],
         ]);
 
-        // remove cache
-        Cache::forget('temp_user_' . $request->token);
+        $this->otpService->forgetCache($request->token);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Akun berhasil diverifikasi!',
         ]);
     }
 
     public function resendOtp(Request $request)
     {
-        
-        $token = $request->token;
+        // ambil token
+        $token    = $request->token;
+        $tempUser = $this->otpService->getFromCache($token);
 
-        // Ambil token berdasarkan req->token 
-        $tempUser = Cache::get('temp_user_' . $token);
+        // buat kode otp baru
+        $otpCode   = $this->otpService->generateOtp();
+        $expiresAt = $this->otpService->getExpiresAt();
 
-        $otpCode = rand(100000, 999999);
-        $otp_expires_at = Carbon::now()->addMinutes(10);
-        // Set token baru
         $tempUser['otp_code'] = $otpCode;
 
-        Mail::to($tempUser['email'])->send(new OtpMail($otpCode));
-
-        // Set ulang cache
-        Cache::put(
-            'temp_user_' . $token,
-            $tempUser,
-            $otp_expires_at
-        );
+        // simpan data di local dan kirim ulang email
+        $this->otpService->storeToCache($token, $tempUser, $expiresAt);
+        $this->otpService->sendOtpEmail($tempUser['email'], $otpCode);
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Silakan cek email OTP Anda.',
-            'otp_expires_at' => $otp_expires_at->timestamp * 1000,
+            'status'         => 'success',
+            'message'        => 'Silakan cek email OTP Anda.',
+            'otp_expires_at' => $expiresAt->timestamp * 1000,
         ]);
-
     }
 
     public function login(Request $request)
     {
+        // validasi inputan user
         $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        // Ambil data Pengguan dari DB
         $user = Pengguna::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Email atau password salah.'
             ], 401);
         }
 
-        // hapus toke lama
         $user->tokens()->delete();
 
-        // abilities berdasarkan role
+        // cek role 
         $abilities = match($user->role) {
-            Pengguna::ROLE_ADMIN =>['Admin'],
-            Pengguna::ROLE_KPS =>['kps'],
-            Pengguna::ROLE_KETUA_PBL =>['ketua-pbl'],
-            default =>['pengunjung'],
+            Pengguna::ROLE_ADMIN     => ['Admin'],
+            Pengguna::ROLE_KPS       => ['kps'],
+            Pengguna::ROLE_KETUA_PBL => ['ketua-pbl'],
+            default                  => ['pengunjung'],
         };
 
-        // Token untuk identitas
         $token = $user->createToken('token', $abilities)->plainTextToken;
 
-        // redirect berdasarkan role
+        // mengarahkan ke dashboard sesuai role
         $redirectTo = match($user->role) {
-            Pengguna::ROLE_ADMIN =>'/admin/pengguna',
-            Pengguna::ROLE_KPS =>'/',
-            Pengguna::ROLE_KETUA_PBL =>'/ketua-pbl/karya',
-            default =>'/',
-
+            Pengguna::ROLE_ADMIN     => '/admin/pengguna',
+            Pengguna::ROLE_KPS       => '/',
+            Pengguna::ROLE_KETUA_PBL => '/ketua-pbl/karya',
+            default                  => '/',
         };
 
         return response()->json([
-            'status' => 'success',
-            'role' => $user->role,
+            'status'      => 'success',
+            'role'        => $user->role,
             'redirect_to' => $redirectTo,
-            'token' => $token,
-            'user' => [
+            'token'       => $token,
+            'user'        => [
                 'id'            => $user->id,
                 'nama'          => $user->nama,
                 'email'         => $user->email,
@@ -195,9 +184,8 @@ class PenggunaController extends Controller
     {
         $request->user()->tokens()->delete();
 
-
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Logout berhasil'
         ]);
     }

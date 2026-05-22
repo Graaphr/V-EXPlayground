@@ -3,17 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengguna;
-use App\Mail\ResetPasswordMail;
-use Carbon\Carbon;
+use App\Services\ResetPasswordService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
-    
+    protected ResetPasswordService $resetPasswordService;
+
+    /**
+     * Inject ResetPasswordService melalui constructor.
+     */
+    public function __construct(ResetPasswordService $resetPasswordService)
+    {
+        $this->resetPasswordService = $resetPasswordService;
+    }
+
     public function forgotPassword(Request $request)
     {
         $request->validate([
@@ -30,17 +35,15 @@ class ResetPasswordController extends Controller
         }
 
         // Generate token & expired
-        $resetToken = Str::uuid();
-        $expiredAt  = Carbon::now()->addMinutes(15);
+        $resetToken = $this->resetPasswordService->generateToken();
+        $expiredAt  = $this->resetPasswordService->getExpiresAt();
 
-        // Simpan di Cache
-        Cache::put('reset_token_' . $resetToken, $user->email, $expiredAt);
+        // Simpan di cache
+        $this->resetPasswordService->storeToCache($resetToken, $user->email, $expiredAt);
 
-        // Link ke frontend
-        $resetLink = config('app.frontend_url') . '/reset-password?token=' . $resetToken;
-
-        // Kirim email
-        Mail::to($user->email)->send(new ResetPasswordMail($resetLink));
+        // Generate link & kirim email
+        $resetLink = $this->resetPasswordService->generateResetLink($resetToken);
+        $this->resetPasswordService->sendResetEmail($user->email, $resetLink);
 
         return response()->json([
             'status'  => 'success',
@@ -48,14 +51,14 @@ class ResetPasswordController extends Controller
         ]);
     }
 
-
     public function verifyResetToken(Request $request)
     {
         $request->validate([
             'token' => 'required',
         ]);
 
-        $email = Cache::get('reset_token_' . $request->token);
+        // Cek token di cache
+        $email = $this->resetPasswordService->getFromCache($request->token);
 
         if (!$email) {
             return response()->json([
@@ -78,8 +81,8 @@ class ResetPasswordController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        // Ambil email dari Cache
-        $email = Cache::get('reset_token_' . $request->token);
+        // Ambil email dari cache
+        $email = $this->resetPasswordService->getFromCache($request->token);
 
         if (!$email) {
             return response()->json([
@@ -102,8 +105,8 @@ class ResetPasswordController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Hapus token dari Cache
-        Cache::forget('reset_token_' . $request->token);
+        // Hapus token dari cache
+        $this->resetPasswordService->forgetCache($request->token);
 
         return response()->json([
             'status'  => 'success',
