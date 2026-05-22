@@ -2,24 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import { Button, ButtonPutih } from '@/components/model/Button';
+import api from '@/lib/axios';
 
 export default function LupaPasswordPage() {
-  const [email, setEmail] = useState('');
+  // RESPONSE
   const [emailSent, setEmailSent] = useState(false);
-
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
+  // DATA
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('reset_email');
+
     if (savedEmail) {
       setEmail(savedEmail);
       setEmailSent(true);
     }
   }, []);
 
+  // =================
+  // handler kirim
+  // =================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -34,28 +39,29 @@ export default function LupaPasswordPage() {
     try {
       setIsLoading(true);
 
+      // const res = await api.post('/api/auth/resend-email', { email });
+      // setSuccess(res.data.message || 'Email berhasil dikrim');
+
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      setSuccess('Berhasil');
 
       localStorage.setItem('reset_email', email);
-
-      setSuccess('Email berhasil dikirim');
-
       setEmailSent(true);
     } catch {
-      setError('Gagal mengirim email');
-    } finally {
-      setIsLoading(false);
+      setError('Gagal');
     }
   };
 
-  // =========================
-  // RESEND EMAIL (DUMMY)
-  // =========================
+  // =================
+  // handler resend
+  // =================
   const handleResend = async () => {
     try {
       setError('');
       setSuccess('');
       setIsLoading(true);
+      const res = await api.post('/api/auth/resend-email', { email });
+      setSuccess(res.data.message || 'Email berhasil dikrim');
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -67,9 +73,9 @@ export default function LupaPasswordPage() {
     }
   };
 
-  // =========================
-  // CHANGE EMAIL
-  // =========================
+  // ============================
+  // handler ganti email (button)
+  // ============================
   const handleChangeEmail = () => {
     setEmailSent(false);
     setSuccess('');
@@ -84,7 +90,9 @@ export default function LupaPasswordPage() {
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">Lupa Password</h1>
 
-          <p className="text-sm text-gray-500 mt-2">{!emailSent ? 'Masukkan email' : 'Cek email Anda'}</p>
+          <p className="text-sm text-gray-500 mt-2">
+            {!emailSent ? 'Masukkan email aktif yang terkait akun anda' : 'Cek email Anda'}
+          </p>
         </div>
 
         {/* ERROR */}
@@ -110,6 +118,14 @@ export default function LupaPasswordPage() {
           </form>
         ) : (
           <div className="space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Masukkan email"
+              className="opacity-60 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled
+            />
             <Button
               type="button"
               onClick={handleResend}
@@ -120,7 +136,7 @@ export default function LupaPasswordPage() {
             </Button>
 
             <ButtonPutih type="button" onClick={handleChangeEmail} className="w-full py-3 rounded-lg">
-              Ganti Email
+              Ubah email
             </ButtonPutih>
           </div>
         )}
