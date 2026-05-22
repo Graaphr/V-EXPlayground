@@ -42,7 +42,7 @@ const tahunList: TahunType[] =
 /* PROPS */
 /* ===================== */
 interface SelectTahunProps {
-  selected: TahunType | null;
+  selected: TahunType ;
   onChange: (
     tahun: TahunType
   ) => void;
