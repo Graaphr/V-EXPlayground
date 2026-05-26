@@ -268,7 +268,7 @@ V-EX dibuat untuk menjadi **digital exhibition ecosystem** bagi mahasiswa Poliba
 
 <div align="center">
 
-Dikembangkan dengan ❤️ oleh tim **TRPL — Politeknik Negeri Batam**
+Dikembangkan oleh tim **TRPL — Politeknik Negeri Batam**
 
 | Nama |
 |------|
@@ -297,6 +297,6 @@ Proyek ini dikembangkan untuk keperluan **edukasi dan Project Based Learning (PB
 
 <br/>
 
-**Politeknik Negeri Batam · Technology Software Engineering · 2024**
+**Politeknik Negeri Batam · Technology Software Engineering · 2026**
 
 </div>
