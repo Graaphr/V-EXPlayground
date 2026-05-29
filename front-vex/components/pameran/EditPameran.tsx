@@ -12,7 +12,7 @@ export default function EditPameran() {
   const params = useParams();
   const router = useRouter();
 
-  const id = params?.id as string;
+  const id = Number(params?.id);
 
   const data = ALL_EXHIBITIONS.find((item) => item.id === id);
 
@@ -91,7 +91,7 @@ export default function EditPameran() {
 
       const formData = new FormData();
 
-      formData.append('id', id);
+      formData.append('id', String(id));
 
       formData.append('prodi', form.prodi);
 

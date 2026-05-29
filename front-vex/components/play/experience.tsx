@@ -33,6 +33,7 @@ type RemotePlayer = {
 
 type Props = {
   exhibitionId: string;
+  mobile: boolean;
 
   playerId: string;
   playerName: string;
@@ -122,10 +123,10 @@ export default function Experience({
   /* ===================== */
 
   const currentExpo =
-    exhibitions.find(
-      (item: any) =>
-        item.id === exhibitionId
-    );
+  exhibitions.find(
+    (item: any) =>
+      String(item.id) === String(exhibitionId)
+  );
 
   const category =
     currentExpo?.category ||
@@ -285,14 +286,17 @@ export default function Experience({
           const data =
             await res.json();
 
+          console.log(data);
+
           const now = Date.now();
 
           const filtered =
-            arr.filter(
-              (p) =>
+            data.filter(
+              (p: any) =>
                 p.id !== playerId &&
-                now - p.updatedAt < 3000
+                now - p.updatedAt < 999999
             );
+            console.log(filtered);
 
           setRemotePlayers((prev) => {
             const same =
@@ -313,7 +317,7 @@ export default function Experience({
     const interval =
       setInterval(
         loadPlayers,
-        300
+        15
       );
 
     return () =>
@@ -676,8 +680,15 @@ function RemotePlayerMesh({
   player: RemotePlayer;
 }) {
   const groupRef =
-    useRef<THREE.Group>(
-      null!
+    useRef<THREE.Group>(null!);
+
+  const currentPos =
+    useRef(
+      new THREE.Vector3(
+        player.x,
+        player.y,
+        player.z
+      )
     );
 
   const targetPos =
@@ -689,45 +700,60 @@ function RemotePlayerMesh({
       )
     );
 
+  const currentRot =
+    useRef(player.rotation);
+
+  const targetRot =
+    useRef(player.rotation);
+
+  /* UPDATE TARGET DARI SERVER */
   useEffect(() => {
     targetPos.current.set(
       player.x,
       player.y,
       player.z
     );
-  }, [player]);
+
+    targetRot.current =
+      player.rotation;
+  }, [
+    player.x,
+    player.y,
+    player.z,
+    player.rotation,
+  ]);
 
   useFrame((_, delta) => {
     if (!groupRef.current)
       return;
 
-    /* POSITION SMOOTH */
-    groupRef.current.position.lerp(
+    /* POSITION */
+    currentPos.current.lerp(
       targetPos.current,
-      delta * 8
+      1 - Math.exp(-10 * delta)
     );
 
-    /* ROTATION SMOOTH */
-    groupRef.current.rotation.y =
+    groupRef.current.position.copy(
+      currentPos.current
+    );
+
+    /* ROTATION */
+    currentRot.current =
       THREE.MathUtils.lerp(
-        groupRef.current
-          .rotation.y,
-        player.rotation,
-        delta * 8
+        currentRot.current,
+        targetRot.current,
+        1 - Math.exp(-10 * delta)
       );
+
+    groupRef.current.rotation.y =
+      currentRot.current;
   });
 
   return (
     <group ref={groupRef}>
-      {/* BODY */}
       <mesh position={[0, -1, 0]}>
         <capsuleGeometry
-          args={[
-            0.8,
-            1.8,
-            4,
-            8,
-          ]}
+          args={[0.8, 1.8, 4, 8]}
         />
 
         <meshStandardMaterial
@@ -737,14 +763,8 @@ function RemotePlayerMesh({
         />
       </mesh>
 
-      {/* NAME */}
       <Text
-        characters="Guest0123456789"
-        position={[
-          0,
-          1,
-          0,
-        ]}
+        position={[0, 1, 0]}
         fontSize={0.28}
         color="black"
         anchorX="center"

@@ -114,8 +114,8 @@ export async function POST(
       y: body.y || 0,
       z: body.z || 0,
 
-      rotY:
-        body.rotY || 0,
+      rotation:
+        body.rotation || 0,
 
       updatedAt:
         Date.now(),

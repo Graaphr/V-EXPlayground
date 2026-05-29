@@ -12,9 +12,11 @@ import {
 } from "next/navigation";
 
 import { Canvas } from "@react-three/fiber";
+import { v4 as uuidv4 } from 'uuid';
 
 import Experience from "@/components/play/experience";
 import Crosshair from "@/components/play/crosshair";
+
 
 type PosterData = {
   src: string;
@@ -86,7 +88,10 @@ export default function Page() {
         typeof window ===
         "undefined"
       ) {
-        return crypto.randomUUID();
+        return typeof crypto !== "undefined" &&
+    crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2);
       }
 
       const existing =
@@ -97,8 +102,7 @@ export default function Page() {
       if (existing)
         return existing;
 
-      const id =
-        crypto.randomUUID();
+      const id = uuidv4();
 
       sessionStorage.setItem(
         "playerId",

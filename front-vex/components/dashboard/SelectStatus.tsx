@@ -23,7 +23,7 @@ interface SelectStatusProps {
 export default function SelectStatus({ selected, onChange }: SelectStatusProps) {
   return (
     <div className="w-full max-w-sm">
-      <Listbox value={selected} onChange={onChange}>
+      <Listbox value={selected ?? undefined} onChange={onChange}>
         <div className="relative">
           <ListboxButton className="relative w-full cursor-pointer rounded-full bg-white py-2 pl-[15px] pr-[30px] text-left text-sm font-poppins shadow-xl/20 ring-1 ring-gray-200 focus:outline-none focus:ring-2 focus:ring-main-blue/60">
             

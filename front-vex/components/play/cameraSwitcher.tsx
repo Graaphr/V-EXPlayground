@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 type Props = {
+    disabled: boolean;
     setMode: React.Dispatch<
         React.SetStateAction<
             "first" | "third"
