@@ -76,6 +76,72 @@ export default function Page() {
     booth: "",
   });
 
+  /* ====================== */
+  /* PLAYER MULTIPLAYER */
+  /* ====================== */
+
+  const [playerId] =
+    useState(() => {
+      if (
+        typeof window ===
+        "undefined"
+      ) {
+        return crypto.randomUUID();
+      }
+
+      const existing =
+        sessionStorage.getItem(
+          "playerId"
+        );
+
+      if (existing)
+        return existing;
+
+      const id =
+        crypto.randomUUID();
+
+      sessionStorage.setItem(
+        "playerId",
+        id
+      );
+
+      return id;
+    });
+
+  const [playerName] =
+    useState(() => {
+      if (
+        typeof window ===
+        "undefined"
+      ) {
+        return "guest000";
+      }
+
+      const existing =
+        sessionStorage.getItem(
+          "playerName"
+        );
+
+      if (existing)
+        return existing;
+
+      const num =
+        Math.floor(
+          Math.random() * 999
+        ) + 1;
+
+      const name = `guest${String(
+        num
+      ).padStart(3, "0")}`;
+
+      sessionStorage.setItem(
+        "playerName",
+        name
+      );
+
+      return name;
+    });
+
   /* MOVE */
   const [
     mobileMove,
@@ -136,6 +202,36 @@ export default function Page() {
       );
     };
   }, []);
+
+  /* ====================== */
+  /* REMOVE PLAYER */
+  /* ====================== */
+
+  useEffect(() => {
+    const removePlayer = () => {
+      fetch(
+        `/api/player?id=${playerId}`,
+        {
+          method: "DELETE",
+          keepalive: true,
+        }
+      );
+    };
+
+    window.addEventListener(
+      "beforeunload",
+      removePlayer
+    );
+
+    return () => {
+      removePlayer();
+
+      window.removeEventListener(
+        "beforeunload",
+        removePlayer
+      );
+    };
+  }, [playerId]);
 
   /* ====================== */
   /* EXIT POINTERLOCK SAAT POSTER BUKA */
@@ -219,7 +315,6 @@ export default function Page() {
         !isPortrait) && (
           <>
             <Canvas
-              shadows
               camera={{
                 position: [
                   0, 2, 5,
@@ -248,6 +343,14 @@ export default function Page() {
                 }
                 lookDelta={
                   lookDelta
+                }
+
+                /* MULTIPLAYER */
+                playerId={
+                  playerId
+                }
+                playerName={
+                  playerName
                 }
               />
             </Canvas>
@@ -306,11 +409,19 @@ export default function Page() {
             </button>
 
             <button
-              onClick={() =>
-                router.push(
-                  `/pameran/${id}`
-                )
-              }
+              onClick={async () => {
+                await fetch(
+                  `/api/player?id=${playerId}`,
+                  {
+                    method: "DELETE",
+                  }
+                );
+
+                sessionStorage.removeItem("playerId");
+                sessionStorage.removeItem("playerName");
+
+                router.push(`/pameran/${id}`);
+              }}
               className="w-full h-12 rounded-xl bg-red-500 font-bold"
             >
               Keluar

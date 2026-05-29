@@ -7,18 +7,35 @@ import {
   useState,
 } from "react";
 
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Text, } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 import Booth from "./booth";
 import Player from "./player";
 import CameraSwitcher from "./cameraSwitcher";
 
-/* ✅ IMPORT JSON BIASA */
 import exhibitions from "@/public/data/Pameran.json";
+
+type RemotePlayer = {
+  id: string;
+
+  name: string;
+
+  x: number;
+  y: number;
+  z: number;
+
+  rotation: number;
+
+  updatedAt: number;
+};
 
 type Props = {
   exhibitionId: string;
+
+  playerId: string;
+  playerName: string;
 
   openPoster: (
     src: string,
@@ -43,6 +60,8 @@ type Props = {
 
 export default function Experience({
   exhibitionId,
+  playerId,
+  playerName,
   openPoster,
   controlsLocked,
   soundOn,
@@ -57,8 +76,22 @@ export default function Experience({
   const [walking, setWalking] =
     useState(false);
 
+  const [jumping, setJumping] =
+    useState(false);
+
+  const [
+    remotePlayers,
+    setRemotePlayers,
+  ] = useState<
+    RemotePlayer[]
+  >([]);
+
   const isViewingMedia =
     !controlsLocked;
+
+  /* ===================== */
+  /* AUDIO */
+  /* ===================== */
 
   const bgmRef =
     useRef<HTMLAudioElement | null>(
@@ -66,6 +99,11 @@ export default function Experience({
     );
 
   const footRef =
+    useRef<HTMLAudioElement | null>(
+      null
+    );
+
+  const jumpRef =
     useRef<HTMLAudioElement | null>(
       null
     );
@@ -98,7 +136,7 @@ export default function Experience({
     .replaceAll(" ", "-");
 
   /* ===================== */
-  /* AUDIO */
+  /* INIT AUDIO */
   /* ===================== */
 
   useEffect(() => {
@@ -109,6 +147,7 @@ export default function Experience({
 
     bgmRef.current.loop =
       true;
+
     bgmRef.current.volume =
       0.35;
 
@@ -119,17 +158,34 @@ export default function Experience({
 
     footRef.current.loop =
       true;
+
     footRef.current.volume =
       0.55;
 
+    jumpRef.current =
+      new Audio(
+        "/music/jump.mp3"
+      );
+
+    jumpRef.current.volume =
+      0.75;
+
     return () => {
       bgmRef.current?.pause();
+
       footRef.current?.pause();
+
+      jumpRef.current?.pause();
     };
   }, []);
 
+  /* ===================== */
+  /* BGM */
+  /* ===================== */
+
   useEffect(() => {
-    if (!bgmRef.current) return;
+    if (!bgmRef.current)
+      return;
 
     if (soundOn) {
       bgmRef.current.volume =
@@ -139,30 +195,40 @@ export default function Experience({
 
       bgmRef.current
         .play()
-        .catch(() => {});
+        .catch(() => { });
     } else {
       bgmRef.current.pause();
+
       footRef.current?.pause();
+
+      jumpRef.current?.pause();
     }
   }, [
     soundOn,
     isViewingMedia,
   ]);
 
+  /* ===================== */
+  /* FOOTSTEP */
+  /* ===================== */
+
   useEffect(() => {
     if (!footRef.current)
       return;
 
-    if (
+    const shouldWalk =
       soundOn &&
       walking &&
-      controlsLocked
-    ) {
+      controlsLocked &&
+      !jumping;
+
+    if (shouldWalk) {
       footRef.current
         .play()
-        .catch(() => {});
+        .catch(() => { });
     } else {
       footRef.current.pause();
+
       footRef.current.currentTime =
         0;
     }
@@ -170,7 +236,91 @@ export default function Experience({
     soundOn,
     walking,
     controlsLocked,
+    jumping,
   ]);
+
+  /* ===================== */
+  /* JUMP SOUND */
+  /* ===================== */
+
+  useEffect(() => {
+    if (
+      !jumpRef.current ||
+      !soundOn
+    )
+      return;
+
+    if (jumping) {
+      footRef.current?.pause();
+
+      if (footRef.current) {
+        footRef.current.currentTime =
+          0;
+      }
+
+      jumpRef.current.pause();
+
+      jumpRef.current.currentTime =
+        0;
+
+      jumpRef.current
+        .play()
+        .catch(() => { });
+    }
+  }, [jumping, soundOn]);
+
+  /* ===================== */
+  /* MULTIPLAYER READ */
+  /* ===================== */
+
+  useEffect(() => {
+    const loadPlayers =
+      async () => {
+        try {
+          const res =
+            await fetch(
+              "/api/player"
+            );
+
+          const data =
+            await res.json();
+
+          const now = Date.now();
+
+          const filtered =
+            arr.filter(
+              (p) =>
+                p.id !== playerId &&
+                now - p.updatedAt < 3000
+            );
+
+          setRemotePlayers((prev) => {
+            const same =
+              JSON.stringify(prev) ===
+              JSON.stringify(filtered);
+
+            return same
+              ? prev
+              : filtered;
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      };
+
+    loadPlayers();
+
+    const interval =
+      setInterval(
+        loadPlayers,
+        300
+      );
+
+    return () =>
+      clearInterval(
+        interval
+      );
+  }, [playerId]);
 
   /* ===================== */
   /* SAFE TEXTURE */
@@ -186,13 +336,14 @@ export default function Experience({
       path,
       (tex) => {
         tex.flipY = false;
+
         tex.colorSpace =
           THREE.SRGBColorSpace;
 
         onLoad(tex);
       },
       undefined,
-      () => {}
+      () => { }
     );
   };
 
@@ -367,11 +518,13 @@ export default function Experience({
 
             result.push({
               name: obj.name,
+
               position: [
                 pos.x,
                 pos.y,
                 pos.z,
               ],
+
               quaternion:
                 [
                   quat.x,
@@ -383,6 +536,7 @@ export default function Experience({
 
             obj.visible =
               false;
+
             obj.raycast =
               () => null;
           }
@@ -416,13 +570,7 @@ export default function Experience({
             obj.isMesh &&
             !obj.userData
               ?.collider
-          ) {
-            obj.castShadow =
-              true;
-
-            obj.receiveShadow =
-              true;
-          }
+          ) { }
         }
       );
 
@@ -440,7 +588,6 @@ export default function Experience({
           10, 15, 10,
         ]}
         intensity={3}
-        castShadow
       />
 
       <pointLight
@@ -476,6 +623,19 @@ export default function Experience({
         )
       )}
 
+      {/* ===================== */}
+      {/* REMOTE PLAYERS */}
+      {/* ===================== */}
+
+      {remotePlayers.map(
+        (player) => (
+          <RemotePlayerMesh
+            key={player.id}
+            player={player}
+          />
+        )
+      )}
+
       <Player
         mode={mode}
         controlsLocked={
@@ -490,6 +650,14 @@ export default function Experience({
         lookDelta={
           lookDelta
         }
+
+        playerId={
+          playerId
+        }
+
+        playerName={
+          playerName
+        }
       />
 
       <CameraSwitcher
@@ -499,5 +667,91 @@ export default function Experience({
         }
       />
     </>
+  );
+}
+
+function RemotePlayerMesh({
+  player,
+}: {
+  player: RemotePlayer;
+}) {
+  const groupRef =
+    useRef<THREE.Group>(
+      null!
+    );
+
+  const targetPos =
+    useRef(
+      new THREE.Vector3(
+        player.x,
+        player.y,
+        player.z
+      )
+    );
+
+  useEffect(() => {
+    targetPos.current.set(
+      player.x,
+      player.y,
+      player.z
+    );
+  }, [player]);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current)
+      return;
+
+    /* POSITION SMOOTH */
+    groupRef.current.position.lerp(
+      targetPos.current,
+      delta * 8
+    );
+
+    /* ROTATION SMOOTH */
+    groupRef.current.rotation.y =
+      THREE.MathUtils.lerp(
+        groupRef.current
+          .rotation.y,
+        player.rotation,
+        delta * 8
+      );
+  });
+
+  return (
+    <group ref={groupRef}>
+      {/* BODY */}
+      <mesh position={[0, -1, 0]}>
+        <capsuleGeometry
+          args={[
+            0.8,
+            1.8,
+            4,
+            8,
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="cyan"
+          transparent
+          opacity={0.7}
+        />
+      </mesh>
+
+      {/* NAME */}
+      <Text
+        characters="Guest0123456789"
+        position={[
+          0,
+          1,
+          0,
+        ]}
+        fontSize={0.28}
+        color="black"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {player.name}
+      </Text>
+    </group>
   );
 }

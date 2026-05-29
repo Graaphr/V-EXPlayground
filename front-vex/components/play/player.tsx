@@ -1,8 +1,9 @@
+
 "use client";
 
 import {
-  PointerLockControls,
   OrbitControls,
+  PointerLockControls,
 } from "@react-three/drei";
 
 import {
@@ -14,15 +15,24 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
 } from "react";
 
 import * as THREE from "three";
 
 type Props = {
   mode: "first" | "third";
+
   controlsLocked: boolean;
 
+  playerId: string;
+  playerName: string;
+
   setWalking?: (
+    value: boolean
+  ) => void;
+
+  setJumping?: (
     value: boolean
   ) => void;
 
@@ -43,8 +53,12 @@ export default function Player({
   mode,
   controlsLocked,
   setWalking,
+  setJumping,
   mobileMove,
   lookDelta,
+
+  playerId,
+  playerName,
 }: Props) {
   const {
     camera,
@@ -67,6 +81,10 @@ export default function Player({
       new THREE.Raycaster()
     );
 
+  /* ===================== */
+  /* PLAYER */
+  /* ===================== */
+
   const position =
     useRef(
       new THREE.Vector3(
@@ -79,28 +97,72 @@ export default function Player({
   const velocityY =
     useRef(0);
 
+  const grounded =
+    useRef(false);
+
+  /* ===================== */
+  /* SETTINGS */
+  /* ===================== */
+
+  const MOVE_SPEED = 6;
+
+  const GRAVITY = 24;
+
+  const JUMP_FORCE = 10;
+
+  const PLAYER_HEIGHT = 3;
+
+  const COLLISION_DISTANCE =
+    0.7;
+
+  /* ===================== */
+  /* INPUT */
+  /* ===================== */
+
   const keys = useRef({
     w: false,
     a: false,
     s: false,
     d: false,
+    space: false,
   });
+
+  /* ===================== */
+  /* COLLIDERS */
+  /* ===================== */
 
   const colliders =
     useRef<
       THREE.Object3D[]
     >([]);
 
+  /* ===================== */
+  /* MOBILE */
+  /* ===================== */
+
   const [
     isMobile,
     setIsMobile,
   ] = useState(false);
 
-  /* LOOK ROTATION */
+  /* ===================== */
+  /* LOOK */
+  /* ===================== */
+
   const yaw =
     useRef(0);
 
   const pitch =
+    useRef(0);
+
+  /* ===================== */
+  /* MULTIPLAYER SAVE */
+  /* ===================== */
+
+  const saveTimer =
+    useRef(0);
+
+  const rotationY =
     useRef(0);
 
   /* ===================== */
@@ -116,37 +178,60 @@ export default function Player({
   }, []);
 
   /* ===================== */
-  /* COLLIDER */
+  /* COLLIDER SCAN */
   /* ===================== */
 
   useEffect(() => {
     const scan = () => {
-      const arr: THREE.Object3D[] = [];
+      const arr: THREE.Object3D[] =
+        [];
 
-      world.traverse((obj: any) => {
-        if (
-          obj.userData?.collider &&
-          obj.isMesh
-        ) {
-          arr.push(obj);
-          obj.visible = false;
+      world.traverse(
+        (obj: any) => {
+          if (
+            obj.userData
+              ?.collider &&
+            obj.isMesh
+          ) {
+            arr.push(obj);
+
+            obj.visible =
+              false;
+          }
         }
-      });
+      );
 
-      colliders.current = arr;
-      console.log("colliders:", arr.length);
+      colliders.current =
+        arr;
+
+      console.log(
+        "colliders:",
+        arr.length
+      );
     };
 
-    const t1 = setTimeout(scan, 300);
-    const t2 = setTimeout(scan, 1000);
-    const t3 = setTimeout(scan, 2000);
-    const t4 = setTimeout(scan, 3500);
+    const t1 =
+      setTimeout(
+        scan,
+        300
+      );
+
+    const t2 =
+      setTimeout(
+        scan,
+        1000
+      );
+
+    const t3 =
+      setTimeout(
+        scan,
+        2000
+      );
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      clearTimeout(t4);
     };
   }, [world]);
 
@@ -158,43 +243,75 @@ export default function Player({
     const down = (
       e: KeyboardEvent
     ) => {
-      if (!controlsLocked)
+      if (
+        !controlsLocked
+      )
         return;
 
-      if (e.code === "KeyW")
+      if (
+        e.code === "KeyW"
+      )
         keys.current.w =
           true;
 
-      if (e.code === "KeyA")
+      if (
+        e.code === "KeyA"
+      )
         keys.current.a =
           true;
 
-      if (e.code === "KeyS")
+      if (
+        e.code === "KeyS"
+      )
         keys.current.s =
           true;
 
-      if (e.code === "KeyD")
+      if (
+        e.code === "KeyD"
+      )
         keys.current.d =
+          true;
+
+      if (
+        e.code ===
+        "Space"
+      )
+        keys.current.space =
           true;
     };
 
     const up = (
       e: KeyboardEvent
     ) => {
-      if (e.code === "KeyW")
+      if (
+        e.code === "KeyW"
+      )
         keys.current.w =
           false;
 
-      if (e.code === "KeyA")
+      if (
+        e.code === "KeyA"
+      )
         keys.current.a =
           false;
 
-      if (e.code === "KeyS")
+      if (
+        e.code === "KeyS"
+      )
         keys.current.s =
           false;
 
-      if (e.code === "KeyD")
+      if (
+        e.code === "KeyD"
+      )
         keys.current.d =
+          false;
+
+      if (
+        e.code ===
+        "Space"
+      )
+        keys.current.space =
           false;
     };
 
@@ -222,12 +339,45 @@ export default function Player({
   }, [controlsLocked]);
 
   /* ===================== */
-  /* FORCE UNLOCK */
+  /* REMOVE PLAYER */
   /* ===================== */
 
   useEffect(() => {
-    if (!controlsLocked) {
+    const removePlayer =
+      () => {
+        fetch(
+          `/api/player?id=${playerId}`,
+          {
+            method: "DELETE",
+          }
+        ).catch(() => { });
+      };
+
+    window.addEventListener(
+      "beforeunload",
+      removePlayer
+    );
+
+    return () => {
+      removePlayer();
+
+      window.removeEventListener(
+        "beforeunload",
+        removePlayer
+      );
+    };
+  }, [playerId]);
+
+  /* ===================== */
+  /* POINTER UNLOCK */
+  /* ===================== */
+
+  useEffect(() => {
+    if (
+      !controlsLocked
+    ) {
       pointerRef.current?.unlock?.();
+
       document.exitPointerLock?.();
     }
   }, [controlsLocked]);
@@ -236,15 +386,15 @@ export default function Player({
   /* FRAME */
   /* ===================== */
 
-  useFrame(() => {
-    const speed =
-      0.15;
-
-    const playerHeight =
-      3;
+  useFrame((_, delta) => {
+    const dt =
+      Math.min(
+        delta,
+        0.1
+      );
 
     /* ===================== */
-    /* MOBILE LOOK FIX */
+    /* MOBILE LOOK */
     /* ===================== */
 
     if (
@@ -252,8 +402,11 @@ export default function Player({
       mode === "first" &&
       lookDelta
     ) {
-      yaw.current -= lookDelta.current.x * 1;
-      pitch.current -= lookDelta.current.y * 1;
+      yaw.current -=
+        lookDelta.current.x;
+
+      pitch.current -=
+        lookDelta.current.y;
 
       pitch.current =
         Math.max(
@@ -277,20 +430,31 @@ export default function Player({
       );
     }
 
-    const dir =
+    /* ===================== */
+    /* MOVE DIR */
+    /* ===================== */
+
+    const forward =
       new THREE.Vector3();
 
     camera.getWorldDirection(
-      dir
+      forward
     );
 
-    dir.y = 0;
-    dir.normalize();
+    rotationY.current =
+      Math.atan2(
+        forward.x,
+        forward.z
+      );
+
+    forward.y = 0;
+
+    forward.normalize();
 
     const right =
       new THREE.Vector3()
         .crossVectors(
-          dir,
+          forward,
           camera.up
         )
         .normalize();
@@ -300,6 +464,9 @@ export default function Player({
 
     let moving =
       false;
+
+    const moveAmount =
+      MOVE_SPEED * dt;
 
     const W =
       keys.current.w ||
@@ -322,24 +489,26 @@ export default function Player({
     ) {
       if (W) {
         next.add(
-          dir
+          forward
             .clone()
             .multiplyScalar(
-              speed
+              moveAmount
             )
         );
+
         moving =
           true;
       }
 
       if (S) {
         next.add(
-          dir
+          forward
             .clone()
             .multiplyScalar(
-              -speed
+              -moveAmount
             )
         );
+
         moving =
           true;
       }
@@ -349,9 +518,10 @@ export default function Player({
           right
             .clone()
             .multiplyScalar(
-              -speed
+              -moveAmount
             )
         );
+
         moving =
           true;
       }
@@ -361,20 +531,22 @@ export default function Player({
           right
             .clone()
             .multiplyScalar(
-              speed
+              moveAmount
             )
         );
+
         moving =
           true;
       }
     }
 
     setWalking?.(
-      moving
+      moving &&
+      grounded.current
     );
 
     /* ===================== */
-    /* COLLISION */
+    /* WALL COLLISION */
     /* ===================== */
 
     const moveDir =
@@ -401,7 +573,7 @@ export default function Player({
       );
 
       raycaster.current.far =
-        0.7;
+        COLLISION_DISTANCE;
 
       const hits =
         raycaster.current.intersectObjects(
@@ -420,17 +592,17 @@ export default function Player({
     }
 
     /* ===================== */
-    /* FLOOR */
+    /* FLOOR CHECK */
     /* ===================== */
 
-    let grounded =
+    grounded.current =
       false;
 
     const floorOrigin =
       position.current.clone();
 
     floorOrigin.y +=
-      0.3;
+      0.2;
 
     raycaster.current.set(
       floorOrigin,
@@ -442,7 +614,7 @@ export default function Player({
     );
 
     raycaster.current.far =
-      20;
+      50;
 
     const floorHits =
       raycaster.current
@@ -470,26 +642,64 @@ export default function Player({
       floorHits.length >
       0
     ) {
-      position.current.y =
+      const floorY =
         floorHits[0]
-          .point.y +
-        playerHeight;
+          .point.y;
 
-      grounded =
-        true;
+      const targetY =
+        floorY +
+        PLAYER_HEIGHT;
 
-      velocityY.current =
-        0;
+      if (
+        velocityY.current <=
+        0 &&
+        position.current.y <=
+        targetY +
+        0.2
+      ) {
+        grounded.current =
+          true;
+
+        velocityY.current =
+          0;
+
+        setJumping?.(false);
+
+        position.current.y =
+          targetY;
+      }
     }
 
+    /* ===================== */
+    /* JUMP */
+    /* ===================== */
+
     if (
-      !grounded
+      grounded.current &&
+      keys.current.space
+    ) {
+      velocityY.current =
+        JUMP_FORCE;
+
+      grounded.current =
+        false;
+
+      setJumping?.(true);
+    }
+
+    /* ===================== */
+    /* GRAVITY */
+    /* ===================== */
+
+    if (
+      !grounded.current
     ) {
       velocityY.current -=
-        0.008;
+        GRAVITY * dt;
 
       position.current.y +=
-        velocityY.current;
+        velocityY.current *
+        dt;
     }
 
     /* ===================== */
@@ -502,6 +712,47 @@ export default function Player({
       camera.position.copy(
         position.current
       );
+    }
+
+    /* ===================== */
+    /* SAVE PLAYER */
+    /* ===================== */
+
+    saveTimer.current += dt;
+
+    if (
+      saveTimer.current >=
+      0.2
+    ) {
+      saveTimer.current = 0;
+
+      fetch("/api/player", {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          id: playerId,
+
+          name:
+            playerName,
+
+          x:
+            position.current.x,
+
+          y:
+            position.current.y,
+
+          z:
+            position.current.z,
+
+          rotation:
+            rotationY.current,
+        }),
+      }).catch(() => { });
     }
 
     if (
@@ -533,10 +784,13 @@ export default function Player({
   return (
     <>
       {!isMobile &&
-        mode === "first" &&
+        mode ===
+        "first" &&
         controlsLocked && (
           <PointerLockControls
-            ref={pointerRef}
+            ref={
+              pointerRef
+            }
           />
         )}
 
