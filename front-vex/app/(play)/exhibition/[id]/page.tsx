@@ -89,9 +89,9 @@ export default function Page() {
         "undefined"
       ) {
         return typeof crypto !== "undefined" &&
-    crypto.randomUUID
-    ? crypto.randomUUID()
-    : Math.random().toString(36).substring(2);
+          crypto.randomUUID
+          ? crypto.randomUUID()
+          : Math.random().toString(36).substring(2);
       }
 
       const existing =
@@ -112,39 +112,46 @@ export default function Page() {
       return id;
     });
 
-  const [playerName] =
-    useState(() => {
-      if (
-        typeof window ===
-        "undefined"
-      ) {
-        return "guest000";
-      }
+  const generateGuestName = () => {
+    const num =
+      Math.floor(
+        Math.random() * 999
+      ) + 1;
 
-      const existing =
-        sessionStorage.getItem(
-          "playerName"
+    return `guest${String(
+      num
+    ).padStart(3, "0")}`;
+  };
+
+  const [playerName, setPlayerName] =
+    useState("");
+
+  const [peerId] = useState(() => {
+    return uuidv4();
+  });
+
+  useEffect(() => {
+    const initPlayerName = async () => {
+      try {
+        const res = await fetch(
+          "/api/player-name"
         );
 
-      if (existing)
-        return existing;
+        const data =
+          await res.json();
 
-      const num =
-        Math.floor(
-          Math.random() * 999
-        ) + 1;
+        setPlayerName(
+          data.name
+        );
+      } catch {
+        setPlayerName(
+          generateGuestName()
+        );
+      }
+    };
 
-      const name = `guest${String(
-        num
-      ).padStart(3, "0")}`;
-
-      sessionStorage.setItem(
-        "playerName",
-        name
-      );
-
-      return name;
-    });
+    initPlayerName();
+  }, []);
 
   /* MOVE */
   const [
@@ -318,46 +325,29 @@ export default function Page() {
       {(!isMobile ||
         !isPortrait) && (
           <>
-            <Canvas
-              camera={{
-                position: [
-                  0, 2, 5,
-                ],
-                fov: 75,
-              }}
-            >
-              <Experience
-                exhibitionId={
-                  id
-                }
-                openPoster={
-                  openPoster
-                }
-                controlsLocked={
-                  controlsLocked
-                }
-                soundOn={
-                  soundOn
-                }
-                mobile={
-                  isMobile
-                }
-                mobileMove={
-                  mobileMove
-                }
-                lookDelta={
-                  lookDelta
-                }
+            {playerName && (
+              <Canvas
+                camera={{
+                  position: [0, 2, 5],
+                  fov: 75,
+                }}
+              >
+                <Experience
+                  exhibitionId={id}
+                  openPoster={openPoster}
+                  controlsLocked={controlsLocked}
+                  soundOn={soundOn}
+                  mobile={isMobile}
+                  mobileMove={mobileMove}
+                  lookDelta={lookDelta}
 
-                /* MULTIPLAYER */
-                playerId={
-                  playerId
-                }
-                playerName={
-                  playerName
-                }
-              />
-            </Canvas>
+                  /* MULTIPLAYER */
+                  playerId={playerId}
+                  playerName={playerName}
+                  peerId={peerId}
+                />
+              </Canvas>
+            )}
 
             {!isMobile &&
               controlsLocked && (

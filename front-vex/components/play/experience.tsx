@@ -1,5 +1,7 @@
 "use client";
 
+import useVoiceChat from "@/hooks/useVoiceChat";
+
 import {
   useEffect,
   useMemo,
@@ -19,6 +21,7 @@ import exhibitions from "@/public/data/Pameran.json";
 
 type RemotePlayer = {
   id: string;
+  peerId: string;
 
   name: string;
 
@@ -37,6 +40,7 @@ type Props = {
 
   playerId: string;
   playerName: string;
+  peerId: string;
 
   openPoster: (
     src: string,
@@ -68,11 +72,14 @@ export default function Experience({
   soundOn,
   mobileMove,
   lookDelta,
+  peerId,
 }: Props) {
   const [mode, setMode] =
     useState<"first" | "third">(
       "first"
     );
+
+
 
   const [walking, setWalking] =
     useState(false);
@@ -80,12 +87,50 @@ export default function Experience({
   const [jumping, setJumping] =
     useState(false);
 
-  const [
-    remotePlayers,
-    setRemotePlayers,
-  ] = useState<
-    RemotePlayer[]
-  >([]);
+  const [remotePlayers, setRemotePlayers] =
+    useState<RemotePlayer[]>([]);
+
+  const [myPosition, setMyPosition] =
+    useState({
+      x: 0,
+      y: 20,
+      z: -8,
+    });
+
+  const nearbyPlayers =
+    useMemo(() => {
+      return remotePlayers.filter(
+        (player) => {
+          const dx =
+            player.x -
+            myPosition.x;
+
+          const dz =
+            player.z -
+            myPosition.z;
+
+          const distance =
+            Math.sqrt(
+              dx * dx +
+              dz * dz
+            );
+
+          return distance <= 15;
+        }
+      );
+    }, [
+      remotePlayers,
+      myPosition,
+    ]);
+
+  useVoiceChat({
+    selfPeerId: peerId,
+    exhibitionId,
+
+    myPosition,
+
+    players: nearbyPlayers,
+  });
 
   const isViewingMedia =
     !controlsLocked;
@@ -123,10 +168,10 @@ export default function Experience({
   /* ===================== */
 
   const currentExpo =
-  exhibitions.find(
-    (item: any) =>
-      String(item.id) === String(exhibitionId)
-  );
+    exhibitions.find(
+      (item: any) =>
+        String(item.id) === String(exhibitionId)
+    );
 
   const category =
     currentExpo?.category ||
@@ -286,8 +331,6 @@ export default function Experience({
           const data =
             await res.json();
 
-          console.log(data);
-
           const now = Date.now();
 
           const filtered =
@@ -296,7 +339,6 @@ export default function Experience({
                 p.id !== playerId &&
                 now - p.updatedAt < 999999
             );
-            console.log(filtered);
 
           setRemotePlayers((prev) => {
             const same =
@@ -308,7 +350,6 @@ export default function Experience({
               : filtered;
           });
         } catch (err) {
-          console.log(err);
         }
       };
 
@@ -317,7 +358,7 @@ export default function Experience({
     const interval =
       setInterval(
         loadPlayers,
-        15
+        200
       );
 
     return () =>
@@ -662,6 +703,10 @@ export default function Experience({
         playerName={
           playerName
         }
+
+        peerId={peerId}
+
+        setPosition={setMyPosition}
       />
 
       <CameraSwitcher
