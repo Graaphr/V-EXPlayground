@@ -183,9 +183,7 @@ export default function useVoiceChat({
                         stream;
 
                     const socket =
-                        io(
-                            "http://localhost:3001"
-                        );
+                        io(window.location.origin); /*isi dengan domain server voice_server nantinya*/
 
                     socketRef.current =
                         socket;

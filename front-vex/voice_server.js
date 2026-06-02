@@ -7,7 +7,8 @@ const server = http.createServer();
 
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: true, /*Isi dengan domain frontend*/
+        methods: ["GET", "POST"],
     },
 });
 
