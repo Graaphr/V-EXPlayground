@@ -1,83 +1,28 @@
 import { NextResponse } from "next/server";
-
-import fs from "fs";
-import path from "path";
-
-const filePath = path.join(
-  process.cwd(),
-  "public",
-  "data",
-  "PlayerData.json"
-);
-
-/* ====================== */
-/* READ */
-/* ====================== */
-
-function readPlayers() {
-  try {
-    if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(
-        filePath,
-        JSON.stringify([])
-      );
-    }
-
-    const data =
-      fs.readFileSync(
-        filePath,
-        "utf-8"
-      );
-
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-/* ====================== */
-/* WRITE */
-/* ====================== */
-
-function writePlayers(
-  data: any
-) {
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(
-      data,
-      null,
-      2
-    )
-  );
-}
-
-/* ====================== */
-/* CLEANUP */
-/* ====================== */
-
-function cleanupPlayers(
-  players: any[]
-) {
-  const now = Date.now();
-
-  return players.filter(
-    (p: any) =>
-      now - p.updatedAt < 5000
-  );
-}
+import { redis } from "@/lib/redis";
 
 /* ====================== */
 /* GET */
 /* ====================== */
 
 export async function GET() {
-  const players =
-    cleanupPlayers(
-      readPlayers()
+  const keys =
+    await redis.keys(
+      "player:*"
     );
 
-  writePlayers(players);
+  const players = [];
+
+  for (const key of keys) {
+    const data =
+      await redis.get(key);
+
+    if (data) {
+      players.push(
+        JSON.parse(data)
+      );
+    }
+  }
 
   return NextResponse.json(
     players
@@ -95,42 +40,28 @@ export async function POST(
     const body =
       await req.json();
 
-    let players =
-      cleanupPlayers(
-        readPlayers()
-      );
-
-    const index =
-      players.findIndex(
-        (p: any) =>
-          p.id === body.id
-      );
-
     const playerData = {
       id: body.id,
+      peerId: body.peerId,
       name: body.name,
 
-      x: body.x || 0,
-      y: body.y || 0,
-      z: body.z || 0,
+      x: body.x ?? 0,
+      y: body.y ?? 0,
+      z: body.z ?? 0,
 
       rotation:
-        body.rotation || 0,
+        body.rotation ?? 0,
 
       updatedAt:
         Date.now(),
     };
 
-    if (index >= 0) {
-      players[index] =
-        playerData;
-    } else {
-      players.push(
-        playerData
-      );
-    }
-
-    writePlayers(players);
+    await redis.set(
+      `player:${body.id}`,
+      JSON.stringify(playerData),
+      "EX",
+      5
+    );
 
     return NextResponse.json({
       success: true,
@@ -173,17 +104,8 @@ export async function DELETE(
       );
     }
 
-    const players =
-      readPlayers();
-
-    const filtered =
-      players.filter(
-        (p: any) =>
-          p.id !== id
-      );
-
-    writePlayers(
-      filtered
+    await redis.del(
+      `player:${id}`
     );
 
     return NextResponse.json({

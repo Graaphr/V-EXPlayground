@@ -27,6 +27,16 @@ type Props = {
 
   playerId: string;
   playerName: string;
+  peerId: string;
+
+  setPosition?: (
+    pos: {
+      x: number;
+      y: number;
+      z: number;
+    }
+  ) => void;
+
 
   setWalking?: (
     value: boolean
@@ -59,6 +69,9 @@ export default function Player({
 
   playerId,
   playerName,
+  peerId,
+
+  setPosition,
 }: Props) {
   const {
     camera,
@@ -718,39 +731,36 @@ export default function Player({
     /* SAVE PLAYER */
     /* ===================== */
 
+    setPosition?.({
+      x: position.current.x,
+      y: position.current.y,
+      z: position.current.z,
+    });
+
     saveTimer.current += dt;
 
     if (
-      saveTimer.current >=
-      0.2
+      saveTimer.current >= 0.2 &&
+      playerName !== "Loading..."
     ) {
       saveTimer.current = 0;
 
       fetch("/api/player", {
         method: "POST",
-
         headers: {
-          "Content-Type":
-            "application/json",
+          "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           id: playerId,
+          peerId,
 
-          name:
-            playerName,
+          name: playerName,
 
-          x:
-            position.current.x,
+          x: position.current.x,
+          y: position.current.y,
+          z: position.current.z,
 
-          y:
-            position.current.y,
-
-          z:
-            position.current.z,
-
-          rotation:
-            rotationY.current,
+          rotation: rotationY.current,
         }),
       }).catch(() => { });
     }
